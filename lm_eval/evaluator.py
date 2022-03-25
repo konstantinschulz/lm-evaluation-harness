@@ -48,8 +48,8 @@ def simple_evaluate(model, model_args=None, tasks=[],
 
     assert tasks != [], "No tasks specified"
 
+    if model_args is None: model_args = ""
     if isinstance(model, str):
-        if model_args is None: model_args = ""
         lm = lm_eval.models.get_model(model).create_from_arg_string(model_args, {
             'batch_size': batch_size, 'device': device
         })
@@ -57,9 +57,10 @@ def simple_evaluate(model, model_args=None, tasks=[],
         assert isinstance(model, lm_eval.base.LM)
         lm = model
 
+    model_name = model if isinstance(model, str) else model.gpt2.name_or_path
     if not no_cache:
         lm = lm_eval.base.CachingLM(
-            lm, 'lm_cache/' + model + '_' + model_args.replace('=', '-').replace(',', '_').replace('/', '-') + '.db'
+            lm, f'lm_cache/{model_name}_' + model_args.replace('=', '-').replace(',', '_').replace('/', '-') + '.db'
         )
     
     task_dict = lm_eval.tasks.get_task_dict(tasks)
@@ -77,7 +78,7 @@ def simple_evaluate(model, model_args=None, tasks=[],
 
     # add info about the model and few shot config
     results["config"] = {
-        "model": model,
+        "model": model_name,  # model,
         "model_args": model_args,
         "num_fewshot": num_fewshot,
         "batch_size": batch_size,

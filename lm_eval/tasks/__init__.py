@@ -4,6 +4,7 @@ from typing import List, Union
 import sacrebleu
 import lm_eval.base
 
+from . import germanquad
 from . import superglue
 from . import glue
 from . import arc
@@ -137,6 +138,7 @@ TASK_REGISTRY = {
     "hellaswag": hellaswag.HellaSwag,
     "openbookqa": openbookqa.OpenBookQA,
     # "sat": sat.SATAnalogies, # not implemented yet
+    "germanquad": germanquad.GermanQuAD,
     "squad2": squad.SQuAD2,
     "race": race.RACE,
     # "naturalqs": naturalqs.NaturalQs, # not implemented yet
