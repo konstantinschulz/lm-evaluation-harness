@@ -61,7 +61,7 @@ class GermanQuAD(HFTask):
         return self.data["test"]
 
     def doc_to_text(self, doc):
-        return 'Background: ' + doc['context'] + '\n\n' + 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
+        return 'Question: ' + doc['question'] + '\n\n' + 'Answer:'  # 'Background: ' + doc['context'] + '\n\n' +
 
     def doc_to_target(self, doc):
         answer_list = doc['answers']['text']

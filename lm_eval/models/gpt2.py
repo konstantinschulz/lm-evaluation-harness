@@ -30,13 +30,15 @@ class HFLM(BaseLM):
         assert isinstance(self.tokenizer, (
             transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast,
             transformers.T5Tokenizer, transformers.T5TokenizerFast,
+            transformers.XGLMTokenizer, transformers.XGLMTokenizerFast
         )), "this tokenizer has not been checked for compatibility yet!"
 
         self.vocab_size = self.tokenizer.vocab_size
 
         if isinstance(self.tokenizer, (transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast)):
-            assert self.tokenizer.encode('hello\n\nhello') == [31884, 79, 152, 152, 31884, 79], \
+            assert self.tokenizer.encode('hello\n\nhello') == [72, 13796, 184, 184, 72, 13796], \
                 self.tokenizer.encode('hello\n\nhello')  # [31373, 198, 198, 31373] [462, 23142, 203, 203, 462, 23142]
+            # [31884, 79, 152, 152, 31884, 79]
 
         # multithreading and batching
         self.batch_size_per_gpu = batch_size  # todo: adaptive batch size

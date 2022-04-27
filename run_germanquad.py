@@ -1,19 +1,19 @@
 import json
-
 import torch.cuda
-
 from lm_eval import evaluator
 from lm_eval.models.gpt2 import HFLM
 
 
 def evaluate_germanquad():
+    device = "cpu"  # "cuda:0" torch.device("cuda")
     results = evaluator.simple_evaluate(
-        model=HFLM(pretrained="yongzx/gpt2-finetuned-oscar-de"),  # dbmdz/german-gpt2
+        model=HFLM(pretrained="facebook/xglm-1.7B", device=device),
+        # dbmdz/german-gpt2 yongzx/gpt2-finetuned-oscar-de benjamin/gpt2-wechsel-german facebook/xglm-564M
         # model_args=args.model_args,
         tasks=["germanquad"],
-        num_fewshot=10,
+        num_fewshot=10,  # 10 25
         batch_size=1,
-        device="cuda:0",  # torch.device("cuda")
+        device=device,
         no_cache=True,
         limit=10,
         description_dict={},
@@ -30,5 +30,5 @@ def evaluate_germanquad():
     print(evaluator.make_table(results))
 
 
-print("CUDA: ", torch.cuda.is_available())
+print("CUDA available: ", torch.cuda.is_available())
 evaluate_germanquad()
