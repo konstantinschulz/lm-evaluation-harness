@@ -50,6 +50,8 @@ from . import truthfulqa
 from . import blimp
 from . import asdiv
 from . import gsm8k
+from . import cnndm
+from . import mlsum_de
 
 ########################################
 # Translation tasks
@@ -150,6 +152,8 @@ TASK_REGISTRY = {
     "anli_r1": anli.ANLIRound1,
     "anli_r2": anli.ANLIRound2,
     "anli_r3": anli.ANLIRound3,
+    "cnndm": cnndm.CNNDM,
+    "mlsum_de": mlsum_de.MLSUM,
 
     "ethics_cm": hendrycks_ethics.EthicsCM,
     "ethics_deontology": hendrycks_ethics.EthicsDeontology,

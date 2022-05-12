@@ -115,7 +115,7 @@ def evaluate(lm, task_dict, provide_description=None, num_fewshot=0, limit=None,
     # TODO: completely refactor this entire function to not be a huge mess, ideally breaking it down into smaller pieces
 
     # TODO: todo: implement proper description-providing system
-    assert not provide_description  # not implemented.
+    # assert not provide_description  # not implemented.
     if provide_description is not None:
         # nudge people to not specify it at all
         print("WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict")
