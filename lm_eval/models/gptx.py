@@ -1,68 +1,115 @@
 import transformers
 import torch
-import torch.nn as nn
 import torch.nn.functional as F
-from lm_eval.base import LM
+from lm_eval.base import BaseLM, LM
 from lm_eval import utils
 from tqdm import tqdm
-import numpy as np
 
 
-class GPTXLM(LM):
-    MAX_GEN_TOKS = 256
-    VOCAB_SIZE = 50257
-    EOT_TOKEN_ID = 50256
+class GPTXLM(BaseLM):
 
-    def __init__(self, device='cuda', pretrained='dbmdz/german-gpt2', batch_size=1):
+    def __init__(self,
+                 device='cuda',
+                 pretrained='gpt2',
+                 batch_size=1,
+                 revision='main',
+                 subfolder=None,
+                 tokenizer=None
+    ):
         super().__init__()
+
+        assert isinstance(device, str)
+        assert isinstance(pretrained, str)
+        assert isinstance(batch_size, int)
+
         if device:
-            self.device = torch.device(device)
+            self._device = torch.device(device)
         else:
-            self.device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+            self._device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+
         self.gptx = transformers.AutoModelForCausalLM.from_pretrained(pretrained).to(self.device)
         self.gptx.eval()
 
-        # pretrained tokenizer for neo is broken for now so just hardcoding this to gptx
-        self.tokenizer = transformers.GPT2TokenizerFast.from_pretrained('gpt2')
-        self.tokenizer.pad_token = "<|endoftext|>"
-        try:
-            self.max_length = self.gptx.config.n_ctx
-        except AttributeError:
-            # gptneoconfig doesn't have n_ctx apparantly
-            self.max_length = self.gptx.config.max_position_embeddings
+        self.tokenizer = transformers.AutoTokenizer.from_pretrained(
+            pretrained if tokenizer is None else tokenizer, revision=revision, subfolder=subfolder)
 
-        assert self.tokenizer.encode('hello\n\nhello') == [31373, 198, 198, 31373]
+        assert isinstance(self.tokenizer, (
+            transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast,
+            transformers.T5Tokenizer, transformers.T5TokenizerFast,
+        )), "this tokenizer has not been checked for compatibility yet!"
+
+        self.vocab_size = self.tokenizer.vocab_size
+
+        # if isinstance(self.tokenizer, (transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast)):
+        #     assert self.tokenizer.encode('Hallo\n\nHallo') == [5568, 203, 203, 5568], \
+        #         self.tokenizer.encode('Hallo\n\nHallo')
 
         # multithreading and batching
         gpus = torch.cuda.device_count()
         batch_size_per_gpu = batch_size  # todo: adaptive batch size
 
-        self.batch_size = batch_size_per_gpu * gpus
+        self.batch_size_per_gpu = batch_size_per_gpu * gpus
+
+        self.max_generate_tokens = self.max_gen_toks
 
         # TODO: fix multi-gpu
         # if gpus > 1:
         #     self.gpt2 = nn.DataParallel(self.gpt2)
 
-    @classmethod
-    def create_from_arg_string(cls, arg_string, additional_config={}):
-        args = utils.simple_parse_args_string(arg_string)
-        args2 = {k: v for k, v in additional_config.items() if v is not None}
-        return cls(**args, **args2)
 
-    def loglikelihood(self, requests):
-        new_reqs = []
-        for context, continuation in requests:
-            if context == "":
-                # end of text as context
-                context_enc = [self.EOT_TOKEN_ID]
-            else:
-                context_enc = self.tokenizer.encode(context)
+    @property
+    def max_gen_toks(self):
+        return 256
 
-            continuation_enc = self.tokenizer.encode(continuation)
+    @property
+    def eot_token_id(self):
+        # we use EOT because end of *text* is more accurate for what we're doing than end of *sentence*
+        return self.tokenizer.eos_token_id
 
-            new_reqs.append(((context, continuation), context_enc, continuation_enc))
+    @property
+    def batch_size(self):
+        # TODO: fix multi-gpu
+        return self.batch_size_per_gpu  # * gpus
 
-        return self._loglikelihood_tokens(new_reqs)
+    @property
+    def device(self):
+        # TODO: fix multi-gpu
+        return self._device
+
+    def tok_encode(self, string: str):
+        return self.tokenizer.encode(string, add_special_tokens=False)
+
+    def tok_decode(self, tokens):
+        return self.tokenizer.decode(tokens)
+
+    @property
+    def max_length(self):
+        try:
+            return self.gptx.config.n_ctx
+        except AttributeError:
+            # gptneoconfig doesn't have n_ctx apparently
+            return self.gptx.config.max_position_embeddings
+
+    # @classmethod
+    # def create_from_arg_string(cls, arg_string, additional_config={}):
+    #     args = utils.simple_parse_args_string(arg_string)
+    #     args2 = {k: v for k, v in additional_config.items() if v is not None}
+    #     return cls(**args, **args2)
+
+    # def loglikelihood(self, requests):
+    #     new_reqs = []
+    #     for context, continuation in requests:
+    #         if context == "":
+    #             # end of text as context
+    #             context_enc = [self.eot_token_id]
+    #         else:
+    #             context_enc = self.tokenizer.encode(context)
+    #
+    #         continuation_enc = self.tokenizer.encode(continuation)
+    #
+    #         new_reqs.append(((context, continuation), context_enc, continuation_enc))
+    #
+    #     return self._loglikelihood_tokens(new_reqs)
 
     def loglikelihood_rolling(self, requests):
         # TODO: Implement caching once we've confirmed the perplexity implementation
@@ -73,7 +120,7 @@ class GPTXLM(LM):
             for string, in tqdm(requests):
                 rolling_token_windows = list(map(utils.make_disjoint_window, utils.get_rolling_token_windows(
                     token_list=self.tokenizer.encode(string),
-                    prefix_token=self.EOT_TOKEN_ID,
+                    prefix_token=self.eot_token_id,
                     max_seq_len=self.max_length,
                     context_len=1,
                 )))
@@ -191,7 +238,7 @@ class GPTXLM(LM):
         returns: a torch tensor of shape [batch, sequence, vocab] with the
         logits retuned from the model
         """
-        return self.gptx(inps)[0][:, :, :50257]
+        return self.gptx(inps)[0][:, :, :self.vocab_size]
 
     def greedy_until(self, requests):
         # TODO: implement fully general `until` that handles untils that are
@@ -210,17 +257,17 @@ class GPTXLM(LM):
                 if isinstance(until, str): until = [until]
 
                 if max_gen_tokens is not None:
-                    self.MAX_GEN_TOKS = max_gen_tokens
+                    self.max_generate_tokens = max_gen_tokens
 
-                context_enc = torch.tensor([self.tokenizer.encode(context)[self.MAX_GEN_TOKS - self.max_length:]]).to(
-                    self.device)
+                context_enc = torch.tensor([self.tok_encode(context)[self.max_generate_tokens - self.max_length:]])\
+                    .to(self.device)
 
-                primary_until, = self.tokenizer.encode(until[0])
+                primary_until, = self.tok_encode(until[0])
 
                 if top_k is not None:
                     cont = self.gptx.generate(
                         context_enc,
-                        max_length=context_enc.shape[1] + self.MAX_GEN_TOKS,
+                        max_length=context_enc.shape[1] + self.max_generate_tokens,
                         top_k=top_k,
                         eos_token_id=primary_until,
                         do_sample=do_sample,
@@ -228,12 +275,12 @@ class GPTXLM(LM):
                 else:
                     cont = self.gptx.generate(
                         context_enc,
-                        max_length=context_enc.shape[1] + self.MAX_GEN_TOKS,
+                        max_length=context_enc.shape[1] + self.max_generate_tokens,
                         eos_token_id=primary_until,
                         do_sample=do_sample,
                     )
 
-                s = self.tokenizer.decode(cont[0].tolist()[context_enc.shape[1]:])
+                s = self.tok_decode(cont[0].tolist()[context_enc.shape[1]:])
 
                 for term in until:
                     s = s.split(term)[0]
@@ -246,14 +293,14 @@ class GPTXLM(LM):
             for context, until in tqdm(reord.get_reordered()):
                 if isinstance(until, str): until = [until]
 
-                context_enc = torch.tensor([self.tokenizer.encode(context)[self.MAX_GEN_TOKS - self.max_length:]]).to(
-                    self.device)
+                context_enc = torch.tensor([self.tokenizer.encode(context)[self.max_generate_tokens
+                                                                           - self.max_length:]]).to(self.device)
 
                 primary_until, = self.tokenizer.encode(until[0])
 
                 cont = self.gptx.generate(
                     context_enc,
-                    max_length=context_enc.shape[1] + self.MAX_GEN_TOKS,
+                    max_length=context_enc.shape[1] + self.max_generate_tokens,
                     eos_token_id=primary_until,
                     do_sample=False,
                 )
@@ -269,3 +316,7 @@ class GPTXLM(LM):
                 res.append(s)
 
         return reord.get_original(res)
+
+
+    def _model_generate(self, context, max_length, eos_token_id):
+        pass

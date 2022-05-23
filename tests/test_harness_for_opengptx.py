@@ -1,4 +1,13 @@
 
+'''
+Test performance of implemented tasks
+
+You can also run
+python main.py --model gptx --model_args pretrained=dbmdz/german-gpt2  --tasks mlsum_de
+ --output_path ./output_mlsum.json
+to run outside the test mode
+
+'''
 from lm_eval import tasks
 from lm_eval import models
 from lm_eval import evaluator
@@ -15,7 +24,7 @@ def test_downstream_task_evaluator(
         eval_task,
         provide_description=True,
         num_fewshot=0,
-        limit=None,
+        limit=5,
         bootstrap_iters=1000
     ):
 

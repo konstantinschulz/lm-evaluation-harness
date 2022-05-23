@@ -7,3 +7,6 @@ lm_cache
 /tests/testdata/
 /run_eval.yaml
 /tests/output/
+/lm_eval/models/megatron_ds.py
+/.pytest_cache/
+/tests/megatron-gpt2-345m/

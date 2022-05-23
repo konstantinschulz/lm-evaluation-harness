@@ -1,29 +1,23 @@
 import datasets
-from math import exp
 from lm_eval.base import rf
-from lm_eval.metrics import f1_score, mean
 from .common import HFTask
 from functools import partial
-from packaging import version
 
 
-def _cnndm_metric(predictions, references):
+def _mlsum_metric(predictions, references):
     summarization_metric = datasets.load_metric("rouge")
     return summarization_metric.compute(predictions=predictions, references=references, use_agregator=True)
 
 
-def _cnndm_agg(key, items):
+def _mlsum_agg(key, items):
     predictions, references = zip(*items)
-    return _cnndm_metric(predictions=predictions, references=references)[key]
+    return _mlsum_metric(predictions=predictions, references=references)[key].mid.fmeasure
 
 
 class MLSUM(HFTask):
     VERSION = None
     DATASET_PATH = "mlsum"
     DATASET_NAME = 'de'
-
-    # assert version.parse(datasets.__version__) >= version.parse(
-    #     "1.0.0"), "datasets 1.0.0 or later required for cnn_dailymail"
 
     def has_training_docs(self):
         return False
@@ -62,6 +56,7 @@ class MLSUM(HFTask):
             part of the document for `doc`.
         """
         continuation = rf.greedy_until(ctx, ['\n'], True, 2, 100) #arg3: do sampling, arg4: top k, arg5: max gen tokens
+        # arg4 and 5 are taken from gpt2 paper
         return continuation
 
     def process_results(self, doc, results):
@@ -100,17 +95,9 @@ class MLSUM(HFTask):
             functions that aggregate a list of metrics
         """
         return {
-            'rouge1': partial(_cnndm_agg, 'rouge1'),
-            'rouge2': partial(_cnndm_agg, 'rouge2'),
-            'rougeL': partial(_cnndm_agg, 'rougeL')
-            # 'HasAns_exact': partial(_squad_agg, 'HasAns_exact'),
-            # # Exact match (the normalized answer exactly match the gold answer)
-            # 'HasAns_f1': partial(_squad_agg, 'HasAns_f1'),  # The F-score of predicted tokens versus the gold answer
-            # 'NoAns_exact': partial(_squad_agg, 'NoAns_exact'),
-            # # Exact match (the normalized answer exactly match the gold answer)
-            # 'NoAns_f1': partial(_squad_agg, 'NoAns_f1'),  # The F-score of predicted tokens versus the gold answer
-            # 'best_exact': partial(_squad_agg, 'best_exact'),  # Best exact match (with varying threshold)
-            # 'best_f1': partial(_squad_agg, 'best_f1'),  # Best F1 (with varying threshold)
+            'rouge1': partial(_mlsum_agg, 'rouge1'),
+            'rouge2': partial(_mlsum_agg, 'rouge2'),
+            'rougeL': partial(_mlsum_agg, 'rougeL')
         }
 
     def higher_is_better(self):

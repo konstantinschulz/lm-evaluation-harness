@@ -1,7 +1,5 @@
 import datasets
-from math import exp
 from lm_eval.base import rf
-from lm_eval.metrics import f1_score, mean
 from .common import HFTask
 from functools import partial
 from packaging import version
@@ -14,7 +12,7 @@ def _cnndm_metric(predictions, references):
 
 def _cnndm_agg(key, items):
     predictions, references = zip(*items)
-    return _cnndm_metric(predictions=predictions, references=references)[key]
+    return _cnndm_metric(predictions=predictions, references=references)[key].mid.fmeasure
 
 
 class CNNDM(HFTask):
@@ -103,14 +101,6 @@ class CNNDM(HFTask):
             'rouge1': partial(_cnndm_agg, 'rouge1'),
             'rouge2': partial(_cnndm_agg, 'rouge2'),
             'rougeL': partial(_cnndm_agg, 'rougeL')
-            # 'HasAns_exact': partial(_squad_agg, 'HasAns_exact'),
-            # # Exact match (the normalized answer exactly match the gold answer)
-            # 'HasAns_f1': partial(_squad_agg, 'HasAns_f1'),  # The F-score of predicted tokens versus the gold answer
-            # 'NoAns_exact': partial(_squad_agg, 'NoAns_exact'),
-            # # Exact match (the normalized answer exactly match the gold answer)
-            # 'NoAns_f1': partial(_squad_agg, 'NoAns_f1'),  # The F-score of predicted tokens versus the gold answer
-            # 'best_exact': partial(_squad_agg, 'best_exact'),  # Best exact match (with varying threshold)
-            # 'best_f1': partial(_squad_agg, 'best_f1'),  # Best F1 (with varying threshold)
         }
 
     def higher_is_better(self):
