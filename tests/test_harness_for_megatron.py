@@ -40,7 +40,6 @@ def test_downstream_task_evaluator(
     end_time = time.time()
 
     output_path = f'output/results_{str(eval_task)}_{str(num_fewshot)}shots_{datetime.now().strftime("%m-%d-%Y-%H-%M-%S")}.json'
-    # output_path = f'/output/asi/lm_eval/results_{str(eval_task)}_{str(num_fewshot)}shots_{datetime.now().strftime("%m-%d-%Y-%H-%M-%S")}.json'
     configuration = {
         'model': model.megatron.config._name_or_path,
         'batch_size': batch_size,
