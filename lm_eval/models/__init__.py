@@ -3,7 +3,7 @@ from . import gpt3
 from . import gptx
 from . import dummy
 from . import megatron
-from . import megatron_ds
+# from . import megatron_ds
 
 MODEL_REGISTRY = {
     "hf": gpt2.HFLM,
@@ -12,7 +12,7 @@ MODEL_REGISTRY = {
     "gptx": gptx.GPTXLM,
     "dummy": dummy.DummyLM,
     "megatron": megatron.MegatronLM,
-    "megatron_ds": megatron_ds.MegatronDSLM
+    # "megatron_ds": megatron_ds.MegatronDSLM
 }
 
 
