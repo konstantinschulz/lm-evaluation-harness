@@ -39,10 +39,10 @@ class x_stance(Task):
         return True
 
     def has_validation_docs(self):
-        return False
+        return True
 
     def has_test_docs(self):
-        return False
+        return True
 
     def training_docs(self):
         if self.has_training_docs():
@@ -56,7 +56,7 @@ class x_stance(Task):
                 # `map(self._process_doc, self.dataset["validation"])`
                 # In most case you can leave this as is unless the dataset split is
                 # named differently than the default `"train"`.
-                self._training_docs = list(self.dataset["train.jsonl"])
+                self._training_docs = list(self.dataset["train"])
             return self._training_docs
 
     def validation_docs(self):
@@ -67,7 +67,7 @@ class x_stance(Task):
             # `map(self._process_doc, self.dataset["validation"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"validation"`.
-            return self.dataset["valid.jsonl"]
+            return self.dataset["valid"]
 
     def test_docs(self):
         if self.has_test_docs():
@@ -77,7 +77,7 @@ class x_stance(Task):
             # `map(self._process_doc, self.dataset["test"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"test"`.
-            return self.dataset["test.jsonl"]
+            return self.dataset["test"]
 
     def _process_doc(self, doc):
         # Process (detokenize, strip, replace etc.) each individual `doc`
