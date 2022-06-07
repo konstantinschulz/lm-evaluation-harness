@@ -80,23 +80,30 @@ class x_stance(Task):
             return self.dataset["test.jsonl"]
 
     def _process_doc(self, doc):
-        # TODO: Process (detokenize, strip, replace etc.) each individual `doc`
+        # Process (detokenize, strip, replace etc.) each individual `doc`
         # with this function. You can map this across the docs in each available
         # dataset split. See the TODOs in `train_docs`, `validation_docs`, and
         # `test_docs` for snippets.
-        # NOTE: DELETE THIS FUNCTION IF UNUSED.
-        return doc
-
-    def doc_to_text(self, doc):
-        # TODO: Format the query prompt portion of the document example.
-        # Query part consists of the question and comment
-        return ("QUESTION: "
+        # Returns doc with gold label
+        return {"QUESTION: "
             + doc["question"]
             + "\n"
             + "COMMENT: "
             + doc["comment"]
             + "\n\n"
-            + "LABEL: ")
+            + "LABEL: "
+            + doc["label"]}
+
+    def doc_to_text(self, doc):
+        # TODO: Format the query prompt portion of the document example.
+        # Query part consists of the question and comment part only (no label)
+        return {"QUESTION: "
+            + doc["question"]
+            + "\n"
+            + "COMMENT: "
+            + doc["comment"]
+            + "\n\n"
+            + "LABEL: "}
 
     def doc_to_target(self, doc):
         # TODO: Fill in the `target` ("gold answer") variable.
