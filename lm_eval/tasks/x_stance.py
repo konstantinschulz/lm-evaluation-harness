@@ -68,7 +68,7 @@ class x_stance(Task):
             # `map(self._process_doc, self.dataset["validation"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"validation"`.
-            return self.dataset["valid"]
+            return self.dataset["validation"]
 
     def test_docs(self):
         if self.has_test_docs():
