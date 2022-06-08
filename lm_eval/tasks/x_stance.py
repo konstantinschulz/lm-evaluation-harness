@@ -11,13 +11,14 @@ The data have been extracted from the Swiss voting advice platform Smartvote.
 https://github.com/ZurichNLP/xstance
 """
 from lm_eval.base import Task
+import lm_eval.datasets.x_stance.x_stance
 
 
 # TODO: Add the BibTeX citation for the task.
 _CITATION = """@inproceedings{vamvas2020xstance,
     author    = "Vamvas, Jannis and Sennrich, Rico",
     title     = "{X-Stance}: A Multilingual Multi-Target Dataset for Stance Detection",
-    booktitle = "Proceedings of the 5th Swiss Text Analytics Conference (SwissText) \& 16th Conference on Natural Language Processing (KONVENS)",
+    booktitle = "Proceedings of the 5th Swiss Text Analytics Conference (SwissText)  16th Conference on Natural Language Processing (KONVENS)",
     address   = "Zurich, Switzerland",
     year      = "2020",
     month     = "jun",
