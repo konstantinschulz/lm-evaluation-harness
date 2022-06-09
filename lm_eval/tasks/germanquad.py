@@ -6,8 +6,13 @@ In order to raise the bar for non-English QA, we are releasing a high-quality, h
 
 Homepage: https://www.deepset.ai/germanquad
 """
+from typing import Any
+
 import datasets
 from math import exp
+
+from datasets import Dataset
+
 from lm_eval.base import rf
 from .common import HFTask
 from functools import partial
@@ -40,6 +45,8 @@ class GermanQuAD(HFTask):
     VERSION = 1
     DATASET_PATH = "deepset/germanquad"
     DATASET_NAME = None
+    TEST_DATASET: list[dict[str, Any]] = None
+    TRAIN_DATASET: list[dict[str, Any]] = None
 
     # HF changed squad on us so we have to make sure we aren't running the old one
     assert version.parse(datasets.__version__) >= version.parse(
@@ -61,15 +68,35 @@ class GermanQuAD(HFTask):
         return self.data["test"]
 
     def doc_to_text(self, doc):
-        return 'Question: ' + doc['question'] + '\n\n' + 'Answer:'  # 'Background: ' + doc['context'] + '\n\n' +
+        def get_qa_string():
+            if not self.TRAIN_DATASET:
+                self.TRAIN_DATASET = list(self.data["train"])
+            if not self.TEST_DATASET:
+                self.TEST_DATASET = list(self.data["test"])
+            target_property: str = "context"
+            context: str = doc[target_property]
+            relevant_items = [x for x in self.TRAIN_DATASET if x[target_property] == context]
+            if not relevant_items:
+                relevant_items = [x for x in self.TEST_DATASET if x[target_property] == context]
+            relevant_items.remove(doc)
+            qa_strings: list[str] = [f"Question: {x['question']}\n\nAnswer: {x['answers']['text'][0]}" for x in
+                                     relevant_items]  # [:5]
+            return '\n\n'.join(qa_strings) + ''
+        # 'Background: ' + doc['context'] + '\n\n' + 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
+        # return 'How long is the answer to the following question: ' + doc['question'] + '\n\n' + 'Answer:'
+        # return 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
+        # return 'Background: ' + doc['context'] + '\n\n' + 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
+        # example_qa_string: str = get_qa_string()
+        # return f"Background: {context}\n\n{example_qa_string}\n\nQuestion: {doc['question']}\n\nAnswer:"
+        return 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
 
     def doc_to_target(self, doc):
         answer_list = doc['answers']['text']
         if len(answer_list) > 0:
-            answer = answer_list[0]
+            answer = answer_list[0]  # len(answer_list[0])
         else:
-            answer = 'unanswerable'
-        return " " + answer
+            answer = 0  # 'unanswerable'
+        return " " + str(answer)  # answer
 
     def construct_requests(self, doc, ctx):
         """ Uses RequestFactory to construct Requests and returns an iterable of
@@ -83,8 +110,8 @@ class GermanQuAD(HFTask):
             part of the document for `doc`.
         """
         continuation = rf.greedy_until(ctx, ['\n'])
-        is_unanswerable = rf.loglikelihood(ctx, " " + "unanswerable")
-        return continuation, is_unanswerable
+        # is_unanswerable = rf.loglikelihood(ctx, " " + "unanswerable")
+        return continuation  # , is_unanswerable
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -96,19 +123,20 @@ class GermanQuAD(HFTask):
         :param results:
             The results of the requests created in construct_requests.
         """
-        continuation, (logprob_unanswerable, _) = results
-
-        no_answer_probability = exp(logprob_unanswerable)
+        # continuation, (logprob_unanswerable, _) = results
+        continuation = results
+        # no_answer_probability = exp(logprob_unanswerable)
 
         predictions = {
             'id': doc['id'],
             'prediction_text': continuation,
-            'no_answer_probability': no_answer_probability,
+            # all questions have an answer in GermanQuAD
+            'no_answer_probability': 0,  # no_answer_probability,
         }
 
         references = {
             'id': doc['id'],
-            'answers': doc['answers'],
+            'answers': doc['answers'],  # str(len(doc['answers']['text'][0]))
         }
 
         return {

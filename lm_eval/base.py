@@ -144,13 +144,16 @@ class BaseLM(LM):
         pass
 
     @abstractmethod
-    def tok_encode(self, string: str): pass
-    
-    @abstractmethod
-    def tok_decode(self, tokens: Iterable[int]): pass
+    def tok_encode(self, string: str):
+        pass
 
     @abstractmethod
-    def _model_generate(self, context, max_length, eos_token_id): pass
+    def tok_decode(self, tokens: Iterable[int]):
+        pass
+
+    @abstractmethod
+    def _model_generate(self, context, max_length, eos_token_id):
+        pass
 
     @abstractmethod
     def _model_call(self, inps):
@@ -199,10 +202,10 @@ class BaseLM(LM):
             # TODO: extract out this call so it only gets called once and also somehow figure out partial caching for
             # that
             string_nll = self._loglikelihood_tokens(rolling_token_windows, disable_tqdm=True)
-            
+
             # discard is_greedy
             string_nll = [x[0] for x in string_nll]
-            
+
             string_nll = sum(string_nll)
             loglikelihoods.append(string_nll)
 
@@ -222,7 +225,7 @@ class BaseLM(LM):
 
             toks = x[1] + x[2]
             return -len(toks), tuple(toks)
-        
+
         # TODO: automatic (variable) batch size detection for vectorization
         reord = utils.Reorderer(requests, _collate)
         for chunk in utils.chunks(tqdm(reord.get_reordered(), disable=disable_tqdm), self.batch_size):
@@ -251,7 +254,7 @@ class BaseLM(LM):
 
                 # when too long to fit in context, truncate from the left
                 inp = torch.tensor(
-                    (context_enc + continuation_enc)[-(self.max_length+1):][:-1],
+                    (context_enc + continuation_enc)[-(self.max_length + 1):][:-1],
                     dtype=torch.long
                 ).to(self.device)
                 inplen, = inp.shape
@@ -279,7 +282,7 @@ class BaseLM(LM):
 
                 # Slice to original seq length
                 contlen = len(cont_toks)
-                logits = logits[inplen-contlen:inplen].unsqueeze(0)  # [1, seq, vocab]
+                logits = logits[inplen - contlen:inplen].unsqueeze(0)  # [1, seq, vocab]
 
                 # Check if per-token argmax is exactly equal to continuation
                 greedy_tokens = logits.argmax(dim=-1)
@@ -300,7 +303,7 @@ class BaseLM(LM):
                 res.append(answer)
 
         return reord.get_original(res)
-    
+
     def greedy_until(self, requests):
         # TODO: implement fully general `until` that handles untils that are 
         #       multiple tokens or that span multiple tokens correctly
@@ -311,7 +314,7 @@ class BaseLM(LM):
         def _collate(x):
             toks = self.tok_encode(x[0])
             return len(toks), x[0]
-        
+
         reord = utils.Reorderer(requests, _collate)
 
         for context, until in tqdm(reord.get_reordered()):
@@ -319,7 +322,7 @@ class BaseLM(LM):
                 until = [until]
 
             primary_until, = self.tok_encode(until[0])
-            
+
             context_enc = torch.tensor([self.tok_encode(context)[self.max_gen_toks - self.max_length:]]).to(self.device)
 
             cont = self._model_generate(context_enc, context_enc.shape[1] + self.max_gen_toks, primary_until)
@@ -328,12 +331,12 @@ class BaseLM(LM):
 
             for term in until:
                 s = s.split(term)[0]
-            
+
             # partial caching
             self.cache_hook.add_partial("greedy_until", (context, until), s)
-            
+
             res.append(s)
-        
+
         return reord.get_original(res)
 
 
@@ -346,6 +349,7 @@ class Task(abc.ABC):
         {"question": ..., "answer": ...} or
         {"question": ..., question, answer)
     """
+
     def __init__(self):
         self.download()
         self._training_docs = None
@@ -485,7 +489,8 @@ class Task(abc.ABC):
         )
         if provide_description is not None:
             # nudge people to not specify it at all
-            print("WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict")
+            print(
+                "WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict")
 
         description = description + "\n\n" if description else ""
 
@@ -511,7 +516,8 @@ class Task(abc.ABC):
             ) + "\n\n"
 
         example = self.doc_to_text(doc)
-        return description + labeled_examples + example
+        # return description + labeled_examples + example
+        return description + example
 
 
 class MultipleChoiceTask(Task, abc.ABC):
@@ -537,13 +543,13 @@ class MultipleChoiceTask(Task, abc.ABC):
             "acc": acc,
             "acc_norm": acc_norm,
         }
-    
+
     def higher_is_better(self):
         return {
             "acc": True,
             "acc_norm": True,
         }
-    
+
     def aggregation(self):
         return {
             "acc": mean,
@@ -570,7 +576,8 @@ class PerplexityTask(Task, abc.ABC):
         )
         if provide_description is not None:
             # nudge people to not specify it at all
-            print("WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict")
+            print(
+                "WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict")
 
         return ""
 
@@ -626,12 +633,12 @@ def hash_args(attr, args):
 
 class CacheHook:
     def __init__(self, cachinglm):
-        if cachinglm is None: 
+        if cachinglm is None:
             self.dbdict = None
             return
 
         self.dbdict = cachinglm.dbdict
-    
+
     def add_partial(self, attr, req, res):
         if self.dbdict is None:
             return
@@ -661,7 +668,7 @@ class CachingLM:
         def fn(requests):
             res = []
             remaining_reqs = []
-            
+
             # figure out which ones are cached and which ones are new
             for req in requests:
                 hsh = hash_args(attr, req)
@@ -674,7 +681,7 @@ class CachingLM:
                 else:
                     res.append(None)
                     remaining_reqs.append(req)
-            
+
             # actually run the LM on the requests that do not have cached results
             rem_res = getattr(self.lm, attr)(remaining_reqs)
 
@@ -692,8 +699,9 @@ class CachingLM:
             self.dbdict.commit()
 
             return res
+
         return fn
-    
+
     def get_cache_hook(self):
         return CacheHook(self)
 
@@ -713,18 +721,18 @@ class Request:
         self.request_type = request_type
         self.args = args
         self.index = index
-    
+
     def __iter__(self):
         if REQUEST_RETURN_LENGTHS[self.request_type] is None:
             raise IndexError('This request type does not return multiple arguments!')
         for i in range(REQUEST_RETURN_LENGTHS[self.request_type]):
             yield Request(self.request_type, self.args, i)
-    
+
     def __getitem__(self, i):
         if REQUEST_RETURN_LENGTHS[self.request_type] is None:
             raise IndexError('This request type does not return multiple arguments!')
         return Request(self.request_type, self.args, i)
-    
+
     def __eq__(self, other):
         return self.request_type == other.request_type and self.args == other.args and self.index == other.index
 
@@ -736,6 +744,7 @@ class RequestFactory:
     def __getattr__(self, attr):
         def fn(*args):
             return Request(attr, args)
+
         return fn
 
 

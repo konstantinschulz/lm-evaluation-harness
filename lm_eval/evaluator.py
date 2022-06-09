@@ -62,7 +62,7 @@ def simple_evaluate(model, model_args=None, tasks=[],
         lm = lm_eval.base.CachingLM(
             lm, f'lm_cache/{model_name}_' + model_args.replace('=', '-').replace(',', '_').replace('/', '-') + '.db'
         )
-    
+
     task_dict = lm_eval.tasks.get_task_dict(tasks)
 
     if check_integrity:
@@ -93,7 +93,8 @@ def simple_evaluate(model, model_args=None, tasks=[],
 
 
 @positional_deprecated
-def evaluate(lm, task_dict, provide_description=None, num_fewshot=0, limit=None, bootstrap_iters=100000, description_dict=None):
+def evaluate(lm, task_dict, provide_description=None, num_fewshot=0, limit=None, bootstrap_iters=100000,
+             description_dict=None):
     """Instantiate and evaluate a model on a list of tasks.
 
     :param lm: obj
@@ -119,12 +120,13 @@ def evaluate(lm, task_dict, provide_description=None, num_fewshot=0, limit=None,
     assert not provide_description  # not implemented.
     if provide_description is not None:
         # nudge people to not specify it at all
-        print("WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict")
+        print(
+            "WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict")
 
     task_dict_items = [
         (name, task)
         for name, task in task_dict.items()
-        if(task.has_validation_docs() or task.has_test_docs())
+        if (task.has_validation_docs() or task.has_test_docs())
     ]
 
     results = collections.defaultdict(dict)
@@ -194,9 +196,12 @@ def evaluate(lm, task_dict, provide_description=None, num_fewshot=0, limit=None,
 
         for resp, (i, task_name, doc, doc_id) in zip(resps, requests_origin[reqtype]):
             process_res_queue[(task_name, doc_id)].append((i, resp))
-    
-    vals = collections.defaultdict(list)
 
+    vals = collections.defaultdict(list)
+    questions: list[str] = [x.args[0].split("\n\n")[-2] for x in requests['greedy_until']]
+    # [x.args[0].split("\n\n")[-2] for x in reqs]
+    # [x.args[0].split("\n\n")[-2] for x in requests['greedy_until']]
+    true_answers: list[list[str]] = []
     # unpack results and sort back in order and return control to Task
     for (task_name, doc_id), requests in process_res_queue.items():
         requests.sort(key=lambda x: x[0])
@@ -206,9 +211,9 @@ def evaluate(lm, task_dict, provide_description=None, num_fewshot=0, limit=None,
         doc = docs[(task_name, doc_id)]
 
         metrics = task.process_results(doc, requests)
+        true_answers.append(metrics['f1'][1]['answers']['text'])
         for metric, value in metrics.items():
             vals[(task_name, metric)].append(value)
-    
     # aggregate results
     for (task_name, metric), items in vals.items():
         task = task_dict[task_name]
@@ -222,8 +227,9 @@ def evaluate(lm, task_dict, provide_description=None, num_fewshot=0, limit=None,
         )
         if stderr is not None:
             results[task_name][metric + "_stderr"] = stderr(items)
-    
+    preds: list[str] = [x[0][1] for x in process_res_queue.values()]
     return {
+        "outputs_true_vs_pred": list(zip(questions, preds, true_answers)),
         "results": dict(results),
         "versions": dict(versions)
     }
