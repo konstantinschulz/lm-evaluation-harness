@@ -13,7 +13,6 @@ https://github.com/ZurichNLP/xstance
 from lm_eval.base import Task
 import lm_eval.datasets.x_stance.x_stance
 
-
 # TODO: Add the BibTeX citation for the task.
 _CITATION = """@inproceedings{vamvas2020xstance,
     author    = "Vamvas, Jannis and Sennrich, Rico",
@@ -113,9 +112,13 @@ class x_stance(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        # TODO: Construct your language model requests with the request factory, `rf`,
-        # and return them as an iterable.
-        return []
+        # rf.loglikelihood as the task is a classification problem. For each document the model predicts loglikelihood for the correct label
+        # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
+
+        ll_favor = rf.loglikelihood(ctx, "FAVOR")
+        ll_against = rf.loglikelihood(ctx, "AGAINST")
+
+        return ll_favor, ll_against
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -130,7 +133,17 @@ class x_stance(Task):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and the corresponding metric result as value
         # for the current `doc`.
-        return {}
+
+        # Calculate accuracy
+        pred = ""
+        if results[0] > results[1]:
+            pred = "FAVOR"
+        else:
+            pred = "AGAINST"
+        
+        gold = doc["label"]
+
+        return {"Accuracy": pred==gold}
 
     def aggregation(self):
         """
@@ -142,10 +155,12 @@ class x_stance(Task):
         # with the metric name as key and an aggregation function as value which
         # determines how to combine results from each document in the dataset.
         # Check `lm_eval.metrics` to find built-in aggregation functions.
-        return {}
+
+
+        return {"Accuracy":mean}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and a `bool` value determining whether or
         # not higher values of that metric are deemed better.
-        return {}
+        return {"Accuracy":True}
