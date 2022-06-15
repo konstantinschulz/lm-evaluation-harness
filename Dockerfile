@@ -14,5 +14,5 @@ RUN pip install -e ".[dev]"
 EXPOSE 5000
 
 # run the command
-CMD ["python /main.py --model gpt2 --model_args device=cuda:0 --tasks x_stance --num_fewshot 2"]
+CMD ["python /main.py --model gpt2 --model_args device=cuda:1 --tasks x_stance --num_fewshot 2"]
 	
