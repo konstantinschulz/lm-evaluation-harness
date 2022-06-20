@@ -12,6 +12,7 @@ https://github.com/ZurichNLP/xstance
 """
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
+from lm_eval.metrics import mean, perplexity
 
 # TODO: Add the BibTeX citation for the task.
 _CITATION = """@inproceedings{vamvas2020xstance,
@@ -143,7 +144,7 @@ class x_stance(Task):
         
         gold = doc["label"]
 
-        return {"Accuracy": pred==gold}
+        return {"acc": pred==gold}
 
     def aggregation(self):
         """
@@ -157,10 +158,10 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"Accuracy":mean}
+        return {"acc":mean}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and a `bool` value determining whether or
         # not higher values of that metric are deemed better.
-        return {"Accuracy":True}
+        return {"acc":True}
