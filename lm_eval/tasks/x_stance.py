@@ -86,12 +86,12 @@ class x_stance(Task):
         # dataset split. See the TODOs in `train_docs`, `validation_docs`, and
         # `test_docs` for snippets.
         # Returns doc with gold label
-        return "QUESTION: "+ doc["question"]+ "\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "+ doc["label"]
+        return "QUESTION: "+ doc["question"]+ "\n"+ "COMMENT: "+ doc["comment"]+ "\n"+ "LABEL: "+ doc["label"]
 
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
         # Query part consists of the question and comment part only (no label)
-        return "QUESTION: "+ doc["question"]+ "\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
+        return "QUESTION: "+ doc["question"]+ "\n"+ "COMMENT: "+ doc["comment"]+ "\n"+ "LABEL: "
 
     def doc_to_target(self, doc):
         # TODO: Fill in the `target` ("gold answer") variable.
