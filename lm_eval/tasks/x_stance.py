@@ -116,8 +116,8 @@ class x_stance(Task):
         # rf.loglikelihood as the task is a classification problem. For each document the model predicts loglikelihood for the correct label
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
 
-        ll_favor = rf.loglikelihood(ctx, "FAVOR")
-        ll_against = rf.loglikelihood(ctx, "AGAINST")
+        ll_favor = rf.loglikelihood(ctx, " "+"FAVOR")
+        ll_against = rf.loglikelihood(ctx, " "+"AGAINST")
 
         return ll_favor, ll_against
 
