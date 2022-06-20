@@ -99,7 +99,7 @@ class x_stance(Task):
         # `doc_to_target` strings.
         # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
         target = doc["label"]
-        return doc["comment"] + " " + target
+        return " " + target
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
