@@ -146,14 +146,14 @@ class x_stance(Task):
         gold = doc["label"]
 
         # Prediction-gold pairs
-        pairs = (gold, pred)
+        pairs = [gold, pred]
         # Precision: TP/(TP+FP)
 
         # Recall: TP/(TP+FN)
 
         # F1: 2*TP/(2*TP+FP+FN)
 
-        return {"acc": pred==gold, "f1-score":pred=="FAVOR"}
+        return {"acc": pred==gold, "f1-score":pairs}
 
     def aggregation(self):
         """
