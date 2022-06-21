@@ -153,7 +153,7 @@ class x_stance(Task):
 
         # F1: 2*TP/(2*TP+FP+FN)
 
-        return {"acc": pred==gold, "f1-score":pairs}
+        return {"acc": pred==gold}#, "f1-score":pairs}
 
     def aggregation(self):
         """
@@ -167,7 +167,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "f1-score":f1_score}
+        return {"acc":mean}#, "f1-score":f1_score}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
