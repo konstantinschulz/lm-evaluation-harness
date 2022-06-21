@@ -139,22 +139,16 @@ class x_stance(Task):
         # Accuracy: (TP+TN)/P+N
         pred = ""
         if results[0] > results[1]:
-            # FAVOR as numerical label = 1
             pred = "FAVOR"
         else:
-            # AGAINST as numerical label = 0
             pred = "AGAINST"       
         gold = doc["label"]
 
-        # Prediction-gold pairs
+        predictions = {"id":doc["id"], "prediction":pred}
 
-        # Precision: TP/(TP+FP)
+        gold = {"id":doc["id"], "gold label":doc["label"]}
 
-        # Recall: TP/(TP+FN)
-
-        # F1: 2*TP/(2*TP+FP+FN)
-
-        return {"acc": pred==gold, "f1-score":(gold, pred)}
+        return {"acc": pred==gold, "f1-score":(predictions, gold)}
 
     def aggregation(self):
         """
