@@ -50,6 +50,7 @@ from . import blimp
 from . import asdiv
 from . import gsm8k
 from . import storycloze
+from . import xquad
 
 ########################################
 # Translation tasks
@@ -129,6 +130,7 @@ TASK_REGISTRY = {
     "hellaswag": hellaswag.HellaSwag,
     "swag": swag.SWAG,
     "openbookqa": openbookqa.OpenBookQA,
+    "xquad": xquad.XQuAD,
     "squad2": squad.SQuAD2,
     "race": race.RACE,
     # "naturalqs": naturalqs.NaturalQs, # not implemented yet
