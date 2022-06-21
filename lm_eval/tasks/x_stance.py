@@ -99,8 +99,8 @@ class x_stance(Task):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
-        target = doc["numerical_label"]
-        return " " + str(target)
+        target = doc["label"]
+        return " " + target
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
@@ -117,8 +117,8 @@ class x_stance(Task):
         # rf.loglikelihood as the task is a classification problem. For each document the model predicts loglikelihood for the correct label
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
 
-        ll_favor = rf.loglikelihood(ctx, " "+str(1))
-        ll_against = rf.loglikelihood(ctx, " "+str(0))
+        ll_favor = rf.loglikelihood(ctx, " "+"FAVOR")
+        ll_against = rf.loglikelihood(ctx, " "+"AGAINST")
 
         return ll_favor, ll_against
 
@@ -140,21 +140,21 @@ class x_stance(Task):
         pred = ""
         if results[0] > results[1]:
             # FAVOR as numerical label = 1
-            pred = 1
+            pred = "FAVOR"
         else:
             # AGAINST as numerical label = 0
-            pred = 0        
-        gold = doc["numerical_label"]
+            pred = "AGAINST"       
+        gold = doc["label"]
 
         # Prediction-gold pairs
-        pairs = [gold, pred]
+
         # Precision: TP/(TP+FP)
 
         # Recall: TP/(TP+FN)
 
         # F1: 2*TP/(2*TP+FP+FN)
 
-        return {"acc": pred==gold, "f1-score":pairs}
+        return {"acc": pred==gold, "f1-score":(gold, pred)}
 
     def aggregation(self):
         """
