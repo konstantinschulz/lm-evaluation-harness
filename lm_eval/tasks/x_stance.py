@@ -136,7 +136,7 @@ class x_stance(Task):
         # with the metric name as key and the corresponding metric result as value
         # for the current `doc`.
 
-        # Calculate accuracy
+        # Accuracy: (TP+TN)/P+N
         pred = ""
         if results[0] > results[1]:
             pred = "FAVOR"
@@ -145,7 +145,15 @@ class x_stance(Task):
         
         gold = doc["label"]
 
-        return {"acc": pred==gold}
+        # Prediction-gold pairs
+        pairs = (gold, pred)
+        # Precision: TP/(TP+FP)
+
+        # Recall: TP/(TP+FN)
+
+        # F1: 2*TP/(2*TP+FP+FN)
+
+        return {"acc": pred==gold, "f1-score":pairs}
 
     def aggregation(self):
         """
@@ -159,7 +167,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean}
+        return {"acc":mean, "f1-score":f1_score(pairs)}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
