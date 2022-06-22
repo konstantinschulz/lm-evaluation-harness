@@ -160,8 +160,8 @@ class x_stance(Task):
         else:
             pred = 0       
         gold_label = doc["numerical_label"]
-        self.golds += gold_label
-        self.preds += pred
+        self.golds.append(gold_label)
+        self.preds.append(pred)
         # Save prediction and gold label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
 
