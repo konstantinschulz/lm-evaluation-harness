@@ -155,14 +155,14 @@ class x_stance(Task):
             pred = 1
         else:
             pred = 0       
-        gold = doc["numerical_label"]
+        gold_label = doc["numerical_label"]
         
         # Save prediction and gold label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
 
         gold = {"id":doc["id"], "gold label":doc["label"]}
 
-        return {"acc": pred==gold, "f1":(predictions, gold)}
+        return {"acc": pred==gold, "f1":[gold_label, pred]}
     
     def aggregation(self):
         """
