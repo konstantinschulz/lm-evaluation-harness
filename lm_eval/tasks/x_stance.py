@@ -28,15 +28,14 @@ _CITATION = """@inproceedings{vamvas2020xstance,
 """
 
 # Helper functions for aggregation (adapted from SQUAD script)
-    def _xstance_metric(predictions, references):
-        xstance_metric = datasets.load_metric("x_stance")
-        return xstance_metric.compute(predictions=predictions, references=references)
+def _xstance_metric(predictions, references):
+    xstance_metric = datasets.load_metric("x_stance")
+    return xstance_metric.compute(predictions=predictions, references=references)
 
 
-    def _xstance_agg(key, items):
-        predictions, references = zip(*items)
-
-        return _xstance_metric(predictions=predictions, references=references)[key]
+def _xstance_agg(key, items):
+    predictions, references = zip(*items)
+    return _xstance_metric(predictions=predictions, references=references)[key]
 
 class x_stance(Task):
     VERSION = 0
