@@ -160,8 +160,8 @@ class x_stance(Task):
         else:
             pred = 0       
         gold_label = doc["numerical_label"]
-        golds += gold_label
-        preds += pred
+        self.golds += gold_label
+        self.preds += pred
         # Save prediction and gold label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
 
@@ -181,7 +181,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "f1": _xstance_f1(golds, preds)}
+        return {"acc":mean, "f1": _xstance_f1(self.golds, self.preds)}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
