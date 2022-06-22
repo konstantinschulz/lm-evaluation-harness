@@ -165,7 +165,7 @@ class x_stance(Task):
 
         gold = {"id":doc["id"], "gold label":doc["label"]}
 
-        return {"acc": pred==gold, "f1":pred}
+        return {"acc": pred==gold, "f1":[pred, gold_label]}
     
     def aggregation(self):
         """
