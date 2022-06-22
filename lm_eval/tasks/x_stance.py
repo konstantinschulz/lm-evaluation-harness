@@ -115,8 +115,8 @@ class x_stance(Task):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
-        target = doc["numerical_label"]
-        return " " + str(target)
+        target = doc["label"]
+        return " " + target
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
@@ -133,8 +133,8 @@ class x_stance(Task):
         # rf.loglikelihood as the task is a classification problem. For each document the model predicts loglikelihood for the correct label
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
 
-        ll_favor = rf.loglikelihood(ctx, " "+"1")
-        ll_against = rf.loglikelihood(ctx, " "+"0")
+        ll_favor = rf.loglikelihood(ctx, " "+"FAVOR")
+        ll_against = rf.loglikelihood(ctx, " "+"AGAINST")
 
         return ll_favor, ll_against
 
@@ -155,10 +155,10 @@ class x_stance(Task):
         # Accuracy: (TP+TN)/P+N
         pred = ""
         if results[0] > results[1]:
-            pred = 1
+            pred = "FAVOR"
         else:
-            pred = 0       
-        gold_label = doc["numerical_label"]
+            pred = "AGAINST"       
+        gold_label = doc["label"]
         
         # Save prediction and gold label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
