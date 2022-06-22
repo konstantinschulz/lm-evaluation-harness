@@ -16,6 +16,7 @@ from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
 from lm_eval.metrics import mean, perplexity, f1_score
 from functools import partial
+from sklearn.metrics import precision_score 
 
 # TODO: Add the BibTeX citation for the task.
 _CITATION = """@inproceedings{vamvas2020xstance,
@@ -161,7 +162,7 @@ class x_stance(Task):
 
         gold = {"id":doc["id"], "gold label":doc["label"]}
 
-        return {"acc": pred==gold, "f1-score":(predictions, gold)}
+        return {"acc": pred==gold, "prec":(predictions, gold)}
     
     def aggregation(self):
         """
@@ -175,11 +176,10 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "f1-score":partial(
-                _xstance_agg, "f1-score")}
+        return {"acc":mean, "prec": precision_score("prec"[1], "prec"[0], average='binary')}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and a `bool` value determining whether or
         # not higher values of that metric are deemed better.
-        return {"acc":True, "f1-score":True}
+        return {"acc":True, "prec":True}
