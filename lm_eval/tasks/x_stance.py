@@ -51,8 +51,8 @@ class x_stance(Task):
     # TODO: Add the `DATASET_NAME` string. This is the name of a subset within
     # `DATASET_PATH`. If there aren't specific subsets you need, leave this as `None`.
     DATASET_NAME = None
-    self.gold = []
-    self.preds = []
+    gold = []
+    preds = []
     def has_training_docs(self):
         return True
 
@@ -160,8 +160,8 @@ class x_stance(Task):
         else:
             pred = 0       
         gold_label = doc["numerical_label"]
-        self.gold += gold_label
-        self.preds += pred
+        gold += gold_label
+        preds += pred
         # Save prediction and gold label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
 
@@ -181,7 +181,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "f1": _xstance_f1(self.gold, self.preds)}
+        return {"acc":mean, "f1": _xstance_f1(gold, preds)}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
