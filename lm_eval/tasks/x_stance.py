@@ -160,7 +160,7 @@ class x_stance(Task):
 
         gold = {"id":doc["id"], "gold label":doc["label"]}
 
-        return {"acc": pred==gold_label, "f1":[pred, gold_label], "acc_all":pred==gold_label}
+        return {"acc": pred==gold_label, "acc_all":pred==gold_label}# "f1":[pred, gold_label]}
     
     def aggregation(self):
         """
@@ -174,7 +174,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "f1": f1_score, "acc_all":acc_all}
+        return {"acc":mean, "acc_all":acc_all}#"f1": f1_score}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
