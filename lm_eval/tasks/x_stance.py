@@ -13,6 +13,7 @@ https://github.com/ZurichNLP/xstance
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
 from lm_eval.metrics import mean, perplexity, f1_score
+from functools import partial
 
 # TODO: Add the BibTeX citation for the task.
 _CITATION = """@inproceedings{vamvas2020xstance,
