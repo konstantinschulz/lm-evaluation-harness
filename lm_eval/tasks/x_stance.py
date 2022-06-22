@@ -152,10 +152,10 @@ class x_stance(Task):
         # Accuracy: (TP+TN)/P+N
         pred = ""
         if results[0] > results[1]:
-            pred = "FAVOR"
+            pred = 1
         else:
-            pred = "AGAINST"       
-        gold = doc["label"]
+            pred = 0       
+        gold = doc["numerical_label"]
         
         # Save prediction and gold label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
