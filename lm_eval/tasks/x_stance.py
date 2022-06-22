@@ -40,6 +40,9 @@ def _xstance_agg(key, items):
     predictions, references = zip(*items)
     return _xstance_metric(predictions=predictions, references=references)[key]
 
+def _xstance_f1(gold, pred):
+    return f1_score(gold, pred, average=None)
+
 class x_stance(Task):
     VERSION = 0
     # TODO: Add the `DATASET_PATH` string. This will be the name of the `Task`
@@ -176,7 +179,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "f1": f1_score}
+        return {"acc":mean, "f1": x_stance_f1(process_results["f1"][0], process_results["f1"][1])}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
