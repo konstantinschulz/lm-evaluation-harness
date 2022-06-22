@@ -179,7 +179,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "f1": xstance_f1(process_results["f1"][0], process_results["f1"][1])}
+        return {"acc":mean, "f1": _xstance_f1(process_results["f1"][0], process_results["f1"][1])}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
