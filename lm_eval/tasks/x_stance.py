@@ -14,9 +14,9 @@ https://github.com/ZurichNLP/xstance
 import datasets
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
-from lm_eval.metrics import mean, perplexity#, f1_score
+from lm_eval.metrics import mean, perplexity, f1_score
 from functools import partial
-from sklearn.metrics import precision_score, f1_score 
+from sklearn.metrics import precision_score#, f1_score 
 
 # TODO: Add the BibTeX citation for the task.
 _CITATION = """@inproceedings{vamvas2020xstance,
@@ -165,7 +165,7 @@ class x_stance(Task):
 
         gold = {"id":doc["id"], "gold label":doc["label"]}
 
-        return {"acc": pred==gold, "f1":[[gold_label], [pred]]}
+        return {"acc": pred==gold, "f1":[gold_label, pred]}
     
     def aggregation(self):
         """
