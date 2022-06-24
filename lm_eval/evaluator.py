@@ -58,7 +58,6 @@ def simple_evaluate(
 
     assert tasks != [], "No tasks specified"
 
-    if model_args is None: model_args = ""
     if isinstance(model, str):
         if model_args is None:
             model_args = ""
@@ -69,7 +68,6 @@ def simple_evaluate(
         assert isinstance(model, lm_eval.base.LM)
         lm = model
 
-    model_name = model if isinstance(model, str) else model.gpt2.name_or_path
     if not no_cache:
         lm = lm_eval.base.CachingLM(
             lm,
@@ -97,7 +95,7 @@ def simple_evaluate(
 
     # add info about the model and few shot config
     results["config"] = {
-        "model": model_name,  # model,
+        "model": model,
         "model_args": model_args,
         "num_fewshot": num_fewshot,
         "batch_size": batch_size,
@@ -255,10 +253,7 @@ def evaluate(
             process_res_queue[(task_name, doc_id)].append((i, resp))
 
     vals = collections.defaultdict(list)
-    questions: list[str] = [x.args[0].split("\n\n")[-2] for x in requests['greedy_until']]
-    # [x.args[0].split("\n\n")[-2] for x in reqs]
-    # [x.args[0].split("\n\n")[-2] for x in requests['greedy_until']]
-    true_answers: list[list[str]] = []
+
     # unpack results and sort back in order and return control to Task
     for (task_name, doc_id), requests in process_res_queue.items():
         requests.sort(key=lambda x: x[0])
@@ -268,7 +263,6 @@ def evaluate(
         doc = docs[(task_name, doc_id)]
 
         metrics = task.process_results(doc, requests)
-        true_answers.append(metrics['f1'][1]['answers']['text'])
         for metric, value in metrics.items():
             vals[(task_name, metric)].append(value)
 
