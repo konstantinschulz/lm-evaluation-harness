@@ -5,9 +5,10 @@ from lm_eval.models.gpt2 import HFLM
 
 
 def evaluate_germanquad():
+    batch_size = 4
     device = "cuda:0"
-    hflm: HFLM = HFLM(pretrained="malteos/gpt2-wechsel-german-ds-meg", device=device)
     # device = "cpu"
+    hflm: HFLM = HFLM(pretrained="malteos/gpt2-wechsel-german-ds-meg", device=device, batch_size=batch_size)
     # hflm: HFLM = HFLM(pretrained="malteos/gpt2-xl-wechsel-german", device=device)
     # dbmdz/german-gpt2 yongzx/gpt2-finetuned-oscar-de benjamin/gpt2-wechsel-german facebook/xglm-1.7B
     # facebook/xglm-564M facebook/xglm-1.7B
@@ -16,10 +17,10 @@ def evaluate_germanquad():
         # model_args=args.model_args,
         tasks=["germanquad"],
         num_fewshot=10,  # 10 25
-        batch_size=1,
+        batch_size=batch_size,
         device=device,
         no_cache=True,
-        limit=10,
+        limit=8,  # 1
         description_dict={},
         # check_integrity=args.check_integrity
     )

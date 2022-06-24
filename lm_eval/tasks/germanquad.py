@@ -110,6 +110,7 @@ class GermanQuAD(HFTask):
             part of the document for `doc`.
         """
         continuation = rf.greedy_until(ctx, ['\n'])
+        # there are no unanswerable questions in GermanQuAD
         # is_unanswerable = rf.loglikelihood(ctx, " " + "unanswerable")
         return continuation  # , is_unanswerable
 
