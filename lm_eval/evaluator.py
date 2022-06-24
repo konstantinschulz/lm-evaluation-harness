@@ -272,7 +272,7 @@ def evaluate(
 
         metrics = task.process_results(doc, requests)
 
-        if 'f1' in metrics and len(metrics['1']) >= 1 and 'answers' in metrics['f1'][1] and 'text' in metrics['f1'][1]['answers']:
+        if 'f1' in metrics and len(metrics['f1']) >= 1 and 'answers' in metrics['f1'][1] and 'text' in metrics['f1'][1]['answers']:
             true_answers.append(metrics['f1'][1]['answers']['text'])
 
         for metric, value in metrics.items():
