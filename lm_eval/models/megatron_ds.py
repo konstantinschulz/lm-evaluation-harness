@@ -11,7 +11,7 @@ from unittest.mock import patch
 class MegatronDSLM(LM):
 
     def __init__(self, checkpoint_path, batch_size=1, args=None, args_overrides=None,
-                 world_size=1, rank=0, local_rank=0):
+                 world_size=1, rank=0, local_rank=0, no_tokenizer_check=False):
         """Megatron-DeepSpeed LM.
 
         :param checkpoint_path: str
@@ -39,6 +39,10 @@ class MegatronDSLM(LM):
         from megatron.checkpointing import load_checkpoint
         from megatron.training import setup_model_and_optimizer
         from pretrain_gpt import model_provider as gpt_model_provider
+
+        if no_tokenizer_check:
+            # ignore
+            pass
 
         # Import args
         if args is None:
