@@ -42,7 +42,8 @@ class WechselDE(PerplexityTask):
         return doc
 
     def test_docs(self):
-        return self.dataset['text']
+        # enforce minimum length
+        return [t for t in self.dataset['text'] if len(t) > 1]
 
     def doc_to_target(self, doc):
         return doc
