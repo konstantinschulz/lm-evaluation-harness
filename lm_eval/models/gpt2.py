@@ -1,3 +1,5 @@
+from typing import List, Union
+
 import transformers
 import torch
 from lm_eval.base import BaseLM
@@ -46,6 +48,10 @@ class HFLM(BaseLM):
             revision=revision,
             subfolder=subfolder,
         )
+        # pad on the left to enable batched generation; we always condition on the last token to predict the next one
+        self.tokenizer.padding_side = "left"
+        # manually add a pad token because GPT2 does not have one by default
+        self.tokenizer.pad_token = self.tokenizer.eos_token
 
         assert isinstance(
             self.tokenizer,
@@ -107,8 +113,8 @@ class HFLM(BaseLM):
         # TODO: fix multi-gpu
         return self._device
 
-    def tok_encode(self, string: str):
-        return self.tokenizer.encode(string, add_special_tokens=False)
+    def tok_encode(self, inputs: Union[str, List[str]], padding=True):
+        return self.tokenizer(inputs, add_special_tokens=False, padding=padding).data["input_ids"]
 
     def tok_decode(self, tokens):
         return self.tokenizer.decode(tokens)

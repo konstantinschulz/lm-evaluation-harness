@@ -1,5 +1,5 @@
 import abc
-from typing import Iterable
+from typing import Iterable, List
 import numpy as np
 import random
 import re
@@ -144,7 +144,7 @@ class BaseLM(LM):
         pass
 
     @abstractmethod
-    def tok_encode(self, string: str):
+    def tok_encode(self, inputs: List[str]):
         pass
 
     @abstractmethod
@@ -329,7 +329,7 @@ class BaseLM(LM):
 
         return re_ord.get_original(res)
 
-    def greedy_until(self, requests):
+    def greedy_until(self, requests, disable_tqdm=False):
         # TODO: implement fully general `until` that handles until that are
         #       multiple tokens or that span multiple tokens correctly
 
@@ -342,29 +342,29 @@ class BaseLM(LM):
 
         re_ord = utils.Reorderer(requests, _collate)
 
-        for context, until in tqdm(re_ord.get_reordered()):
-            if isinstance(until, str):
-                until = [until]
+        for chunk in utils.chunks(tqdm(re_ord.get_reordered(), disable=disable_tqdm), self.batch_size):
+            until = [chunk[0][1]] if isinstance(chunk[0][1], str) else chunk[0][1]
 
             (primary_until,) = self.tok_encode(until[0])
 
-            context_enc = torch.tensor(
-                [self.tok_encode(context)[self.max_gen_toks - self.max_length :]]
-            ).to(self.device)
+            context_enc = torch.tensor(self.tok_encode([c[0] for c in chunk])).to(self.device)
+            context_enc = context_enc[::, self.max_gen_toks - self.max_length:]
 
             cont = self._model_generate(
                 context_enc, context_enc.shape[1] + self.max_gen_toks, primary_until
             )
 
-            s = self.tok_decode(cont[0].tolist()[context_enc.shape[1] :])
+            s = [self.tok_decode(continuation.tolist()[context_enc.shape[1]:]) for continuation in cont]
 
-            for term in until:
-                s = s.split(term)[0]
+            for i in range(len(s)):
+                for term in until:
+                    s[i] = s[i].split(term)[0]
 
+            # TODO: enable partial caching for single samples in batched generation
             # partial caching
-            self.cache_hook.add_partial("greedy_until", (context, until), s)
+            self.cache_hook.add_partial("greedy_until", (context_enc, until), s)
 
-            res.append(s)
+            res.extend(s)
 
         return re_ord.get_original(res)
 
