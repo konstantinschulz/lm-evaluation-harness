@@ -9,12 +9,8 @@ Homepage: https://www.deepset.ai/germanquad
 from typing import Any, Dict, List
 
 import datasets
-from math import exp
 
-from datasets import Dataset
-
-from lm_eval.base import rf
-from .common import HFTask
+from lm_eval.base import rf, Task
 from functools import partial
 from packaging import version
 
@@ -41,7 +37,7 @@ def _squad_agg(key, items):
     return _squad_metric(predictions=predictions, references=references)[key]
 
 
-class GermanQuAD(HFTask):
+class GermanQuAD(Task):
     VERSION = 1
     DATASET_PATH = "deepset/germanquad"
     DATASET_NAME = None
@@ -62,17 +58,17 @@ class GermanQuAD(HFTask):
         return True
 
     def training_docs(self):
-        return self.data["train"]
+        return self.dataset["train"]
 
     def test_docs(self):
-        return self.data["test"]
+        return self.dataset["test"]
 
     def doc_to_text(self, doc):
         def get_qa_string():
             if not self.TRAIN_DATASET:
-                self.TRAIN_DATASET = list(self.data["train"])
+                self.TRAIN_DATASET = list(self.dataset["train"])
             if not self.TEST_DATASET:
-                self.TEST_DATASET = list(self.data["test"])
+                self.TEST_DATASET = list(self.dataset["test"])
             target_property: str = "context"
             context: str = doc[target_property]
             relevant_items = [x for x in self.TRAIN_DATASET if x[target_property] == context]
