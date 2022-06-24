@@ -1,5 +1,7 @@
 import collections
 import itertools
+from typing import List
+
 import numpy as np
 import random
 import lm_eval.metrics
@@ -256,10 +258,10 @@ def evaluate(
             process_res_queue[(task_name, doc_id)].append((i, resp))
 
     vals = collections.defaultdict(list)
-    questions: list[str] = [x.args[0].split("\n\n")[-2] for x in requests['greedy_until']]
+    questions: List[str] = [x.args[0].split("\n\n")[-2] for x in requests['greedy_until']]
     # [x.args[0].split("\n\n")[-2] for x in reqs]
     # [x.args[0].split("\n\n")[-2] for x in requests['greedy_until']]
-    true_answers: list[list[str]] = []
+    true_answers: List[List[str]] = []
     # unpack results and sort back in order and return control to Task
     for (task_name, doc_id), requests in process_res_queue.items():
         requests.sort(key=lambda x: x[0])
@@ -269,7 +271,10 @@ def evaluate(
         doc = docs[(task_name, doc_id)]
 
         metrics = task.process_results(doc, requests)
-        true_answers.append(metrics['f1'][1]['answers']['text'])
+
+        if 'f1' in metrics and len(metrics['1']) >= 1 and 'answers' in metrics['f1'][1] and 'text' in metrics['f1'][1]['answers']:
+            true_answers.append(metrics['f1'][1]['answers']['text'])
+
         for metric, value in metrics.items():
             vals[(task_name, metric)].append(value)
 
