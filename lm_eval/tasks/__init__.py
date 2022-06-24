@@ -4,7 +4,6 @@ from typing import List, Union
 import sacrebleu
 import lm_eval.base
 
-from . import germanquad
 from . import superglue
 from . import glue
 from . import arc
@@ -51,7 +50,11 @@ from . import blimp
 from . import asdiv
 from . import gsm8k
 from . import storycloze
+
+# German tasks
+from . import xnli
 from . import wechsel_de
+from . import germanquad
 
 ########################################
 # Translation tasks
@@ -131,8 +134,6 @@ TASK_REGISTRY = {
     "hellaswag": hellaswag.HellaSwag,
     "swag": swag.SWAG,
     "openbookqa": openbookqa.OpenBookQA,
-    # "sat": sat.SATAnalogies, # not implemented yet
-    "germanquad": germanquad.GermanQuAD,
     "squad2": squad.SQuAD2,
     "race": race.RACE,
     # "naturalqs": naturalqs.NaturalQs, # not implemented yet
@@ -283,7 +284,13 @@ TASK_REGISTRY = {
     "blimp_wh_vs_that_no_gap_long_distance": blimp.BlimpWhVsThatNoGapLongDistance,
     "blimp_wh_vs_that_with_gap": blimp.BlimpWhVsThatWithGap,
     "blimp_wh_vs_that_with_gap_long_distance": blimp.BlimpWhVsThatWithGapLongDistance,
+    # xglue
+
+    # German tasks
+    "xnli_de": xnli.XNLIDe,
     "wechsel_de": wechsel_de.WechselDE,
+    "germanquad": germanquad.GermanQuAD,
+
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
