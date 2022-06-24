@@ -4,3 +4,4 @@ data/
 lm_cache
 .idea
 output.json
+run_germanquad.py
