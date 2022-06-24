@@ -6,7 +6,7 @@ In order to raise the bar for non-English QA, we are releasing a high-quality, h
 
 Homepage: https://www.deepset.ai/germanquad
 """
-from typing import Any
+from typing import Any, Dict, List
 
 import datasets
 from math import exp
@@ -45,8 +45,8 @@ class GermanQuAD(HFTask):
     VERSION = 1
     DATASET_PATH = "deepset/germanquad"
     DATASET_NAME = None
-    TEST_DATASET: list[dict[str, Any]] = None
-    TRAIN_DATASET: list[dict[str, Any]] = None
+    TEST_DATASET: List[Dict[str, Any]] = None
+    TRAIN_DATASET: List[Dict[str, Any]] = None
 
     # HF changed squad on us so we have to make sure we aren't running the old one
     assert version.parse(datasets.__version__) >= version.parse(
