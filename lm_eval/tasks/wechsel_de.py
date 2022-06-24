@@ -39,6 +39,9 @@ class WechselDE(PerplexityTask):
 
     def _process_doc(self, doc):
         print(f'process doc: {doc}')
+        if len(doc) < 1:
+            raise ValueError(f'Empty document')
+
         return doc
 
     def test_docs(self):
@@ -46,6 +49,9 @@ class WechselDE(PerplexityTask):
         return [t for t in self.dataset['text'] if len(t) > 1]
 
     def doc_to_target(self, doc):
+        if len(doc) < 1:
+            raise ValueError(f'Empty document')
+
         return doc
 
     def count_words(self, doc):
