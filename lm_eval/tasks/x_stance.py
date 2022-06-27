@@ -149,7 +149,7 @@ class x_stance(Task):
 
         # Accuracy: (TP+TN)/P+N
         pred = ""
-        favor, (against, _) = results
+        favor, against = results
         if favor > against:
             pred = "FAVOR"
         else:
