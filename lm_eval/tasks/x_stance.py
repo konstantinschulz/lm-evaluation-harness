@@ -149,8 +149,8 @@ class x_stance(Task):
 
         # Accuracy: (TP+TN)/P+N
         pred = ""
-        favor, against = results
-        #print(results)
+        favor, _ = results
+        
         if favor[1] == True:
             pred = "FAVOR"
         else:
@@ -177,7 +177,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "f1": f1_score}#"acc_all":acc_all, 
+        return {"acc":mean, "f1": f1_score(predictions, gold)}#"acc_all":acc_all, 
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
