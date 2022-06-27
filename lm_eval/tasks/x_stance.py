@@ -14,7 +14,7 @@ https://github.com/ZurichNLP/xstance
 import datasets
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
-from lm_eval.metrics import mean, perplexity, #f1_score, acc_all
+from lm_eval.metrics import mean, perplexity#, f1_score, acc_all
 from functools import partial
 from sklearn.metrics import precision_score, f1_score 
 
