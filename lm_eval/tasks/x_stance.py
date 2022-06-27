@@ -151,7 +151,7 @@ class x_stance(Task):
         pred = ""
         favor, against = results
         print(results)
-        if favor > against:
+        if favor[1] == True:
             pred = "FAVOR"
         else:
             pred = "AGAINST"       
