@@ -163,7 +163,7 @@ class x_stance(Task):
 
         gold = {"id":doc["id"], "gold label":doc["label"]}
 
-        return {"acc": pred==gold_label, "f1":(predictions, gold)}
+        return {"acc": pred==gold_label}#, "f1":(predictions, gold)}
     
     def aggregation(self):
         """
@@ -183,4 +183,4 @@ class x_stance(Task):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and a `bool` value determining whether or
         # not higher values of that metric are deemed better.
-        return {"acc":True, "acc_all":True, "f1":True}
+        return {"acc":True}#, "acc_all":True, "f1":True}
