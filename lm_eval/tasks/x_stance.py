@@ -35,8 +35,8 @@ def _xstance_agg(key, items):
     predictions, references = zip(*items)
     return _xstance_f1(predictions=predictions, references=references)[key]
 
-def _xstance_f1(gold, pred):
-    return f1_score(gold, pred, average=None)
+def _xstance_f1(y_true, y_pred):
+    return f1_score(y_true, y_pred, average=None)
 
 class x_stance(Task):
     VERSION = 0
@@ -155,15 +155,15 @@ class x_stance(Task):
             pred = "FAVOR"
         else:
             pred = "AGAINST"       
-        gold_label = doc["label"]
-        print(pred, gold_label)
+        true_label = doc["label"]
+        print(pred, true_label)
         
-        # Save prediction and gold label for evaluation
-        predictions = {"id":doc["id"], "prediction":pred}#, "gold label":doc["label"]}
+        # Save prediction and true label for evaluation
+        predictions = {"id":doc["id"], "prediction":pred}
 
-        gold = {"id":doc["id"], "gold label":doc["label"]}
+        y_true = {"id":doc["id"], "true label":doc["label"]}
 
-        return {"acc": pred==gold_label, "perpl":(predictions, gold)}#, "f1":(predictions, gold)}
+        return {"acc": pred==true_label, "f1":(predictions, y_true)}
     
     def aggregation(self):
         """
@@ -177,10 +177,10 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "perpl":perplexity}#, "f1": f1_score}#"acc_all":acc_all, 
+        return {"acc":mean, "f1": f1_score}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and a `bool` value determining whether or
         # not higher values of that metric are deemed better.
-        return {"acc":True, "perpl":True}#, "f1":True}
+        return {"acc":True, "f1":True}
