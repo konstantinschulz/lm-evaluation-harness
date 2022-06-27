@@ -14,9 +14,9 @@ https://github.com/ZurichNLP/xstance
 import datasets
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
-from lm_eval.metrics import mean, perplexity#, f1_score, acc_all
+from lm_eval.metrics import mean, perplexity, f1_score, acc_all
 from functools import partial
-from sklearn.metrics import precision_score, f1_score 
+#from sklearn.metrics import precision_score, f1_score 
 
 # TODO: Add the BibTeX citation for the task.
 _CITATION = """@inproceedings{vamvas2020xstance,
@@ -176,7 +176,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "f1": partial(_xstance_f1, "f1")}#"acc_all":acc_all, 
+        return {"acc":mean, "f1": f1_score}#"acc_all":acc_all, 
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
