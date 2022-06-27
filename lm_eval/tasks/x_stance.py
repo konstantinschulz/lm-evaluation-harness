@@ -33,10 +33,10 @@ _CITATION = """@inproceedings{vamvas2020xstance,
 # Helper functions for aggregation (adapted from SQUAD script)
 def _xstance_agg(key, items):
     predictions, references = zip(*items)
-    return f1_score(predictions=predictions, references=references)[key]
+    return _xstance_f1(predictions=predictions, references=references)[key]
 
 def _xstance_f1(gold, pred):
-    return f1_score(gold_label, pred, average=None)
+    return f1_score(gold, pred, average=None)
 
 class x_stance(Task):
     VERSION = 0
