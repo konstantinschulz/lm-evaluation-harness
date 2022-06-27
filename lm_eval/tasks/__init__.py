@@ -50,7 +50,7 @@ from . import blimp
 from . import asdiv
 from . import gsm8k
 from . import storycloze
-
+from . import mlqa
 ########################################
 # Translation tasks
 ########################################
@@ -130,6 +130,7 @@ TASK_REGISTRY = {
     "swag": swag.SWAG,
     "openbookqa": openbookqa.OpenBookQA,
     "squad2": squad.SQuAD2,
+    "mlqa": mlqa.MLQA,
     "race": race.RACE,
     # "naturalqs": naturalqs.NaturalQs, # not implemented yet
     "headqa": headqa.HeadQAEsDeprecated,  # for backwards compat - headqa used to default to es
