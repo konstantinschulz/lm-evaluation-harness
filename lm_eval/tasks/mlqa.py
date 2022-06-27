@@ -2,7 +2,7 @@
 MLQA: Evaluating Cross-lingual Extractive Question Answering
 https://aclanthology.org/2020.acl-main.653
 
-We present MLQA, a multi-way aligned extractive QA evaluation benchmark intended to spur research in this area. MLQA contains QA instances in 7 languages, English, Arabic, German, Spanish, Hindi, Vietnamese and Simplified Chinese. MLQA has over 12K instances in English and 5K in each other language, with each instance parallel between 4 languages on average.
+MLQA is a multi-way aligned extractive QA evaluation benchmark intended to spur research in this area. MLQA contains QA instances in 7 languages, English, Arabic, German, Spanish, Hindi, Vietnamese and Simplified Chinese. MLQA has over 12K instances in English and 5K in each other language, with each instance parallel between 4 languages on average.
 
 Homepage: https://github.com/facebookresearch/mlqa
 """
