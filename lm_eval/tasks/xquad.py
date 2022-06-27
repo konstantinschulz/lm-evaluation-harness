@@ -1,5 +1,10 @@
 """
+XQuAD (Cross-lingual Question Answering Dataset)
+https://doi.org/10.48550/arXiv.1910.11856
 
+We also release XQuAD as a more comprehensive cross-lingual benchmark, which comprises 240 paragraphs and 1190 question-answer pairs from SQuAD v1.1 translated into ten languages by professional translators.
+
+Homepage: https://github.com/deepmind/xquad
 """
 from typing import Any
 
@@ -14,7 +19,15 @@ from functools import partial
 from packaging import version
 
 _CITATION = """
-
+@article{Artetxe:etal:2019,
+      author    = {Mikel Artetxe and Sebastian Ruder and Dani Yogatama},
+      title     = {On the cross-lingual transferability of monolingual representations},
+      journal   = {CoRR},
+      volume    = {abs/1910.11856},
+      year      = {2019},
+      archivePrefix = {arXiv},
+      eprint    = {1910.11856}
+}
 """
 
 
@@ -38,7 +51,7 @@ class XQuAD(HFTask):
 
     # HF changed squad on us so we have to make sure we aren't running the old one
     assert version.parse(datasets.__version__) >= version.parse(
-        "1.11.0"), "datasets v1.11.0 or later required for GermanQuAD"
+        "1.11.0"), "datasets v1.11.0 or later required for XQuAD"
 
     def has_training_docs(self):
         return False
