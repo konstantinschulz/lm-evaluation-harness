@@ -2,7 +2,7 @@
 XQuAD (Cross-lingual Question Answering Dataset)
 https://doi.org/10.48550/arXiv.1910.11856
 
-We also release XQuAD as a more comprehensive cross-lingual benchmark, which comprises 240 paragraphs and 1190 question-answer pairs from SQuAD v1.1 translated into ten languages by professional translators.
+XQuAD (Cross-lingual Question Answering Dataset) is a benchmark dataset for evaluating cross-lingual question answering performance. It is a subset of 240 paragraphs and 1190 question-answer pairs from the development set of SQuAD v1.1 (Rajpurkar et al., 2016) with their translations into ten languages
 
 Homepage: https://github.com/deepmind/xquad
 """
