@@ -163,7 +163,7 @@ class x_stance(Task):
         # Save prediction and true label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
 
-        y_true = {"id":doc["id"], "true label":doc["label"]}
+        y_true = {"id":doc["id"], "true label":true_label}
 
         return {"acc": pred==true_label, "prec":(true_label, pred)}
     
