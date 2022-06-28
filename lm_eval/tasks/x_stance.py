@@ -165,7 +165,7 @@ class x_stance(Task):
 
         y_true = {"id":doc["id"], "true label":true_label}
 
-        return {"acc": pred==true_label, "prec":(true_label, pred)}
+        return {"acc": pred==true_label, "precision":(true_label, pred)}
     
     def aggregation(self):
         """
@@ -179,10 +179,10 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "prec": partial(_xstance_agg, "prec")}
+        return {"acc":mean, "precision": partial(_xstance_agg, "precision")}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and a `bool` value determining whether or
         # not higher values of that metric are deemed better.
-        return {"acc":True, "prec":True}
+        return {"acc":True, "precision":True}
