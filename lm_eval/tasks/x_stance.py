@@ -34,7 +34,7 @@ _CITATION = """@inproceedings{vamvas2020xstance,
 # Helper functions for aggregation (adapted from SQUAD script)
 def _xstance_agg(key, items):
     predictions, references = zip(*items)
-    return _xstance_f1(predictions=predictions, references=references)[key]
+     return _xstance_precision(predictions=predictions, references=references).get(key, 0)
 
 def _xstance_f1(y_true, y_pred):
     return f1_score(y_true, y_pred, average=None)
@@ -42,7 +42,7 @@ def _xstance_f1(y_true, y_pred):
 def _xstance_precision(y_true, y_pred):
     precision_metric = datasets.load_metric("precision")
 
-    return precision_metric.compute(y_true, y_pred)
+    return precision_metric.compute(references=y_true, predictions=y_pred)
 
 
 class x_stance(Task):
