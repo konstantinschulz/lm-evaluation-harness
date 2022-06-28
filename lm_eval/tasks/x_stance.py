@@ -38,6 +38,12 @@ def _xstance_agg(key, items):
 def _xstance_f1(y_true, y_pred):
     return f1_score(y_true, y_pred, average=None)
 
+def _xstance_precision(y_true, y_pred):
+    precision_metric = evaluate.load("precision")
+
+    return precision_metric.compute(references=[0, 1], predictions=[0, 1])
+
+
 class x_stance(Task):
     VERSION = 0
     # TODO: Add the `DATASET_PATH` string. This will be the name of the `Task`
