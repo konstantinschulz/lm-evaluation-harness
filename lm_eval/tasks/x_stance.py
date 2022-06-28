@@ -16,8 +16,7 @@ import datasets
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
 from lm_eval.metrics import mean, perplexity, f1_score, acc_all
-from functools import partial
-#from sklearn.metrics import precision_score, f1_score 
+from functools import partial 
 
 # TODO: Add the BibTeX citation for the task.
 _CITATION = """@inproceedings{vamvas2020xstance,
@@ -35,9 +34,6 @@ _CITATION = """@inproceedings{vamvas2020xstance,
 def _xstance_agg(key, items):
     predictions, references = zip(*items)
     return _xstance_precision(predictions=predictions, references=references).get(key, 0)
-
-def _xstance_f1(y_true, y_pred):
-    return f1_score(y_true, y_pred, average=None)
 
 def _xstance_precision(y_true, y_pred):
     precision_metric = datasets.load_metric("precision")
@@ -184,7 +180,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "prec": partial(_xstance_precision, "prec")}
+        return {"acc":mean, "prec": partial(_xstance_agg, "prec")}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
