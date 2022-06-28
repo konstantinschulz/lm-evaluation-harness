@@ -12,7 +12,7 @@ https://github.com/ZurichNLP/xstance
 """
 
 import datasets
-import evaluate
+
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
 from lm_eval.metrics import mean, perplexity, f1_score, acc_all
@@ -40,7 +40,7 @@ def _xstance_f1(y_true, y_pred):
     return f1_score(y_true, y_pred, average=None)
 
 def _xstance_precision(y_true, y_pred):
-    precision_metric = evaluate.load("precision")
+    precision_metric = datasets.load_metric("precision")
 
     return precision_metric.compute(y_true, y_pred)
 
