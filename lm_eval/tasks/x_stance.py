@@ -38,7 +38,7 @@ def _xstance_agg(key, items):
 def _xstance_precision(y_true, y_pred):
     precision_metric = datasets.load_metric("precision")
 
-    return precision_metric.compute(references=y_true, predictions=y_pred, average=None)
+    return precision_metric.compute(references=y_true, predictions=y_pred, average='macro')
 
 
 class x_stance(Task):
