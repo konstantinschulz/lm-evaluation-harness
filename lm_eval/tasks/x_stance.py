@@ -31,9 +31,9 @@ _CITATION = """@inproceedings{vamvas2020xstance,
 """
 
 # Helper functions for aggregation (adapted from SQUAD script)
-'''def _xstance_agg(key, items):
+def _xstance_agg(key, items):
     predictions, references = zip(*items)
-    return _xstance_precision(references, predictions)[key]'''
+    return _xstance_precision(references, predictions)[key]
 
 def _xstance_precision(y_true, y_pred):
     precision_metric = datasets.load_metric("precision")
@@ -179,7 +179,7 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "precision": partial(_xstance_precision, "precision")}#partial(_xstance_agg, "precision")}
+        return {"acc":mean, "precision": partial(_xstance_agg, "precision")}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
