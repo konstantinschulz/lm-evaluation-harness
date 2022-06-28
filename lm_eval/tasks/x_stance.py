@@ -12,6 +12,7 @@ https://github.com/ZurichNLP/xstance
 """
 
 import datasets
+import evaluate
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
 from lm_eval.metrics import mean, perplexity, f1_score, acc_all
@@ -41,7 +42,7 @@ def _xstance_f1(y_true, y_pred):
 def _xstance_precision(y_true, y_pred):
     precision_metric = evaluate.load("precision")
 
-    return precision_metric.compute(references=[0, 1], predictions=[0, 1])
+    return precision_metric.compute(y_true, y_pred)
 
 
 class x_stance(Task):
@@ -169,7 +170,7 @@ class x_stance(Task):
 
         y_true = {"id":doc["id"], "true label":doc["label"]}
 
-        return {"acc": pred==true_label, "f1":(predictions, y_true)}
+        return {"acc": pred==true_label, "prec":(y_true, predictions)}
     
     def aggregation(self):
         """
@@ -183,10 +184,10 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "f1": f1_score}
+        return {"acc":mean, "prec": _xstance_precision}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and a `bool` value determining whether or
         # not higher values of that metric are deemed better.
-        return {"acc":True, "f1":True}
+        return {"acc":True, "prec":True}
