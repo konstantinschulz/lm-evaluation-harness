@@ -159,14 +159,13 @@ class x_stance(Task):
         else:
             pred = "AGAINST"       
         true_label = doc["label"]
-        print(pred, true_label)
         
         # Save prediction and true label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
 
         y_true = {"id":doc["id"], "true label":doc["label"]}
 
-        return {"acc": pred==true_label, "prec":(y_true, predictions)}
+        return {"acc": pred==true_label, "prec":(true_label, pred)}
     
     def aggregation(self):
         """
