@@ -39,7 +39,7 @@ def _xstance_agg_precision(key, items):
 def _xstance_agg_recall(key, items):
     references, predictions = zip(*items)
     recall_metric = datasets.load_metric("recall")
-    return recall_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(y_predictions))[key]
+    return recall_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(predictions))[key]
 
 
 '''def _xstance_precision(y_true, y_pred):
