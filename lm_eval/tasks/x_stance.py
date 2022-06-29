@@ -46,6 +46,15 @@ def _xstance_agg_f1(key, items):
     f1_metric = datasets.load_metric("f1")
     return f1_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(predictions))[key]
 
+def _xstance_metric(predictions, references):
+    xstance_metric = datasets.load_metric("precision", "recall", "f1")
+    return xstance_metric.compute(predictions=predictions, references=references)
+
+
+def _xstance_agg(key, items):
+    predictions, references = zip(*items)
+
+    return _xstance_metric(predictions=predictions, references=references)[key]
 '''def _xstance_precision(y_true, y_pred):
     precision_metric = datasets.load_metric("precision")
     return precision_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
@@ -198,9 +207,12 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "precision": partial(_xstance_agg_precision, "precision"), 
+        '''return {"acc":mean, "precision": partial(_xstance_agg_precision, "precision"), 
                 "recall" : partial(_xstance_agg_recall, "recall"), 
-                "f1" : partial(_xstance_agg_f1, "f1")}
+                "f1" : partial(_xstance_agg_f1, "f1")}'''
+        return {"acc":mean, "precision": partial(_xstance_agg, "precision"), 
+                "recall" : partial(_xstance_agg, "recall"), 
+                "f1" : partial(_xstance_agg, "f1")}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
