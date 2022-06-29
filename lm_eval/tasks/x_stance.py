@@ -41,6 +41,10 @@ def _xstance_agg_recall(key, items):
     recall_metric = datasets.load_metric("recall")
     return recall_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(predictions))[key]
 
+def _xstance_agg_f1(key, items):
+    references, predictions = zip(*items)
+    f1_metric = datasets.load_metric("recall")
+    return f1_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(predictions))[key]
 
 '''def _xstance_precision(y_true, y_pred):
     precision_metric = datasets.load_metric("precision")
@@ -180,7 +184,7 @@ class x_stance(Task):
 
         y_true = {"id":doc["id"], "true label":true_label}
 
-        return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred)}#, "f1":(true_label, pred)}
+        return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred)}, "f1":(true_label, pred)}
     
     def aggregation(self):
         """
@@ -195,11 +199,11 @@ class x_stance(Task):
 
 
         return {"acc":mean, "precision": partial(_xstance_agg_precision, "precision"), 
-                "recall" : partial(_xstance_agg_recall, "recall"), }
-                #"f1" : partial(_xstance_agg, "f1")}
+                "recall" : partial(_xstance_agg_recall, "recall"), 
+                "f1" : partial(_xstance_agg_f1, "f1")}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and a `bool` value determining whether or
         # not higher values of that metric are deemed better.
-        return {"acc":True, "precision":True, "recall":True,}# "f1":True}
+        return {"acc":True, "precision":True, "recall":True, "f1":True}
