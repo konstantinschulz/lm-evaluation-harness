@@ -184,10 +184,6 @@ class x_stance(Task):
         # determines how to combine results from each document in the dataset.
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
-
-        '''return {"acc":mean, "precision": partial(_xstance_agg_precision, "precision"), 
-                "recall" : partial(_xstance_agg_recall, "recall"), 
-                "f1" : partial(_xstance_agg_f1, "f1")}'''
         return {"acc":mean, "precision": partial(_xstance_agg_precision, "precision"), 
                 "recall" : partial(_xstance_agg_recall, "recall"), 
                 "f1" : partial(_xstance_agg_f1, "f1")}
