@@ -38,8 +38,9 @@ def _xstance_agg(key, items):
 
 def _xstance_precision(y_true, y_pred):
     precision_metric = datasets.load_metric("precision")
-
-    return precision_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
+    recall_metric = datasets.load_metric("recall")
+    return [precision_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred)),
+            recall_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))]
 
 
 class x_stance(Task):
@@ -167,7 +168,7 @@ class x_stance(Task):
 
         y_true = {"id":doc["id"], "true label":true_label}
 
-        return {"acc": pred==true_label, "precision":(true_label, pred)}
+        return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred)}
     
     def aggregation(self):
         """
@@ -181,10 +182,10 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "precision": partial(_xstance_agg, "precision")}
+        return {"acc":mean, "precision": partial(_xstance_agg, "precision"), "recall" : partial(_xstance_agg, "recall")}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and a `bool` value determining whether or
         # not higher values of that metric are deemed better.
-        return {"acc":True, "precision":True}
+        return {"acc":True, "precision":True, "recall":True}
