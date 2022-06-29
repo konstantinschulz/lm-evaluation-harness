@@ -40,7 +40,7 @@ def _xstance_precision(y_true, y_pred):
     return precision_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
 def _xstance_recall(y_true, y_pred):
-    recall_metric = datasets.load_metric("recall")
+    recall_metric = datasets.load_metric("precision", "recall")
     return recall_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
 def _xstance_metric(y_true, y_pred):
