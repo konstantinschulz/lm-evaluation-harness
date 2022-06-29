@@ -45,8 +45,10 @@ def _xstance_recall(y_true, y_pred):
     return recall_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
 def _xstance_metric(y_true, y_pred):
-    metric = datasets.load_metric('precision', 'recall')
-    return metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
+    metric = datasets.load_metric('precision')
+    rec = datasets.load_metric('recall')
+    return {metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred)),
+            rec.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))}
 
 
 class x_stance(Task):
