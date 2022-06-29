@@ -45,7 +45,7 @@ def _xstance_recall(y_true, y_pred):
     return recall_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
 def _xstance_metric(y_true, y_pred, key):
-    metric = datasets.load_metric(metric)
+    metric = datasets.load_metric(key)
     return metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
 
