@@ -184,7 +184,7 @@ class x_stance(Task):
 
         y_true = {"id":doc["id"], "true label":true_label}
 
-        return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred)}, "f1":(true_label, pred)}
+        return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
     
     def aggregation(self):
         """
