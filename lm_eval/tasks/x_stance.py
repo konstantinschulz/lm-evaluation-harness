@@ -16,7 +16,8 @@ import datasets
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
 from lm_eval.metrics import mean, perplexity, f1_score, acc_all
-from functools import partial 
+from functools import partial
+import numpy as np
 
 # TODO: Add the BibTeX citation for the task.
 _CITATION = """@inproceedings{vamvas2020xstance,
@@ -38,7 +39,7 @@ def _xstance_agg(key, items):
 def _xstance_precision(y_true, y_pred):
     precision_metric = datasets.load_metric("precision")
 
-    return precision_metric.compute(references=y_true, predictions=y_pred, average='macro')
+    return precision_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
 
 class x_stance(Task):
@@ -153,7 +154,7 @@ class x_stance(Task):
         # Accuracy: (TP+TN)/P+N
         pred = ""
         favor, against = results
-        print(favor)
+        
         # Evaluation metrics will only work with numerical labels
         if favor[0] > against[0]:
             pred = 1
