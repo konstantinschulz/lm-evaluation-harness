@@ -30,7 +30,7 @@ _CITATION = """@inproceedings{vamvas2020xstance,
 }
 """
 
-# Helper functions for aggregation (adapted from SQUAD script)
+# Helper functions for aggregation (separate function for each metric)
 def _xstance_agg_precision(key, items):
     references, predictions = zip(*items)
     precision_metric = datasets.load_metric("precision")
@@ -155,8 +155,7 @@ class x_stance(Task):
         # with the metric name as key and the corresponding metric result as value
         # for the current `doc`.
 
-        # Accuracy: (TP+TN)/P+N
-        pred = ""
+        pred = 0
         favor, against = results
         
         # Evaluation metrics will only work with numerical labels
