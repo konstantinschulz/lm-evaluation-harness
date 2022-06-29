@@ -46,7 +46,7 @@ def _xstance_recall(y_true, y_pred):
 
 def _xstance_metric(y_true, y_pred):
     process_id=1
-    metric = datasets.load_metric('precision', 'recall', process_id=1)
+    metric = datasets.load_metric('precision', 'recall', num_process=3, process_id=1)
     return metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
 
