@@ -152,10 +152,10 @@ class x_stance(Task):
 
         # Accuracy: (TP+TN)/P+N
         pred = ""
-        favor, _ = results
+        favor, against = results
         print(favor)
         # Evaluation metrics will only work with numerical labels
-        if favor[1] == True:
+        if favor[0] > against[0]:
             pred = 1
         else:
             pred = 0       
