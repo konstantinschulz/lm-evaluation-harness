@@ -31,11 +31,18 @@ _CITATION = """@inproceedings{vamvas2020xstance,
 """
 
 # Helper functions for aggregation (adapted from SQUAD script)
-def _xstance_agg(key, items):
+def _xstance_agg_precision(key, items):
     references, predictions = zip(*items)
-    return _xstance_recall(references, predictions)[key]
+    precision_metric = datasets.load_metric("precision")
+    return precision_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(y_pred))[key]
 
-def _xstance_precision(y_true, y_pred):
+def _xstance_agg_recall(key, items):
+    references, predictions = zip(*items)
+    recall_metric = datasets.load_metric("recall")
+    return recall_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(y_pred))[key]
+
+
+'''def _xstance_precision(y_true, y_pred):
     precision_metric = datasets.load_metric("precision")
     return precision_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
@@ -45,7 +52,7 @@ def _xstance_recall(y_true, y_pred):
 
 def _xstance_metric(y_true, y_pred):
     metric = datasets.load_metric('precision')
-    return metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
+    return metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))'''
 
 
 class x_stance(Task):
@@ -187,8 +194,8 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "precision": partial(_xstance_agg, "precision"), 
-                "recall" : partial(_xstance_agg, "recall"), }
+        return {"acc":mean, "precision": partial(_xstance_agg_precision, "precision"), 
+                "recall" : partial(_xstance_agg_recall, "recall"), }
                 #"f1" : partial(_xstance_agg, "f1")}
 
     def higher_is_better(self):
