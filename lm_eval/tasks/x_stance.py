@@ -47,7 +47,7 @@ def _xstance_agg_f1(key, items):
     return f1_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(predictions))[key]
 
 def _xstance_metric(predictions, references):
-    xstance_metric = datasets.load_metric('precision', 'recall', 'f1', process_id=1)
+    xstance_metric = datasets.load_metric('precision', 'recall', 'f1')
     return xstance_metric.compute(predictions=predictions, references=references)
 
 
