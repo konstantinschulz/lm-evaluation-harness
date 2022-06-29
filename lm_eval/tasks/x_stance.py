@@ -34,7 +34,7 @@ _CITATION = """@inproceedings{vamvas2020xstance,
 # Helper functions for aggregation (adapted from SQUAD script)
 def _xstance_agg(key, items):
     references, predictions = zip(*items)
-    return _xstance_metric(references, predictions, key)[key]
+    return _xstance_metric(references, predictions)[key]
 
 def _xstance_precision(y_true, y_pred):
     precision_metric = datasets.load_metric("precision")
@@ -44,8 +44,8 @@ def _xstance_recall(y_true, y_pred):
     recall_metric = datasets.load_metric("recall")
     return recall_metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
-def _xstance_metric(y_true, y_pred, key):
-    metric = datasets.load_metric(key)
+def _xstance_metric(y_true, y_pred):
+    metric = datasets.load_metric('precision', 'recall', 'f1')
     return metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
 
@@ -188,10 +188,12 @@ class x_stance(Task):
         # Check `lm_eval.metrics` to find built-in aggregation functions.
 
 
-        return {"acc":mean, "precision": partial(_xstance_agg, "precision"), "recall" : partial(_xstance_agg, "recall")}
+        return {"acc":mean, "precision": partial(_xstance_agg, "precision"), 
+                "recall" : partial(_xstance_agg, "recall"), 
+                "f1" : partial(_xstance_agg, "f1")}
 
     def higher_is_better(self):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and a `bool` value determining whether or
         # not higher values of that metric are deemed better.
-        return {"acc":True, "precision":True, "recall":True}
+        return {"acc":True, "precision":True, "recall":True, "f1":True}
