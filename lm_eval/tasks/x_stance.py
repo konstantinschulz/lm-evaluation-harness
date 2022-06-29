@@ -12,7 +12,6 @@ https://github.com/ZurichNLP/xstance
 """
 
 import datasets
-from datasets import precision, recall
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
 from lm_eval.metrics import mean
