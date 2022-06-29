@@ -34,17 +34,17 @@ _CITATION = """@inproceedings{vamvas2020xstance,
 def _xstance_agg_precision(key, items):
     references, predictions = zip(*items)
     precision_metric = datasets.load_metric("precision")
-    return precision_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(predictions))[key]
+    return precision_metric.compute(references=references, predictions=predictions, average='macro')[key]
 
 def _xstance_agg_recall(key, items):
     references, predictions = zip(*items)
     recall_metric = datasets.load_metric("recall")
-    return recall_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(predictions))[key]
+    return recall_metric.compute(references=references, predictions=predictions, average='macro')[key]
 
 def _xstance_agg_f1(key, items):
     references, predictions = zip(*items)
     f1_metric = datasets.load_metric("f1")
-    return f1_metric.compute(references=references, predictions=predictions, average='macro', labels=np.unique(predictions))[key]
+    return f1_metric.compute(references=references, predictions=predictions, average='macro')[key]
 
 class x_stance(Task):
     VERSION = 0
