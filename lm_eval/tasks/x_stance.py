@@ -46,7 +46,7 @@ def _xstance_recall(y_true, y_pred):
 
 def _xstance_metric(y_true, y_pred):
     process_id=1
-    metric = datasets.load_metric(process_id=process_id, 'precision', 'recall', 'f1')
+    metric = datasets.load_metric('precision', 'recall', 'f1')
     return metric.compute(references=y_true, predictions=y_pred, average='macro', labels=np.unique(y_pred))
 
 
@@ -175,7 +175,7 @@ class x_stance(Task):
 
         y_true = {"id":doc["id"], "true label":true_label}
 
-        return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred)}
+        return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
     
     def aggregation(self):
         """
