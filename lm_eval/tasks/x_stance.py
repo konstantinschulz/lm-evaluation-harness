@@ -155,10 +155,10 @@ class x_stance(Task):
         favor, _ = results
         
         if favor[1] == True:
-            pred = 1
+            pred = "FAVOR"
         else:
-            pred = 0       
-        true_label = doc["numerical_label"]
+            pred = "AGAINST"       
+        true_label = doc["label"]
         
         # Save prediction and true label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
