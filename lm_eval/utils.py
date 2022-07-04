@@ -105,6 +105,8 @@ def get_rolling_token_windows(token_list, prefix_token, max_seq_len, context_len
         window_pred_len = min(len(token_list) - predicted, pred_len)
         window_end = predicted + window_pred_len
 
+        print(f'window length = {len(token_list[window_end - max_seq_len - 1 : window_end - 1])}, {len(token_list[window_end - window_pred_len : window_end])}')
+
         yield (
             token_list[window_end - max_seq_len - 1 : window_end - 1],
             token_list[window_end - window_pred_len : window_end],
