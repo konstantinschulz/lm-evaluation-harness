@@ -248,11 +248,13 @@ class BaseLM(LM):
             # tensors, then we pack them together into a batch, call the model, and then pick it all apart
             # again because vectorizing is annoying
 
-            for _, context_enc, continuation_enc in chunk:
+            for chunk_i, (_, context_enc, continuation_enc) in enumerate(chunk):
                 # sanity check
                 if len(context_enc) > 0:
-                    raise ValueError(f'Sanity check failed. context_enc = {len(context_enc)} > 0; '
-                                     f'chunk = {chunk}; requests = {requests}')
+                    raise ValueError(f'Sanity check failed. chuck #{chunk_i}; '
+                                     f'context_enc = {len(context_enc)} = {context_enc} > 0; '
+                                     f'chunk = {chunk}; '
+                                     f'requests = {requests}')
                 # assert len(context_enc) > 0
                 assert len(continuation_enc) > 0
                 assert len(continuation_enc) <= self.max_length
