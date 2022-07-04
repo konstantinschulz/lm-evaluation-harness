@@ -90,7 +90,7 @@ class x_stance(Task):
             # named differently than the default `"validation"`.
             return self.dataset["validation"]
 
-     def test_docs(self):
+    def test_docs(self):
         if self.has_test_docs():
             # TODO: Return the test document generator from `self.dataset`.
             # If you need to process the data, `map` over the documents with the
