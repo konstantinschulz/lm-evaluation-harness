@@ -76,7 +76,8 @@ class x_stance(Task):
                 # `map(self._process_doc, self.dataset["validation"])`
                 # In most case you can leave this as is unless the dataset split is
                 # named differently than the default `"train"`.
-                self._training_docs = list(self.dataset["train"])
+                self._training_docs = list(self.dataset["train"]["language"]=="de")
+
             return self._training_docs
 
     def validation_docs(self):
