@@ -105,7 +105,7 @@ def get_rolling_token_windows(token_list, prefix_token, max_seq_len, context_len
         window_pred_len = min(len(token_list) - predicted, pred_len)
         window_end = predicted + window_pred_len
 
-        print(f'window length = {len(token_list[window_end - max_seq_len - 1 : window_end - 1])}, {len(token_list[window_end - window_pred_len : window_end])}')
+        # print(f'window length = {len(token_list[window_end - max_seq_len - 1 : window_end - 1])}, {len(token_list[window_end - window_pred_len : window_end])}')
 
         window_a = token_list[window_end - max_seq_len - 1 : window_end - 1]
         window_b = token_list[window_end - window_pred_len : window_end]
@@ -126,7 +126,7 @@ def make_disjoint_window(pair):
 
     a, b = pair
 
-    print(f'make_disjoint_window {len(a[: -(len(b) - 1)])}, {len(b)}')
+    # print(f'make_disjoint_window {len(a[: -(len(b) - 1)])}, {len(b)}')
 
     return a[: -(len(b) - 1)], b
 

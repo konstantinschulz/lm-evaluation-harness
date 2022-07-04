@@ -37,16 +37,17 @@ class WechselDE(PerplexityTask):
     def has_test_docs(self):
         return True
 
-    def _process_doc(self, doc):
-        print(f'process doc: {doc}')
-        if len(doc) < 1:
-            raise ValueError(f'Empty document')
-
-        return doc
+    # def _process_doc(self, doc):
+    #     print(f'process doc: {doc}')
+    #     if len(doc) < 1:
+    #         raise ValueError(f'Empty document')
+    #
+    #     return doc
 
     def test_docs(self):
         # enforce minimum length
-        return [t for t in self.dataset['text'] if len(t) > 1]
+        #  if len(t) > 1
+        return [t for t in self.dataset['text']]
 
     def doc_to_target(self, doc):
         if len(doc) < 1:
@@ -54,6 +55,6 @@ class WechselDE(PerplexityTask):
 
         return doc
 
-    def count_words(self, doc):
-        # count number of words in *original doc before detokenization*
-        return len(re.split(r"\s+", doc))
+    # def count_words(self, doc):
+    #     # count number of words in *original doc before detokenization*
+    #     return len(re.split(r"\s+", doc))

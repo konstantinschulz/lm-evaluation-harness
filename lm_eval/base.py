@@ -172,7 +172,7 @@ class BaseLM(LM):
     def loglikelihood(self, requests):
         new_reqs = []
         for context, continuation in requests:
-            print(f'  >>> loglikelihood >>>   {context=} {continuation=}\n\n')
+            # print(f'  >>> loglikelihood >>>   {context=} {continuation=}\n\n')
             if context == "":
                 # end of text as context
                 context_enc = [self.eot_token_id]
@@ -189,7 +189,7 @@ class BaseLM(LM):
         # TODO: Implement caching once we've confirmed the perplexity implementation
         # TODO: automatic batch size detection for vectorization
 
-        print(f'loglikelihood_rolling => {requests=}')
+        # print(f'loglikelihood_rolling => {requests=}')
 
         loglikelihoods = []
         for (string,) in tqdm(requests):
@@ -209,7 +209,7 @@ class BaseLM(LM):
 
             rolling_token_windows = [(None,) + x for x in rolling_token_windows]
 
-            print(f'xxxx     loglikelihood_rolling  = {rolling_token_windows=}')
+            # print(f'xxxx     loglikelihood_rolling  = {rolling_token_windows=}')
 
             # TODO: extract out this call so it only gets called once and also somehow figure out partial caching for
             # that
