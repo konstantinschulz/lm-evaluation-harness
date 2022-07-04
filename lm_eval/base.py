@@ -189,8 +189,12 @@ class BaseLM(LM):
         # TODO: Implement caching once we've confirmed the perplexity implementation
         # TODO: automatic batch size detection for vectorization
 
+        print(f'loglikelihood_rolling => {requests=}')
+
         loglikelihoods = []
         for (string,) in tqdm(requests):
+            print(f'loglikelihood_rolling string => {string=}')
+
             rolling_token_windows = list(
                 map(
                     utils.make_disjoint_window,
@@ -204,6 +208,8 @@ class BaseLM(LM):
             )
 
             rolling_token_windows = [(None,) + x for x in rolling_token_windows]
+
+            print(f'xxxx     loglikelihood_rolling  = {rolling_token_windows=}')
 
             # TODO: extract out this call so it only gets called once and also somehow figure out partial caching for
             # that
