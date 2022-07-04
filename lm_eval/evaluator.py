@@ -217,7 +217,7 @@ def evaluate(
                 print(f'skip {doc_id}')
                 continue
 
-            print(f'{doc_id=}  {doc=}')
+            # print(f'{doc_id=}  {doc=}')
 
             if decontaminate and task.should_decontaminate():
                 docs_for_decontamination[(task_name, task_set)].append(
@@ -237,7 +237,7 @@ def evaluate(
                 # doc_id: unique id that we can get back to a doc using `docs`
                 requests_origin[req.request_type].append((i, task_name, doc, doc_id))
 
-                print(f'--- {req=} {i=} {doc_id=}')
+                # print(f'--- {req=} {i=} {doc_id=}')
 
     # Compare all tasks/sets at once to ensure a single training set scan
     if decontaminate:
