@@ -288,6 +288,7 @@ TASK_REGISTRY = {
     # X-Stance
     "x_stance":x_stance.x_stance,
     "x_stance_multilingual":x_stance.x_stance_multilingual,
+    "x_stance_german":x_stance.x_stance_german,
 }
 
 
