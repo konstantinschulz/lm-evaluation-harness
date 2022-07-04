@@ -172,6 +172,7 @@ class BaseLM(LM):
     def loglikelihood(self, requests):
         new_reqs = []
         for context, continuation in requests:
+            print(f'  >>> loglikelihood >>>   {context=} {continuation=}\n\n')
             if context == "":
                 # end of text as context
                 context_enc = [self.eot_token_id]
