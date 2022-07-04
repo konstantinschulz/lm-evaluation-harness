@@ -250,9 +250,9 @@ class BaseLM(LM):
 
             for chunk_i, (_, context_enc, continuation_enc) in enumerate(chunk):
                 # sanity check
-                if len(context_enc) > 0:
+                if not (len(context_enc) > 0):
                     raise ValueError(f'Sanity check failed. chuck #{chunk_i}; '
-                                     f'context_enc = {len(context_enc)} = {context_enc} > 0; '
+                                     f'context_enc = {len(context_enc)} = {context_enc} <= 0; '
                                      f'chunk = {chunk}; '
                                      f'requests = {requests}')
                 # assert len(context_enc) > 0
