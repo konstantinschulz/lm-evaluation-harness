@@ -119,6 +119,8 @@ def make_disjoint_window(pair):
 
     a, b = pair
 
+    print(f'make_disjoint_window {len(a[: -(len(b) - 1)])}, {len(b)}')
+
     return a[: -(len(b) - 1)], b
 
 
