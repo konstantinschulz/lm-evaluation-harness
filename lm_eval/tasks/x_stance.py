@@ -110,7 +110,7 @@ class x_stance(Task):
         if doc["language"]=="de":
             return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "+ doc["label"])
         else:
-            ""
+            return ""
 
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
@@ -118,7 +118,7 @@ class x_stance(Task):
         if doc["language"]=="de":
             return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: ")
         else:
-            ""
+            return ""
 
     def doc_to_target(self, doc):
         # TODO: Fill in the `target` ("gold answer") variable.
@@ -129,7 +129,7 @@ class x_stance(Task):
             target = doc["label"]
             return " " + target
         else:
-            ""
+            return ""
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
