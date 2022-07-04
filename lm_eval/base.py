@@ -250,7 +250,10 @@ class BaseLM(LM):
 
             for _, context_enc, continuation_enc in chunk:
                 # sanity check
-                assert len(context_enc) > 0
+                if len(context_enc) > 0:
+                    raise ValueError(f'Sanity check failed. context_enc = {len(context_enc)} > 0; '
+                                     f'chunk = {chunk}; requests = {requests}')
+                # assert len(context_enc) > 0
                 assert len(continuation_enc) > 0
                 assert len(continuation_enc) <= self.max_length
 
