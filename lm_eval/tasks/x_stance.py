@@ -53,7 +53,7 @@ class x_stance(Task):
     DATASET_PATH = "x_stance"
     # TODO: Add the `DATASET_NAME` string. This is the name of a subset within
     # `DATASET_PATH`. If there aren't specific subsets you need, leave this as `None`.
-    DATASET_NAME = None
+    DATASET_NAME = "de"
     
     def has_training_docs(self):
         return True
@@ -76,7 +76,7 @@ class x_stance(Task):
                 # `map(self._process_doc, self.dataset["validation"])`
                 # In most case you can leave this as is unless the dataset split is
                 # named differently than the default `"train"`.
-                self._training_docs = list(self.dataset["train"] where ["language"]=="de")
+                self._training_docs = list(self.dataset["train"])
 
             return self._training_docs
 
