@@ -215,6 +215,7 @@ def evaluate(
         for doc_id, doc in enumerate(itertools.islice(task_docs, 0, limit)):
             if skip is not None and doc_id < skip:
                 print(f'skip {doc_id}')
+                continue
 
             print(f'{doc_id=}  {doc=}')
 
