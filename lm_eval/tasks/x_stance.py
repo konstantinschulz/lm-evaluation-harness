@@ -100,7 +100,7 @@ class x_stance(Task):
             # named differently than the default `"test"`.
             return self.dataset["test"]
         
-     def _process_doc(self, doc):
+    def _process_doc(self, doc):
         # Process (detokenize, strip, replace etc.) each individual `doc`
         # with this function. You can map this across the docs in each available
         # dataset split. See the TODOs in `train_docs`, `validation_docs`, and
