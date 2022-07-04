@@ -125,8 +125,11 @@ class x_stance(Task):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
-        target = doc["label"]
-        return " " + target
+        if doc["language"]=="de":
+            target = doc["label"]
+            return " " + target
+        else:
+            pass
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
