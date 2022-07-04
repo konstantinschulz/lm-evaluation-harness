@@ -237,6 +237,8 @@ def evaluate(
                 # doc_id: unique id that we can get back to a doc using `docs`
                 requests_origin[req.request_type].append((i, task_name, doc, doc_id))
 
+                print(f'--- {req=} {i=} {doc_id=}')
+
     # Compare all tasks/sets at once to ensure a single training set scan
     if decontaminate:
         from lm_eval.decontamination.decontaminate import get_train_overlap
