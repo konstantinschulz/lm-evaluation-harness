@@ -21,6 +21,7 @@ def simple_evaluate(
     device=None,
     no_cache=False,
     limit=None,
+    skip=None,
     bootstrap_iters=100000,
     description_dict=None,
     check_integrity=False,
@@ -93,6 +94,7 @@ def simple_evaluate(
         task_dict=task_dict,
         num_fewshot=num_fewshot,
         limit=limit,
+        skip=skip,
         bootstrap_iters=bootstrap_iters,
         description_dict=description_dict,
         decontamination_ngrams_path=decontamination_ngrams_path,
@@ -124,6 +126,7 @@ def evaluate(
     provide_description=None,
     num_fewshot=0,
     limit=None,
+    skip=None,
     bootstrap_iters=100000,
     description_dict=None,
     decontamination_ngrams_path=None,
@@ -210,6 +213,10 @@ def evaluate(
         )
 
         for doc_id, doc in enumerate(itertools.islice(task_docs, 0, limit)):
+            if skip is not None and doc_id < skip:
+                print(f'skip {doc_id}')
+
+            print(f'{doc_id=}  {doc=}')
 
             if decontaminate and task.should_decontaminate():
                 docs_for_decontamination[(task_name, task_set)].append(
