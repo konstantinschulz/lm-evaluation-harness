@@ -14,10 +14,9 @@ from math import exp
 from datasets import Dataset
 
 from lm_eval.base import rf
-from .common import HFTask
 from functools import partial
 from packaging import version
-
+from ..base import Task
 _CITATION = """
 @article{lewis2019mlqa,
   title={MLQA: Evaluating Cross-lingual Extractive Question Answering},
@@ -39,7 +38,7 @@ def _squad_agg(key, items):
     return _squad_metric(predictions=predictions, references=references)[key]
 
 
-class MLQA(HFTask):
+class MLQA(Task):
     VERSION = 1
     DATASET_PATH = "mlqa"
     DATASET_NAME = "mlqa.de.de"
@@ -49,7 +48,10 @@ class MLQA(HFTask):
     # HF changed squad on us so we have to make sure we aren't running the old one
     assert version.parse(datasets.__version__) >= version.parse(
         "1.11.0"), "datasets v1.11.0 or later required for MLQA"
-
+    
+    def download(self):
+        self.data = datasets.load_dataset(path=self.DATASET_PATH, name=self.DATASET_NAME)
+        
     def has_training_docs(self):
         return False
 
@@ -59,14 +61,25 @@ class MLQA(HFTask):
     def has_test_docs(self):
         return True
 
+    def _convert_standard(self, doc):
+        return doc
+
     def training_docs(self):
-        return self.data["train"]
+        if self.has_training_docs():
+            if self._training_docs is None:
+                self._training_docs = list(map(self._convert_standard, self.data["train"]))
+            return self._training_docs
+
+    def validation_docs(self):
+        if self.has_validation_docs():
+            return map(self._convert_standard, self.data["validation"])
 
     def test_docs(self):
-        return self.data["test"]
+        if self.has_test_docs():
+            return map(self._convert_standard, self.data["test"])
 
     def doc_to_text(self, doc):
-        return 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
+        return 'Context: '+ doc['context'] + '\n\n' + 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
 
     def doc_to_target(self, doc):
         answer_list = doc['answers']['text']
