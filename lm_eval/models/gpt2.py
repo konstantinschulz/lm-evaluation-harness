@@ -4,8 +4,15 @@ from lm_eval.base import BaseLM
 
 
 class HFLM(BaseLM):
-
-    def __init__(self, device='cuda', pretrained='gpt2', revision='main', subfolder=None, tokenizer=None, batch_size=1):
+    def __init__(
+        self,
+        device="cuda",
+        pretrained="gpt2",
+        revision="main",
+        subfolder=None,
+        tokenizer=None,
+        batch_size=1,
+    ):
         super().__init__()
 
         assert isinstance(device, str)
@@ -13,32 +20,54 @@ class HFLM(BaseLM):
         assert isinstance(batch_size, int)
 
         if device:
+            if device not in ["cuda", "cpu"]:
+                device = int(device)
             self._device = torch.device(device)
+            print(f"Using device '{device}'")
         else:
-            self._device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+            print("Device not specified")
+            print(f"Cuda Available? {torch.cuda.is_available()}")
+            self._device = (
+                torch.device("cuda")
+                if torch.cuda.is_available()
+                else torch.device("cpu")
+            )
 
         # TODO: update this to be less of a hack once subfolder is fixed in HF
         self.gpt2 = transformers.AutoModelForCausalLM.from_pretrained(
-            pretrained, revision=revision + ("/" + subfolder if subfolder is not None else "")
+            pretrained,
+            revision=revision + ("/" + subfolder if subfolder is not None else ""),
         ).to(self.device)
         self.gpt2.eval()
 
         # pretrained tokenizer for neo is broken for now so just hard-coding this to gpt2
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(
-            pretrained if tokenizer is None else tokenizer, revision=revision, subfolder=subfolder)
+            pretrained if tokenizer is None else tokenizer,
+            revision=revision,
+            subfolder=subfolder,
+        )
 
-        assert isinstance(self.tokenizer, (
-            transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast,
-            transformers.T5Tokenizer, transformers.T5TokenizerFast,
-            transformers.XGLMTokenizer, transformers.XGLMTokenizerFast
-        )), "this tokenizer has not been checked for compatibility yet!"
+        assert isinstance(
+            self.tokenizer,
+            (
+                transformers.GPT2Tokenizer,
+                transformers.GPT2TokenizerFast,
+                transformers.T5Tokenizer,
+                transformers.T5TokenizerFast,
+            ),
+        ), "this tokenizer has not been checked for compatibility yet!"
 
         self.vocab_size = self.tokenizer.vocab_size
 
-        if isinstance(self.tokenizer, (transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast)):
-            assert self.tokenizer.encode('hello\n\nhello') == [17337, 79, 186, 186, 17337, 79], \
-                self.tokenizer.encode('hello\n\nhello')  # [31373, 198, 198, 31373] [462, 23142, 203, 203, 462, 23142]
-            # [31884, 79, 152, 152, 31884, 79] [72, 13796, 184, 184, 72, 13796]
+        if isinstance(
+            self.tokenizer, (transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast)
+        ):
+            assert self.tokenizer.encode("hello\n\nhello") == [
+                31373,
+                198,
+                198,
+                31373,
+            ], self.tokenizer.encode("hello\n\nhello")
 
         # multithreading and batching
         self.batch_size_per_gpu = batch_size  # todo: adaptive batch size
@@ -94,10 +123,7 @@ class HFLM(BaseLM):
 
     def _model_generate(self, context, max_length, eos_token_id):
         return self.gpt2.generate(
-            context,
-            max_length=max_length,
-            eos_token_id=eos_token_id,
-            do_sample=False
+            context, max_length=max_length, eos_token_id=eos_token_id, do_sample=False
         )
 
 
