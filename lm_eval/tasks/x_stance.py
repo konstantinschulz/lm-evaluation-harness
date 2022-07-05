@@ -77,7 +77,9 @@ class x_stance(Task):
                 # In most case you can leave this as is unless the dataset split is
                 # named differently than the default `"train"`.
                 self._training_docs = list(self.dataset["train"])
-
+            for d in self.training_docs:
+                if d.contains("\"language\": \"de") == False:
+                    self.training_docs = self.training_docs.remove(d)
             return self._training_docs
 
     def validation_docs(self):
@@ -88,7 +90,12 @@ class x_stance(Task):
             # `map(self._process_doc, self.dataset["validation"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"validation"`.
-            return self.dataset["validation"]
+            val_docs = []
+            for d in self.dataset["validation"]:
+                if d.contains("\"language\": \"de") == True:
+                    val_docs.append(d)
+            return val_docs        
+            #return self.dataset["validation"]
 
     def test_docs(self):
         if self.has_test_docs():
@@ -98,7 +105,12 @@ class x_stance(Task):
             # `map(self._process_doc, self.dataset["test"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"test"`.
-            return self.dataset["test"]
+            test_docs = []
+            for d in self.dataset["test"]:
+                if d.contains("\"language\": \"de") == True:
+                    test_docs.append(d)
+            return test_docs                    
+            #return self.dataset["test"]
         
     def _process_doc(self, doc):
         # Process (detokenize, strip, replace etc.) each individual `doc`
@@ -107,29 +119,32 @@ class x_stance(Task):
         # `test_docs` for snippets.
         # Returns only docs with German comments
         #Not needed if test should pass
-        if doc["language"]=="de":
+        '''if doc["language"]=="de":
             return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "+ doc["label"])
         else:
-            return " "
+            return " "'''
+        return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "+ doc["label"])
 
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
         # Query part consists of the question and comment part only (no label)
-        if doc["language"]=="de":
+        '''if doc["language"]=="de":
             return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: ")
         else:
-            return " "
-
+            return " "'''
+        return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: ")
     def doc_to_target(self, doc):
         # TODO: Fill in the `target` ("gold answer") variable.
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
-        if doc["language"]=="de":
+        '''if doc["language"]=="de":
             target = doc["label"]
             return " " + target
         else:
-            return " "
+            return " "'''
+        target = doc["label"]
+        return " " + target
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
