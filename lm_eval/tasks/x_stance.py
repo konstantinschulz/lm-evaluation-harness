@@ -92,7 +92,7 @@ class x_stance(Task):
             # named differently than the default `"validation"`.
             val_docs = []
             for d in self.dataset["validation"]:
-                if "\"language\": \"de" in d:
+                if d["language"]=="de":
                     val_docs.append(d)
             return val_docs        
             #return self.dataset["validation"]
@@ -107,7 +107,7 @@ class x_stance(Task):
             # named differently than the default `"test"`.
             test_docs = []
             for d in self.dataset["test"]:
-                if "\"language\": \"de" in d:
+                if d["language"]=="de":
                     test_docs.append(d)
             return test_docs                    
             #return self.dataset["test"]
