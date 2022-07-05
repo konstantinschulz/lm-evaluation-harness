@@ -5,7 +5,7 @@ http://ceur-ws.org/Vol-2624/paper9.pdf
 
 The x-stance dataset consists of more than 150 political questions and 67,000 comments by candidates.
 It can be used to train and evaluate stance detection systems.
-Comments are in German, French and Italian. Questions are given in all three languages and English.
+Comments are in German, French and Italian (for this task only the German subset has been selected). Questions are given in all three languages and English.
 The data have been extracted from the Swiss voting advice platform Smartvote.
 
 https://github.com/ZurichNLP/xstance
@@ -77,9 +77,7 @@ class x_stance(Task):
                 # In most case you can leave this as is unless the dataset split is
                 # named differently than the default `"train"`.
                 self._training_docs = list(self.dataset["train"])
-            for d in self.training_docs:
-                if "\"language\": \"de" not in d:
-                    self.training_docs = self.training_docs.remove(d)
+
             return self._training_docs
 
     def validation_docs(self):
@@ -90,12 +88,7 @@ class x_stance(Task):
             # `map(self._process_doc, self.dataset["validation"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"validation"`.
-            val_docs = []
-            for d in self.dataset["validation"]:
-                if d["language"]=="de":
-                    val_docs.append(d)
-            return val_docs        
-            #return self.dataset["validation"]
+            return self.dataset["validation"]
 
     def test_docs(self):
         if self.has_test_docs():
@@ -105,12 +98,7 @@ class x_stance(Task):
             # `map(self._process_doc, self.dataset["test"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"test"`.
-            test_docs = []
-            for d in self.dataset["test"]:
-                if d["language"]=="de":
-                    test_docs.append(d)
-            return test_docs                    
-            #return self.dataset["test"]
+            return self.dataset["test"]
         
     def _process_doc(self, doc):
         # Process (detokenize, strip, replace etc.) each individual `doc`
@@ -119,32 +107,29 @@ class x_stance(Task):
         # `test_docs` for snippets.
         # Returns only docs with German comments
         #Not needed if test should pass
-        '''if doc["language"]=="de":
+        if doc["language"]=="de":
             return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "+ doc["label"])
         else:
-            return " "'''
-        return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "+ doc["label"])
+            return " "
 
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
         # Query part consists of the question and comment part only (no label)
-        '''if doc["language"]=="de":
+        if doc["language"]=="de":
             return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: ")
         else:
-            return " "'''
-        return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: ")
+            return " "
+
     def doc_to_target(self, doc):
         # TODO: Fill in the `target` ("gold answer") variable.
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
-        '''if doc["language"]=="de":
+        if doc["language"]=="de":
             target = doc["label"]
             return " " + target
         else:
-            return " "'''
-        target = doc["label"]
-        return " " + target
+            return " "
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
