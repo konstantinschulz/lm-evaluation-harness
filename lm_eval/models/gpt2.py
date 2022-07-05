@@ -4,8 +4,15 @@ from lm_eval.base import BaseLM
 
 
 class HFLM(BaseLM):
-
-    def __init__(self, device='cuda', pretrained='gpt2', revision='main', subfolder=None, tokenizer=None, batch_size=1):
+    def __init__(
+        self,
+        device="cuda",
+        pretrained="gpt2",
+        revision="main",
+        subfolder=None,
+        tokenizer=None,
+        batch_size=1,
+    ):
         super().__init__()
 
         assert isinstance(device, str)
