@@ -78,7 +78,7 @@ class x_stance(Task):
                 # named differently than the default `"train"`.
                 self._training_docs = list(self.dataset["train"])
             for d in self.training_docs:
-                if d.contains("\"language\": \"de") == False:
+                if "\"language\": \"de" not in d:
                     self.training_docs = self.training_docs.remove(d)
             return self._training_docs
 
@@ -92,7 +92,7 @@ class x_stance(Task):
             # named differently than the default `"validation"`.
             val_docs = []
             for d in self.dataset["validation"]:
-                if d.contains("\"language\": \"de") == True:
+                if "\"language\": \"de" in d:
                     val_docs.append(d)
             return val_docs        
             #return self.dataset["validation"]
@@ -107,7 +107,7 @@ class x_stance(Task):
             # named differently than the default `"test"`.
             test_docs = []
             for d in self.dataset["test"]:
-                if d.contains("\"language\": \"de") == True:
+                if "\"language\": \"de" in d:
                     test_docs.append(d)
             return test_docs                    
             #return self.dataset["test"]
