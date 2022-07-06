@@ -286,7 +286,7 @@ TASK_REGISTRY = {
     # "sat": sat.SATAnalogies,
 
     # X-Stance
-    "x_stance":x_stance.x_stance,
+    "x_stance":x_stance.XStance,
 }
 
 
