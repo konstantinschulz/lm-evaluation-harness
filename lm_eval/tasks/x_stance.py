@@ -11,15 +11,15 @@ The data have been extracted from the Swiss voting advice platform Smartvote.
 https://github.com/ZurichNLP/xstance
 """
 
-import datasets
+from datasets import Dataset
 from lm_eval.base import Task, rf
-import lm_eval.datasets.x_stance.x_stance
+#import lm_eval.datasets.x_stance.x_stance
 from lm_eval.metrics import mean
 from functools import partial
 import numpy as np
 
-# TODO: Add the BibTeX citation for the task.
-_CITATION = """@inproceedings{vamvas2020xstance,
+_CITATION = """
+@inproceedings{vamvas2020xstance,
     author    = "Vamvas, Jannis and Sennrich, Rico",
     title     = "{X-Stance}: A Multilingual Multi-Target Dataset for Stance Detection",
     booktitle = "Proceedings of the 5th Swiss Text Analytics Conference (SwissText)  16th Conference on Natural Language Processing (KONVENS)",
@@ -46,13 +46,9 @@ def _xstance_agg_f1(key, items):
     f1_metric = datasets.load_metric("f1")
     return f1_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions))[key]
 
-class x_stance(Task):
+class XStance(Task):
     VERSION = 0
-    # TODO: Add the `DATASET_PATH` string. This will be the name of the `Task`
-    # dataset as denoted in HuggingFace `datasets`.
     DATASET_PATH = "x_stance"
-    # TODO: Add the `DATASET_NAME` string. This is the name of a subset within
-    # `DATASET_PATH`. If there aren't specific subsets you need, leave this as `None`.
     DATASET_NAME = None
     
     def has_training_docs(self):
