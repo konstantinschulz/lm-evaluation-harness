@@ -102,7 +102,7 @@ class XStance(Task):
         # Returns only docs with German comments
         #Not needed if test should pass
         if doc["language"]=="de":
-            return {"QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "+ doc["label"]}
+            return dict("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "+ doc["label"])
         else:
             pass
 
