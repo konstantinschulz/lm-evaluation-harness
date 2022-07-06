@@ -109,7 +109,7 @@ class XStance(Task):
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
         # Query part consists of the question and comment part only (no label)
-        if doc != None:
+        if type(doc) != None:
             return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
 
     def doc_to_target(self, doc):
