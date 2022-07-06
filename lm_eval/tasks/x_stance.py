@@ -109,7 +109,7 @@ class XStance(Task):
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
         # Query part consists of the question and comment part only (no label)
-        if type(doc) != None:
+        if doc is not None:
             return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
 
     def doc_to_target(self, doc):
@@ -117,6 +117,7 @@ class XStance(Task):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
+        
         target = doc["label"]
         return " " + target
 
