@@ -76,8 +76,8 @@ class XStance(Task):
         
     def doc_to_text(self, doc):
         #return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
-        return "question: "+ doc["question"]+ "\n\n"+ "comment: "+ doc["comment"]+ "\n\n"+ "label: "
-        #return "Frage: "+ doc["question"]+ "\n\n"+ "Kommentar: "+ doc["comment"]+ "\n\n"+ "Kategorie: "
+        #return "question: "+ doc["question"]+ "\n\n"+ "comment: "+ doc["comment"]+ "\n\n"+ "label: "
+        return "Frage: "+ doc["question"]+ "\n\n"+ "Kommentar: "+ doc["comment"]+ "\n\n"+ "Label: "
 
     def doc_to_target(self, doc):
         target = doc["label"]
