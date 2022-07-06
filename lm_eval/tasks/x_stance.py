@@ -115,15 +115,15 @@ class XStance(Task):
             The results of the requests created in construct_requests.
         """
 
-        pred = 0
+        pred = ""
         favor, against = results
         
         # Evaluation metrics will only work with numerical labels
         if favor[0] > against[0]:
-            pred = 1
+            pred = "FAVOR"
         else:
-            pred = 0       
-        true_label = doc["numerical_label"]
+            pred = "AGAINST"      
+        true_label = doc["label"]
         
         # Save prediction and true label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
