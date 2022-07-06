@@ -101,17 +101,17 @@ class XStance(Task):
         # `test_docs` for snippets.
         # Returns only docs with German comments
         #Not needed if test should pass
-
-        if doc["language"]=="de":
-            return {"question":doc["question"], "comment":doc["comment"], "label":doc["label"]}
+        d = doc.filter(lambda example: example['language']=="de")
+        #if doc["language"]=="de":
+        return {"question":d["question"], "comment":d["comment"], "label":d["label"]}
         #else:
         #    pass
 
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
         # Query part consists of the question and comment part only (no label)
-        if type(doc) is dict:
-            return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
+        #if type(doc) is dict:
+        return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
         #else:
         #    pass
 
@@ -120,9 +120,9 @@ class XStance(Task):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
-        if type(doc) is dict:
-            target = doc["label"]
-            return " " + target
+        #if type(doc) is dict:
+        target = doc["label"]
+        return " " + target
         #else:
         #    pass
 
