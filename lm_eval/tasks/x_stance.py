@@ -101,6 +101,7 @@ class XStance(Task):
         # `test_docs` for snippets.
         # Returns only docs with German comments
         #Not needed if test should pass
+        print(type(doc))
         if doc["language"]=="de":
             return {"question":doc["question"], "comment":doc["comment"], "label":doc["label"]}
         #else:
