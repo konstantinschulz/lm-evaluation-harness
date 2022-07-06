@@ -82,7 +82,7 @@ class XStance(Task):
             # `map(self._process_doc, self.dataset["validation"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"validation"`.
-            return self.dataset["validation"]
+            return map(self._process_doc, self.dataset["validation"])
 
     def test_docs(self):
         if self.has_test_docs():
@@ -92,7 +92,7 @@ class XStance(Task):
             # `map(self._process_doc, self.dataset["test"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"test"`.
-            return self.dataset["test"]
+            return map(self._process_doc, self.dataset["test"])
         
     def _process_doc(self, doc):
         # Process (detokenize, strip, replace etc.) each individual `doc`
@@ -109,21 +109,15 @@ class XStance(Task):
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
         # Query part consists of the question and comment part only (no label)
-        if doc["language"]=="de":
-            return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: ")
-        else:
-            pass
+        return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: ")
 
     def doc_to_target(self, doc):
         # TODO: Fill in the `target` ("gold answer") variable.
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
-        if doc["language"]=="de":
-            target = doc["label"]
-            return " " + target
-        else:
-            pass
+        target = doc["label"]
+        return " " + target
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
