@@ -47,6 +47,7 @@ def _xstance_agg_f1(key, items):
 class XStance(Task):
     VERSION = 0
     DATASET_PATH = "strombergnlp/x-stance"
+    # Select only German part of the dataset
     DATASET_NAME = "de"
     
     def has_training_docs(self):
@@ -61,23 +62,22 @@ class XStance(Task):
     def training_docs(self):
         if self.has_training_docs():
             if self._training_docs is None:
-                # Filter only German comments
-                self._training_docs = list(self.dataset["train"])#.filter(lambda example: example["language"]=="de"))
+                self._training_docs = list(self.dataset["train"])
 
             return self._training_docs
 
     def validation_docs(self):
         if self.has_validation_docs():
-            # Filter only German comments
-            return self.dataset["validation"]#.filter(lambda example: example["language"]=="de")
+            return self.dataset["validation"]
 
     def test_docs(self):
         if self.has_test_docs():
-            # Filter only German comments
-            return self.dataset["test"]#.filter(lambda example: example["language"]=="de")
+            return self.dataset["test"]
         
     def doc_to_text(self, doc):
-        return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
+        #return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
+        #return "question: "+ doc["question"]+ "\n\n"+ "comment: "+ doc["comment"]+ "\n\n"+ "label: "
+        return "Frage: "+ doc["question"]+ "\n\n"+ "Kommentar: "+ doc["comment"]+ "\n\n"+ "Kategorie: "
 
     def doc_to_target(self, doc):
         target = doc["label"]
