@@ -123,7 +123,7 @@ class XStance(Task):
             pred = 1
         else:
             pred = 0      
-        true_label = doc["numerical_label"]
+        true_label = doc["label"]
         
         # Save prediction and true label for evaluation
         predictions = {"id":doc["id"], "prediction":pred}
