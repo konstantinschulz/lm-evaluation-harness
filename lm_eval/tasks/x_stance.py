@@ -103,14 +103,16 @@ class XStance(Task):
         #Not needed if test should pass
         if doc["language"]=="de":
             return {"question":doc["question"], "comment":doc["comment"], "label":doc["label"]}
-        #else:
-        #    pass
+        else:
+            pass
 
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
         # Query part consists of the question and comment part only (no label)
         if doc is not None:
             return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
+        else:
+            pass
 
     def doc_to_target(self, doc):
         # TODO: Fill in the `target` ("gold answer") variable.
@@ -120,6 +122,8 @@ class XStance(Task):
         if doc is not None:
             target = doc["label"]
             return " " + target
+        else:
+            pass
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
