@@ -60,71 +60,28 @@ class XStance(Task):
 
     def training_docs(self):
         if self.has_training_docs():
-            # We cache training documents in `self._training_docs` for faster
-            # few-shot processing. If the data is too large to fit in memory,
-            # return the training data as a generator instead of a list.
             if self._training_docs is None:
-                # TODO: Return the training document generator from `self.dataset`.
-                # If you need to process the data, `map` over the documents with
-                # the custom processing function, `self._process_doc`. E.g.
-                # `map(self._process_doc, self.dataset["validation"])`
-                # In most case you can leave this as is unless the dataset split is
-                # named differently than the default `"train"`.
-                self._training_docs = list(self.dataset["train"].filter(lambda example: example['language']=="de"))
+                # Filter only German comments
+                self._training_docs = list(self.dataset["train"].filter(lambda example: example["language"]=="de"))
 
             return self._training_docs
 
     def validation_docs(self):
         if self.has_validation_docs():
-            # TODO: Return the validation document generator from `self.dataset`.
-            # If you need to process the data, `map` over the documents with the
-            # custom processing function, `self._process_doc`. E.g.
-            # `map(self._process_doc, self.dataset["validation"])`
-            # In most case you can leave this as is unless the dataset split is
-            # named differently than the default `"validation"`.
-            return self.dataset["validation"].filter(lambda example: example['language']=="de")
+            # Filter only German comments
+            return self.dataset["validation"].filter(lambda example: example["language"]=="de")
 
     def test_docs(self):
         if self.has_test_docs():
-            # TODO: Return the test document generator from `self.dataset`.
-            # If you need to process the data, `map` over the documents with the
-            # custom processing function, `self._process_doc`. E.g.
-            # `map(self._process_doc, self.dataset["test"])`
-            # In most case you can leave this as is unless the dataset split is
-            # named differently than the default `"test"`.
-            return self.dataset["test"].filter(lambda example: example['language']=="de")
+            # Filter only German comments
+            return self.dataset["test"].filter(lambda example: example["language"]=="de")
         
-    def _process_doc(self, doc):
-        # Process (detokenize, strip, replace etc.) each individual `doc`
-        # with this function. You can map this across the docs in each available
-        # dataset split. See the TODOs in `train_docs`, `validation_docs`, and
-        # `test_docs` for snippets.
-        # Returns only docs with German comments
-        #Not needed if test should pass
-        #d = doc.filter(lambda example: example['language']=="de")
-        #if doc["language"]=="de":
-        return {"question":d["question"], "comment":d["comment"], "label":d["label"]}
-        #else:
-        #    pass
-
     def doc_to_text(self, doc):
-        # TODO: Format the query prompt portion of the document example.
-        # Query part consists of the question and comment part only (no label)
-        #if type(doc) is dict:
         return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
-        #else:
-        #    pass
 
     def doc_to_target(self, doc):
-        # TODO: Fill in the `target` ("gold answer") variable.
-        # The prepended `" "` is required to space out the `doc_to_text` and
-        # `doc_to_target` strings.
-        # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
-        #if type(doc) is dict:
         target = doc["label"]
         return " " + target
-        #else:
-        #    pass
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
@@ -157,10 +114,7 @@ class XStance(Task):
         :param results:
             The results of the requests created in construct_requests.
         """
-        # TODO: For each (sub)metric in the task evaluation, add a key-value pair
-        # with the metric name as key and the corresponding metric result as value
-        # for the current `doc`.
-        #if doc is not None:
+
         pred = 0
         favor, against = results
         
@@ -184,17 +138,10 @@ class XStance(Task):
             A dictionary where keys are the names of submetrics and values are
             functions that aggregate a list of metric scores
         """
-        # TODO: For each (sub)metric in the task evaluation, add a key-value pair
-        # with the metric name as key and an aggregation function as value which
-        # determines how to combine results from each document in the dataset.
-        # Check `lm_eval.metrics` to find built-in aggregation functions.
 
         return {"acc":mean, "precision": partial(_xstance_agg_precision, "precision"), 
                 "recall" : partial(_xstance_agg_recall, "recall"), 
                 "f1" : partial(_xstance_agg_f1, "f1")}
 
     def higher_is_better(self):
-        # TODO: For each (sub)metric in the task evaluation, add a key-value pair
-        # with the metric name as key and a `bool` value determining whether or
-        # not higher values of that metric are deemed better.
         return {"acc":True, "precision":True, "recall":True, "f1":True}
