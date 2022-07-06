@@ -62,19 +62,19 @@ class XStance(Task):
         if self.has_training_docs():
             if self._training_docs is None:
                 # Filter only German comments
-                self._training_docs = list(self.dataset["x-stance-train-de"])#.filter(lambda example: example["language"]=="de"))
+                self._training_docs = list(self.dataset["train-de"])#.filter(lambda example: example["language"]=="de"))
 
             return self._training_docs
 
     def validation_docs(self):
         if self.has_validation_docs():
             # Filter only German comments
-            return self.dataset["x-stance-valid-de"]#.filter(lambda example: example["language"]=="de")
+            return self.dataset["valid-de"]#.filter(lambda example: example["language"]=="de")
 
     def test_docs(self):
         if self.has_test_docs():
             # Filter only German comments
-            return self.dataset["x-stance-test-de"]#.filter(lambda example: example["language"]=="de")
+            return self.dataset["test-de"]#.filter(lambda example: example["language"]=="de")
         
     def doc_to_text(self, doc):
         return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
