@@ -103,8 +103,8 @@ class XStance(Task):
         #Not needed if test should pass
         if doc["language"]=="de":
             return {"question":doc["question"], "comment":doc["comment"], "label":doc["label"]}
-        else:
-            pass
+        #else:
+        #    pass
 
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
