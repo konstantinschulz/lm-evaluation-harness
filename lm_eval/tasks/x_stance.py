@@ -101,7 +101,7 @@ class XStance(Task):
         # `test_docs` for snippets.
         # Returns only docs with German comments
         #Not needed if test should pass
-        print(type(doc))
+
         if doc["language"]=="de":
             return {"question":doc["question"], "comment":doc["comment"], "label":doc["label"]}
         #else:
@@ -110,7 +110,7 @@ class XStance(Task):
     def doc_to_text(self, doc):
         # TODO: Format the query prompt portion of the document example.
         # Query part consists of the question and comment part only (no label)
-        if doc is not None:
+        if type(doc) is dict:
             return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
         #else:
         #    pass
@@ -120,11 +120,11 @@ class XStance(Task):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         # Target is the label (i.e.'Favor' or 'Against'), which is appended to the string returned by doc_to_text
-        if doc is not None:
+        if type(doc) is dict:
             target = doc["label"]
             return " " + target
-        else:
-            pass
+        #else:
+        #    pass
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
@@ -141,11 +141,11 @@ class XStance(Task):
         # rf.loglikelihood as the task is a classification problem. For each document the model predicts loglikelihood for the correct label
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
 
-        if doc is not None:
-            ll_favor = rf.loglikelihood(ctx, " "+"FAVOR")
-            ll_against = rf.loglikelihood(ctx, " "+"AGAINST")
+        
+        ll_favor = rf.loglikelihood(ctx, " "+"FAVOR")
+        ll_against = rf.loglikelihood(ctx, " "+"AGAINST")
 
-            return ll_favor, ll_against
+        return ll_favor, ll_against
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
