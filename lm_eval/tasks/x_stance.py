@@ -10,7 +10,7 @@ The data have been extracted from the Swiss voting advice platform Smartvote.
 
 https://github.com/ZurichNLP/xstance
 """
-
+import datasets
 from lm_eval.base import Task, rf
 import lm_eval.datasets.x_stance.x_stance
 from lm_eval.metrics import mean
