@@ -112,7 +112,7 @@ class XStance(Task):
         if doc["language"]=="de":
             return ("QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: ")
         else:
-            return " "
+            pass
 
     def doc_to_target(self, doc):
         # TODO: Fill in the `target` ("gold answer") variable.
@@ -123,7 +123,7 @@ class XStance(Task):
             target = doc["label"]
             return " " + target
         else:
-            return " "
+            pass
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
