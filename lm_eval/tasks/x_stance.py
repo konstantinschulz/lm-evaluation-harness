@@ -140,10 +140,11 @@ class XStance(Task):
         # rf.loglikelihood as the task is a classification problem. For each document the model predicts loglikelihood for the correct label
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
 
-        ll_favor = rf.loglikelihood(ctx, " "+"FAVOR")
-        ll_against = rf.loglikelihood(ctx, " "+"AGAINST")
+        if doc is not None:
+            ll_favor = rf.loglikelihood(ctx, " "+"FAVOR")
+            ll_against = rf.loglikelihood(ctx, " "+"AGAINST")
 
-        return ll_favor, ll_against
+            return ll_favor, ll_against
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -158,7 +159,7 @@ class XStance(Task):
         # TODO: For each (sub)metric in the task evaluation, add a key-value pair
         # with the metric name as key and the corresponding metric result as value
         # for the current `doc`.
-
+        #if doc is not None:
         pred = 0
         favor, against = results
         
