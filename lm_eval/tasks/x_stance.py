@@ -70,7 +70,7 @@ class XStance(Task):
                 # `map(self._process_doc, self.dataset["validation"])`
                 # In most case you can leave this as is unless the dataset split is
                 # named differently than the default `"train"`.
-                self._training_docs = list(map(self._process_doc, self.dataset["train"]))
+                self._training_docs = list(self.dataset["train"].filter(lambda example: example['language']=="de"))
 
             return self._training_docs
 
@@ -82,7 +82,7 @@ class XStance(Task):
             # `map(self._process_doc, self.dataset["validation"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"validation"`.
-            return map(self._process_doc, self.dataset["validation"])
+            return self.dataset["validation"].filter(lambda example: example['language']=="de")
 
     def test_docs(self):
         if self.has_test_docs():
@@ -92,7 +92,7 @@ class XStance(Task):
             # `map(self._process_doc, self.dataset["test"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"test"`.
-            return map(self._process_doc, self.dataset["test"])
+            return self.dataset["test"].filter(lambda example: example['language']=="de")
         
     def _process_doc(self, doc):
         # Process (detokenize, strip, replace etc.) each individual `doc`
@@ -101,7 +101,7 @@ class XStance(Task):
         # `test_docs` for snippets.
         # Returns only docs with German comments
         #Not needed if test should pass
-        d = doc.filter(lambda example: example['language']=="de")
+        #d = doc.filter(lambda example: example['language']=="de")
         #if doc["language"]=="de":
         return {"question":d["question"], "comment":d["comment"], "label":d["label"]}
         #else:
