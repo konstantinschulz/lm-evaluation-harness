@@ -1,13 +1,13 @@
-<<<<<<< HEAD
-# TODO: Remove all TODO comments once the implementation is complete.
-"""
-TODO: Add the Paper Title on this line.
-TODO: Add the paper's PDF URL (preferably from arXiv) on this line.
 
-TODO: Write a Short Description of the task.
 
-Homepage: TODO: Add the URL to the task's Homepage here.
-=======
+
+
+
+
+
+
+
+
 """
 Ten Thousand German News Articles Dataset
 Paper of the original One Million Posts Corpus: https://dl.acm.org/doi/10.1145/3077136.3080711
@@ -25,34 +25,34 @@ Additionally, this dataset can be used as a benchmark dataset for German topic c
 from lm_eval.base import Task
 
 
-<<<<<<< HEAD
-# TODO: Add the BibTeX citation for the task.
-_CITATION = """
-"""
 
 
-# TODO: Replace `NewTask` with the name of your Task.
-class NewTask(Task):
-    VERSION = 0
-    # TODO: Add the `DATASET_PATH` string. This will be the name of the `Task`
-    # dataset as denoted in HuggingFace `datasets`.
-    DATASET_PATH = ""
-    # TODO: Add the `DATASET_NAME` string. This is the name of a subset within
-    # `DATASET_PATH`. If there aren't specific subsets you need, leave this as `None`.
-    DATASET_NAME = None
 
-    def has_training_docs(self):
-        # TODO: Fill in the return with `True` if the Task has training data; else `False`.
-        return False
 
-    def has_validation_docs(self):
-        # TODO: Fill in the return with `True` if the Task has validation data; else `False`.
-        return False
 
-    def has_test_docs(self):
-        # TODO: Fill in the return with `True` if the Task has test data; else `False`.
-        return False
-=======
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 _CITATION = """
 @InProceedings{Schabus2017,
   Author    = {Dietmar Schabus and Marcin Skowron and Martin Trapp},
@@ -80,7 +80,7 @@ class GNAD10(Task):
 
     def has_test_docs(self):
         return True
->>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
+
 
     def training_docs(self):
         if self.has_training_docs():
@@ -88,34 +88,34 @@ class GNAD10(Task):
             # few-shot processing. If the data is too large to fit in memory,
             # return the training data as a generator instead of a list.
             if self._training_docs is None:
-<<<<<<< HEAD
+
                 # TODO: Return the training document generator from `self.dataset`.
                 # If you need to process the data, `map` over the documents with
                 # the custom processing function, `self._process_doc`. E.g.
                 # `map(self._process_doc, self.dataset["validation"])`
                 # In most case you can leave this as is unless the dataset split is
                 # named differently than the default `"train"`.
-=======
->>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
+
+
                 self._training_docs = list(self.dataset["train"])
             return self._training_docs
 
     def validation_docs(self):
         if self.has_validation_docs():
-<<<<<<< HEAD
+
             # TODO: Return the validation document generator from `self.dataset`.
             # If you need to process the data, `map` over the documents with the
             # custom processing function, `self._process_doc`. E.g.
             # `map(self._process_doc, self.dataset["validation"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"validation"`.
-=======
->>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
+
+
             return self.dataset["validation"]
 
     def test_docs(self):
         if self.has_test_docs():
-<<<<<<< HEAD
+
             # TODO: Return the test document generator from `self.dataset`.
             # If you need to process the data, `map` over the documents with the
             # custom processing function, `self._process_doc`. E.g.
@@ -124,9 +124,9 @@ class GNAD10(Task):
             # named differently than the default `"test"`.
             return self.dataset["test"]
 
-    def _process_doc(self, doc):
-=======
-            return self.dataset["test"]
+
+
+
 
     """def _process_doc(self, doc):
 >>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
@@ -157,7 +157,7 @@ class GNAD10(Task):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         target = doc["label"]
->>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
+
         return " " + target
 
     def construct_requests(self, doc, ctx):
