@@ -27,7 +27,7 @@ _CITATION = """
 }"""
 
 
-class gnad10(Task):
+class GNAD10(Task):
     VERSION = 0
     DATASET_PATH = "gnad10"
     DATASET_NAME = None
