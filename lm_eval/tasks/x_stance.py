@@ -1,4 +1,3 @@
-# TODO: Remove all TODO comments once the implementation is complete.
 """
 X-Stance: A Multilingual Multi-Target Dataset for Stance Detection
 http://ceur-ws.org/Vol-2624/paper9.pdf
@@ -95,6 +94,7 @@ class XStance(Task):
         """
         # rf.loglikelihood as the task is a classification problem. For each document the model predicts loglikelihood for the correct label
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
+        # Labels are integers in the dataset (1-FAVOR, 0-AGAINST); metrics are slightly better if labels are encoded numerically
 
         
         ll_favor = rf.loglikelihood(ctx, " "+str(1))
@@ -123,11 +123,6 @@ class XStance(Task):
             pred = 0      
         true_label = doc["label"]
         
-        # Save prediction and true label for evaluation
-        predictions = {"id":doc["id"], "prediction":pred}
-
-        y_true = {"id":doc["id"], "true label":true_label}
-
         return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
     
     def aggregation(self):
