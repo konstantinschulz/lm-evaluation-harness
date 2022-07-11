@@ -14,9 +14,9 @@ from math import exp
 from datasets import Dataset
 
 from lm_eval.base import rf
-from .common import HFTask
 from functools import partial
 from packaging import version
+from ..base import Task
 
 _CITATION = """
 @article{Artetxe:etal:2019,
@@ -42,7 +42,7 @@ def _squad_agg(key, items):
     return _squad_metric(predictions=predictions, references=references)[key]
 
 
-class XQuAD(HFTask):
+class XQuAD(Task):
     VERSION = 1
     DATASET_PATH = "xquad"
     DATASET_NAME = "xquad.de"
@@ -62,34 +62,12 @@ class XQuAD(HFTask):
     def has_test_docs(self):
         return False
 
-    def training_docs(self):
-        return self.data["train"]
-
-    def test_docs(self):
-        return self.data["test"]
+    def validation_docs(self):
+        if self.has_validation_docs():
+            return self.dataset["validation"]
 
     def doc_to_text(self, doc):
-        def get_qa_string():
-            if not self.TRAIN_DATASET:
-                self.TRAIN_DATASET = list(self.data["train"])
-            if not self.TEST_DATASET:
-                self.TEST_DATASET = list(self.data["test"])
-            target_property: str = "context"
-            context: str = doc[target_property]
-            relevant_items = [x for x in self.TRAIN_DATASET if x[target_property] == context]
-            if not relevant_items:
-                relevant_items = [x for x in self.TEST_DATASET if x[target_property] == context]
-            relevant_items.remove(doc)
-            qa_strings: list[str] = [f"Question: {x['question']}\n\nAnswer: {x['answers']['text'][0]}" for x in
-                                     relevant_items]  # [:5]
-            return '\n\n'.join(qa_strings) + ''
-        # 'Background: ' + doc['context'] + '\n\n' + 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
-        # return 'How long is the answer to the following question: ' + doc['question'] + '\n\n' + 'Answer:'
-        # return 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
-        # return 'Background: ' + doc['context'] + '\n\n' + 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
-        # example_qa_string: str = get_qa_string()
-        # return f"Background: {context}\n\n{example_qa_string}\n\nQuestion: {doc['question']}\n\nAnswer:"
-        return 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
+        return 'Frage: ' + doc['question'] + '\n\n' + 'Antwort:'
 
     def doc_to_target(self, doc):
         answer_list = doc['answers']['text']
