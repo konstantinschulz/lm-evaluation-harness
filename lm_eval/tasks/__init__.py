@@ -50,7 +50,11 @@ from . import blimp
 from . import asdiv
 from . import gsm8k
 from . import storycloze
+<<<<<<< HEAD
 from . import x_stance
+=======
+from . import gnad10
+>>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
 
 ########################################
 # Translation tasks
@@ -284,9 +288,14 @@ TASK_REGISTRY = {
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
     # "sat": sat.SATAnalogies,
+<<<<<<< HEAD
 
     # X-Stance
     "x_stance":x_stance.x_stance,
+=======
+    
+    "gnad10": gnad10.GNAD10,
+>>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
 }
 
 
