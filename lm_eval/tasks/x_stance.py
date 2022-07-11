@@ -75,9 +75,6 @@ class XStance(Task):
             return self.dataset["test"]
         
     def doc_to_text(self, doc):
-        #return "QUESTION: "+ doc["question"]+ "\n\n"+ "COMMENT: "+ doc["comment"]+ "\n\n"+ "LABEL: "
-        #return "question: "+ doc["question"]+ "\n\n"+ "comment: "+ doc["comment"]+ "\n\n"+ "label: "
-        #return "Frage: "+ doc["question"]+ "\n\n"+ "Kommentar: "+ doc["comment"]+ "\n\n"+ "Label: "
         return "FRAGE: "+ doc["question"]+ "\n\n"+ "KOMMENTAR: "+ doc["comment"]+ "\n\n"+ "KATEGORIE: " # Formatting the prompts capitalized in German gives the highest scores
 
     def doc_to_target(self, doc):
@@ -100,8 +97,8 @@ class XStance(Task):
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
 
         
-        ll_favor = rf.loglikelihood(ctx, " "+"FAVOR")
-        ll_against = rf.loglikelihood(ctx, " "+"AGAINST")
+        ll_favor = rf.loglikelihood(ctx, " "+"1")
+        ll_against = rf.loglikelihood(ctx, " "+"0")
 
         return ll_favor, ll_against
 
