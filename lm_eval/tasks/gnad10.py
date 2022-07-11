@@ -69,7 +69,7 @@ class GNAD10(Task):
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
-        target = doc["label"]
+        target = doc["class_label"]
 
         return " " + str(target)
 
@@ -85,9 +85,17 @@ class GNAD10(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        # TODO: Construct your language model requests with the request factory, `rf`,
-        # and return them as an iterable.
-        return []
+        ll_web = rf.loglikelihood(ctx, " "+"Web")
+        ll_panorama = rf.loglikelihood(ctx, " "+"Panorama")
+        ll_international = rf.loglikelihood(ctx, " "+"International")
+        ll_wirtschaft = rf.loglikelihood(ctx, " "+"Wirtschaft")
+        ll_sport = rf.loglikelihood(ctx, " "+"Sport")
+        ll_inland = rf.loglikelihood(ctx, " "+"Inland")
+        ll_etat = rf.loglikelihood(ctx, " "+"Etat")
+        ll_wissenschaft = rf.loglikelihood(ctx, " "+"Wissenschaft")
+        ll_kultur = rf.loglikelihood(ctx, " "+"Kultur")
+        
+        return ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -99,9 +107,33 @@ class GNAD10(Task):
         :param results:
             The results of the requests created in construct_requests.
         """
-        # TODO: For each (sub)metric in the task evaluation, add a key-value pair
-        # with the metric name as key and the corresponding metric result as value
-        # for the current `doc`.
+        ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur = results
+        pred = results.index(max(ll_web[0], ll_panorama[0], ll_international[0], ll_wirtschaft[0], ll_sport[0], ll_inland[0], 
+                                 ll_etat[0], ll_wissenschaft[0], ll_kultur[0]))
+        
+        # Evaluation metrics will only work with numerical labels
+        if pred == 0:
+          pred = "Web"
+        elif pred == 1:
+          pred = "Panorama"
+        elif pred == 2:
+          pred = "International"
+        elif pred == 3:
+          pred == "Wirtschaft"
+        elif pred == 4:
+          pred == "Sport"
+        elif pred == 5:
+          pred == "Inland"
+        elif pred == 6:
+          pred == "Etat"
+        elif pred == 7:
+          pred == "Wissenschaft"
+        else:
+          pred == "Kultur"
+              
+        true_label = doc["class_label"]
+        
+        return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
         return {}
 
     def aggregation(self):
