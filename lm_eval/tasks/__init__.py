@@ -285,7 +285,7 @@ TASK_REGISTRY = {
     # "storycloze_2018": storycloze.StoryCloze2018,
     # "sat": sat.SATAnalogies,
     
-    "gnad10": gnad10.gnad10,
+    "gnad10": gnad10.GNAD10,
 }
 
 
