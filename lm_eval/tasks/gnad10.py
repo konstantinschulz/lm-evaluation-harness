@@ -48,67 +48,20 @@ class GNAD10(Task):
             # few-shot processing. If the data is too large to fit in memory,
             # return the training data as a generator instead of a list.
             if self._training_docs is None:
-
-                # TODO: Return the training document generator from `self.dataset`.
-                # If you need to process the data, `map` over the documents with
-                # the custom processing function, `self._process_doc`. E.g.
-                # `map(self._process_doc, self.dataset["validation"])`
-                # In most case you can leave this as is unless the dataset split is
-                # named differently than the default `"train"`.
-
-
                 self._training_docs = list(self.dataset["train"])
             return self._training_docs
 
     def validation_docs(self):
         if self.has_validation_docs():
-
-            # TODO: Return the validation document generator from `self.dataset`.
-            # If you need to process the data, `map` over the documents with the
-            # custom processing function, `self._process_doc`. E.g.
-            # `map(self._process_doc, self.dataset["validation"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"validation"`.
-
-
             return self.dataset["validation"]
 
     def test_docs(self):
         if self.has_test_docs():
-
-            # TODO: Return the test document generator from `self.dataset`.
-            # If you need to process the data, `map` over the documents with the
-            # custom processing function, `self._process_doc`. E.g.
-            # `map(self._process_doc, self.dataset["test"])`
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"test"`.
             return self.dataset["test"]
-
-
-
-
-
-    """def _process_doc(self, doc):
->>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
-        # TODO: Process (detokenize, strip, replace etc.) each individual `doc`
-        # with this function. You can map this across the docs in each available
-        # dataset split. See the TODOs in `train_docs`, `validation_docs`, and
-        # `test_docs` for snippets.
-        # NOTE: DELETE THIS FUNCTION IF UNUSED.
-<<<<<<< HEAD
-        return doc
-
-    def doc_to_text(self, doc):
-        # TODO: Format the query prompt portion of the document example.
-        return ""
-
-    def doc_to_target(self, doc):
-        # TODO: Fill in the `target` ("gold answer") variable.
-        # The prepended `" "` is required to space out the `doc_to_text` and
-        # `doc_to_target` strings.
-        target = ""
-=======
-        return doc"""
 
     def doc_to_text(self, doc):
         return "text: "+ doc["text"]+ "\n\n"+ "label: "
@@ -123,10 +76,7 @@ class GNAD10(Task):
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
         Requests which will be sent to the LM.
-<<<<<<< HEAD
 
-=======
->>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
         :param doc:
             The document as returned from training_docs, validation_docs, or
             test_docs.
@@ -143,10 +93,7 @@ class GNAD10(Task):
         """Take a single document and the LM results and evaluates, returning a
         dict where keys are the names of submetrics and values are the values of
         the metric for that one document
-<<<<<<< HEAD
 
-=======
->>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
         :param doc:
             The document as returned from training_docs, validation_docs, or test_docs.
         :param results:
