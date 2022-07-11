@@ -1,13 +1,3 @@
-
-
-
-
-
-
-
-
-
-
 """
 Ten Thousand German News Articles Dataset
 Paper of the original One Million Posts Corpus: https://dl.acm.org/doi/10.1145/3077136.3080711
@@ -20,38 +10,8 @@ Each news article has been classified into one of 9 categories by professional f
 This dataset is extended from the original One Million Posts Corpus. The dataset was created to support topic classification in German 
 because a classifier effective on a English dataset may not be as effective on a German dataset due to higher inflections and longer compound words. 
 Additionally, this dataset can be used as a benchmark dataset for German topic classification.
->>>>>>> 31d14889a7ca0fb305d592d17f7bbafbb620cc1e
 """
 from lm_eval.base import Task
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 _CITATION = """
 @InProceedings{Schabus2017,
@@ -158,7 +118,7 @@ class GNAD10(Task):
         # `doc_to_target` strings.
         target = doc["label"]
 
-        return " " + target
+        return " " + str(target)
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
