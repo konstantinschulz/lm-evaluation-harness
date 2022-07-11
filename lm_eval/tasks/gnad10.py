@@ -1,5 +1,6 @@
 """
-No paper found
+Ten Thousand German News Articles Dataset
+Paper of the original One Million Posts Corpus: https://dl.acm.org/doi/10.1145/3077136.3080711
 
 Homepage: https://tblock.github.io/10kGNAD/
 Git: https://github.com/tblock/10kGNAD
@@ -13,17 +14,22 @@ Additionally, this dataset can be used as a benchmark dataset for German topic c
 from lm_eval.base import Task
 
 
-# TODO: Add the BibTeX citation for the task.
-#_CITATION = """
+_CITATION = """
+@InProceedings{Schabus2017,
+  Author    = {Dietmar Schabus and Marcin Skowron and Martin Trapp},
+  Title     = {One Million Posts: A Data Set of German Online Discussions},
+  Booktitle = {Proceedings of the 40th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR)},
+  Pages     = {1241--1244},
+  Year      = {2017},
+  Address   = {Tokyo, Japan},
+  Doi       = {10.1145/3077136.3080711},
+  Month     = aug
+}"""
 
 
 class gnad10(Task):
     VERSION = 0
-    # TODO: Add the `DATASET_PATH` string. This will be the name of the `Task`
-    # dataset as denoted in HuggingFace `datasets`.
     DATASET_PATH = "gnad10"
-    # TODO: Add the `DATASET_NAME` string. This is the name of a subset within
-    # `DATASET_PATH`. If there aren't specific subsets you need, leave this as `None`.
     DATASET_NAME = None
 
     def has_training_docs(self):
@@ -42,52 +48,32 @@ class gnad10(Task):
             # few-shot processing. If the data is too large to fit in memory,
             # return the training data as a generator instead of a list.
             if self._training_docs is None:
-                # TODO: Return the training document generator from `self.dataset`.
-                # If you need to process the data, `map` over the documents with
-                # the custom processing function, `self._process_doc`. E.g.
-                # `map(self._process_doc, self.dataset["validation"])`
-                # In most case you can leave this as is unless the dataset split is
-                # named differently than the default `"train"`.
                 self._training_docs = list(self.dataset["train"])
             return self._training_docs
 
     def validation_docs(self):
         if self.has_validation_docs():
-            # TODO: Return the validation document generator from `self.dataset`.
-            # If you need to process the data, `map` over the documents with the
-            # custom processing function, `self._process_doc`. E.g.
-            # `map(self._process_doc, self.dataset["validation"])`
-            # In most case you can leave this as is unless the dataset split is
-            # named differently than the default `"validation"`.
             return self.dataset["validation"]
 
     def test_docs(self):
         if self.has_test_docs():
-            # TODO: Return the test document generator from `self.dataset`.
-            # If you need to process the data, `map` over the documents with the
-            # custom processing function, `self._process_doc`. E.g.
-            # `map(self._process_doc, self.dataset["test"])`
-            # In most case you can leave this as is unless the dataset split is
-            # named differently than the default `"test"`.
             return self.dataset["test"]
 
-    def _process_doc(self, doc):
+    """def _process_doc(self, doc):
         # TODO: Process (detokenize, strip, replace etc.) each individual `doc`
         # with this function. You can map this across the docs in each available
         # dataset split. See the TODOs in `train_docs`, `validation_docs`, and
         # `test_docs` for snippets.
         # NOTE: DELETE THIS FUNCTION IF UNUSED.
-        return doc
+        return doc"""
 
     def doc_to_text(self, doc):
-        # TODO: Format the query prompt portion of the document example.
-        return ""
+        return "text: "+ doc["text"]+ "\n\n"+ "label: "
 
     def doc_to_target(self, doc):
-        # TODO: Fill in the `target` ("gold answer") variable.
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
-        target = ""
+        target = doc["label"]
         return " " + target
 
     def construct_requests(self, doc, ctx):
