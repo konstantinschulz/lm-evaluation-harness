@@ -114,7 +114,7 @@ class GNAD10(Task):
         ll_etat = rf.loglikelihood(ctx, " "+"Etat")
         ll_wissenschaft = rf.loglikelihood(ctx, " "+"Wissenschaft")
         ll_kultur = rf.loglikelihood(ctx, " "+"Kultur")
-        
+        #print(ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur)
         return ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur
 
     def process_results(self, doc, results):
@@ -128,6 +128,7 @@ class GNAD10(Task):
             The results of the requests created in construct_requests.
         """
         ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur = results
+        print(results)
         pred = results.index(max(ll_web[0], ll_panorama[0], ll_international[0], ll_wirtschaft[0], ll_sport[0], ll_inland[0], 
                                  ll_etat[0], ll_wissenschaft[0], ll_kultur[0]))
         
