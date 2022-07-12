@@ -94,15 +94,11 @@ class GNAD10(Task):
         c = 0
         text = ""
         for t in text.split(' '):
-          while c < 1023:
             text += t + " "
             c += 2
-        
-        return {
-            'text': text,
-            'label': doc["label"],
-        }
-      
+            if c > 1023:
+              return {'text': text, 'label': doc["label"]}
+            
       return {
             'text': text,
             'label': doc["label"],
