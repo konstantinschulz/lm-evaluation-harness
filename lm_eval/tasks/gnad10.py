@@ -60,8 +60,7 @@ class GNAD10(Task):
 
     def has_test_docs(self):
         return True
-
-
+      
     def training_docs(self):
         if self.has_training_docs():
             # We cache training documents in `self._training_docs` for faster
@@ -83,20 +82,8 @@ class GNAD10(Task):
             # named differently than the default `"test"`.
             return self.dataset["test"]
       
-    def doc_to_text(self, doc):
-      # Truncate examples which exceed the maximum token length for the model (1024)
-      text = doc["text"]
-      if len(text.split(' ')) > 1023:
-        text = text[0:1023]
-      """if len(text.split(' ')) > 1023:
-        c = 0
-        text = ""
-        for t in text.split(' '):
-          while c < 1024:
-            text += t + " "
-            c += 2"""
-      print(len(doc["text"].split(' ')))     
-      return "text: "+ text+ "\n\n"+ "label: "
+    def doc_to_text(self, doc): 
+      return "text: "+ doc["text"] + "\n\n"+ "label: "
 
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
