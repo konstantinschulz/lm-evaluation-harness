@@ -117,7 +117,7 @@ class GNAD10(Task):
           c += 2
           
           if c == 1024:
-            return 'text': truncated_text+ "\n\n"+ "label: "
+            return "text: "+ truncated_text+ "\n\n"+ "label: "
       else:
         return "text: "+ doc["text"]+ "\n\n"+ "label: "
 
