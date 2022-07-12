@@ -83,7 +83,7 @@ class GNAD10(Task):
             # named differently than the default `"test"`.
             return map(self._process_doc, self.dataset["test"])
           
-    """def _process_doc(self, doc):
+    def _process_doc(self, doc):
       # Truncate examples which exceed the maximum token length for the model (1024)
       text = doc["text"]
       
@@ -103,7 +103,7 @@ class GNAD10(Task):
       return {
             'text': text,
             'label': doc["label"],
-      }"""
+      }
       
     def doc_to_text(self, doc):
       # Truncate examples which exceed the maximum token length for the model (1024)
@@ -118,8 +118,8 @@ class GNAD10(Task):
           
           if c == 1024:
             return "text: "+ truncated_text+ "\n\n"+ "label: "
-      else:
-        return "text: "+ doc["text"]+ "\n\n"+ "label: "
+      
+      return "text: "+ doc["text"]+ "\n\n"+ "label: "
 
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
