@@ -132,7 +132,7 @@ class GNAD10(Task):
         pred = max(ll_web[0], ll_panorama[0], ll_international[0], ll_wirtschaft[0], ll_sport[0], ll_inland[0], 
                                  ll_etat[0], ll_wissenschaft[0], ll_kultur[0])
         
-        pred = float(-inf)
+        pred = float('-inf')
         
         for i in results:
           if i[0] > pred:
