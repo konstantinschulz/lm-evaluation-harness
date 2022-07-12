@@ -92,7 +92,7 @@ class GNAD10(Task):
         truncated_text = ""
         for t in text.split(' '):
           truncated_text += t + " "
-          c += 1
+          c += 2
           
           if c == 1024:
             print(truncated_text)
