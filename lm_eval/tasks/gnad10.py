@@ -114,15 +114,13 @@ class GNAD10(Task):
       
       if len(text.split(' ')) > 1023:
         c = 0
-        truncated_text = ""
+        text = ""
         for t in text.split(' '):
-          truncated_text += t + " "
-          c += 2
-          
-          if c == 1024:
-            return "text: "+ truncated_text+ "\n\n"+ "label: "
-      
-      return "text: "+ doc["text"]+ "\n\n"+ "label: "
+          while c < 1024:
+            text += t + " "
+            c += 2
+            
+      return "text: "+ text+ "\n\n"+ "label: "
 
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
