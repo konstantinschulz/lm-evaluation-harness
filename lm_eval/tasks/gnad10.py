@@ -106,6 +106,19 @@ class GNAD10(Task):
       }
       
     def doc_to_text(self, doc):
+      # Truncate examples which exceed the maximum token length for the model (1024)
+      text = doc["text"]
+      
+      if len(text.split(' ')) > 1023:
+        c = 0
+        truncated_text = ""
+        for t in text.split(' '):
+          truncated_text += t + " "
+          c += 2
+          
+          if c == 1024:
+            return 'text': truncated_text+ "\n\n"+ "label: "
+      else:
         return "text: "+ doc["text"]+ "\n\n"+ "label: "
 
     def doc_to_target(self, doc):
