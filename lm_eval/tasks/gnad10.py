@@ -97,12 +97,12 @@ class GNAD10(Task):
           while c < 1023:
             text += t + " "
             c += 2
-        print(len(text.split(' ')))
+        
         return {
             'text': text,
             'label': doc["label"],
         }
-      print(len(text.split(' ')))
+      
       return {
             'text': text,
             'label': doc["label"],
@@ -119,7 +119,7 @@ class GNAD10(Task):
           while c < 1024:
             text += t + " "
             c += 2"""
-            
+      len(doc["text"])      
       return "text: "+ doc["text"]+ "\n\n"+ "label: "
 
     def doc_to_target(self, doc):
