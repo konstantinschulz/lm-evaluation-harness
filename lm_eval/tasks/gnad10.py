@@ -77,14 +77,14 @@ class GNAD10(Task):
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"validation"`.
             #return map(self._process_doc, self.dataset["validation"])
-            return map(self._process_doc, self.dataset["validation"])
+            return self.dataset["validation"]
 
     def test_docs(self):
         if self.has_test_docs():
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"test"`.
             #return map(self._process_doc, self.dataset["test"])
-            return map(self._process_doc, self.dataset["test"])
+            return self.dataset["test"]
           
     """def _process_doc(self, doc):
       # Truncate examples which exceed the maximum token length for the model (1024)
