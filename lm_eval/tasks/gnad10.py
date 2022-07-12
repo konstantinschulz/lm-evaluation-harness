@@ -105,7 +105,7 @@ class GNAD10(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        ll_web = rf.loglikelihood(ctx, " "+str(0))
+        """ll_web = rf.loglikelihood(ctx, " "+str(0))
         ll_panorama = rf.loglikelihood(ctx, " "+str(1))
         ll_international = rf.loglikelihood(ctx, " "+str(2))
         ll_wirtschaft = rf.loglikelihood(ctx, " "+str(3))
@@ -113,7 +113,17 @@ class GNAD10(Task):
         ll_inland = rf.loglikelihood(ctx, " "+str(5))
         ll_etat = rf.loglikelihood(ctx, " "+str(6))
         ll_wissenschaft = rf.loglikelihood(ctx, " "+str(7))
-        ll_kultur = rf.loglikelihood(ctx, " "+str(8))
+        ll_kultur = rf.loglikelihood(ctx, " "+str(8))"""
+        
+        ll_web = rf.loglikelihood(ctx, " "+"Web")
+        ll_panorama = rf.loglikelihood(ctx, " "+"Panorama")
+        ll_international = rf.loglikelihood(ctx, " "+"International")
+        ll_wirtschaft = rf.loglikelihood(ctx, " "+"Wirtschaft")
+        ll_sport = rf.loglikelihood(ctx, " "+"Sport")
+        ll_inland = rf.loglikelihood(ctx, " "+"Inland")
+        ll_etat = rf.loglikelihood(ctx, " "+"Etat")
+        ll_wissenschaft = rf.loglikelihood(ctx, " "+"Wissenschaft")
+        ll_kultur = rf.loglikelihood(ctx, " "+"Kultur")
         #print(ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur)
         return ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur
 
