@@ -11,7 +11,11 @@ This dataset is extended from the original One Million Posts Corpus. The dataset
 because a classifier effective on a English dataset may not be as effective on a German dataset due to higher inflections and longer compound words. 
 Additionally, this dataset can be used as a benchmark dataset for German topic classification.
 """
-from lm_eval.base import Task
+import datasets
+from lm_eval.base import Task, rf
+from lm_eval.metrics import mean
+from functools import partial
+import numpy as np
 
 _CITATION = """
 @InProceedings{Schabus2017,
@@ -25,7 +29,23 @@ _CITATION = """
   Month     = aug
 }"""
 
+# Helper functions for aggregation (separate function for each metric)
+def _gnad10_agg_precision(key, items):
+    references, predictions = zip(*items)
+    precision_metric = datasets.load_metric("precision")
+    return precision_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions))[key]
 
+def _gnad10_agg_recall(key, items):
+    references, predictions = zip(*items)
+    recall_metric = datasets.load_metric("recall")
+    return recall_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions))[key]
+
+def _gnad10_agg_f1(key, items):
+    references, predictions = zip(*items)
+    f1_metric = datasets.load_metric("f1")
+    return f1_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions))[key]
+  
+  
 class GNAD10(Task):
     VERSION = 0
     DATASET_PATH = "gnad10"
@@ -134,7 +154,6 @@ class GNAD10(Task):
         true_label = doc["class_label"]
         
         return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
-        return {}
 
     def aggregation(self):
         """
@@ -142,14 +161,9 @@ class GNAD10(Task):
             A dictionary where keys are the names of submetrics and values are
             functions that aggregate a list of metric scores
         """
-        # TODO: For each (sub)metric in the task evaluation, add a key-value pair
-        # with the metric name as key and an aggregation function as value which
-        # determines how to combine results from each document in the dataset.
-        # Check `lm_eval.metrics` to find built-in aggregation functions.
-        return {}
+        return {"acc":mean, "precision": partial(_gnad10_agg_precision, "precision"), 
+                "recall" : partial(_gnad10_agg_recall, "recall"), 
+                "f1" : partial(_gnad10_agg_f1, "f1")}
 
     def higher_is_better(self):
-        # TODO: For each (sub)metric in the task evaluation, add a key-value pair
-        # with the metric name as key and a `bool` value determining whether or
-        # not higher values of that metric are deemed better.
-        return {}
+        return {"acc":True, "precision":True, "recall":True, "f1":True}
