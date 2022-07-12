@@ -89,7 +89,7 @@ class GNAD10(Task):
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
-        target = doc["class_label"]
+        target = doc["class label"]
 
         return " " + str(target)
 
@@ -152,7 +152,7 @@ class GNAD10(Task):
         else:
           pred == "Kultur"
               
-        true_label = doc["class_label"]
+        true_label = doc["class label"]
         
         return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
 
