@@ -132,8 +132,14 @@ class GNAD10(Task):
         pred = max(ll_web[0], ll_panorama[0], ll_international[0], ll_wirtschaft[0], ll_sport[0], ll_inland[0], 
                                  ll_etat[0], ll_wissenschaft[0], ll_kultur[0])
         
+        pred = -inf
+        
+        for i in results:
+          if i[0] > pred:
+            pred = results.index(i)
+        
         # Evaluation metrics will only work with numerical labels
-        if pred == ll_web[0]:
+        """if pred == ll_web[0]:
           #pred = "Web"
           pred = 0
         elif pred == ll_panorama[0]:
@@ -159,7 +165,7 @@ class GNAD10(Task):
           pred = 7
         else:
           #pred = "Kultur"
-          pred = 8
+          pred = 8"""
               
         true_label = doc["label"]
         
