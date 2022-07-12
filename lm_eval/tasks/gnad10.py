@@ -98,11 +98,11 @@ class GNAD10(Task):
             c += 2
             if c > 1023:
               return {'text': text, 'label': doc["label"]}
-            
-      return {
+      else:
+        return {
             'text': text,
             'label': doc["label"],
-      }
+        }
       
     def doc_to_text(self, doc):
       # Truncate examples which exceed the maximum token length for the model (1024)
