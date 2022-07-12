@@ -87,19 +87,20 @@ class GNAD10(Task):
             #return self.dataset["test"]
           
     def _process_doc(self, doc):
-      # Truncate examples which exceed the maximum token length for the model (1024)
-      text = doc["text"]
-      
+      # Truncate examples which exceed the maximum token length for the model (1024)      
       text = doc["text"]
       
       if len(text.split(' ')) > 1023:
         c = 0
         text = ""
         for t in text.split(' '):
-          while c < 1024:
+          while c < 1023:
             text += t + " "
             c += 2
-            
+        return {
+            'text': text,
+            'label': doc["label"],
+        } 
       return {
             'text': text,
             'label': doc["label"],
