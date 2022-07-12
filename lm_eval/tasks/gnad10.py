@@ -97,10 +97,12 @@ class GNAD10(Task):
           while c < 1023:
             text += t + " "
             c += 2
+        print(len(text))
         return {
             'text': text,
             'label': doc["label"],
-        } 
+        }
+      print(len(text))
       return {
             'text': text,
             'label': doc["label"],
