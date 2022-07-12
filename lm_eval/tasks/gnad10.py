@@ -119,7 +119,7 @@ class GNAD10(Task):
           while c < 1024:
             text += t + " "
             c += 2"""
-      len(doc["text"])      
+      print(len(doc["text"]))      
       return "text: "+ doc["text"]+ "\n\n"+ "label: "
 
     def doc_to_target(self, doc):
