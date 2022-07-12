@@ -105,15 +105,15 @@ class GNAD10(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        ll_web = rf.loglikelihood(ctx, " "+"Web")
-        ll_panorama = rf.loglikelihood(ctx, " "+"Panorama")
-        ll_international = rf.loglikelihood(ctx, " "+"International")
-        ll_wirtschaft = rf.loglikelihood(ctx, " "+"Wirtschaft")
-        ll_sport = rf.loglikelihood(ctx, " "+"Sport")
-        ll_inland = rf.loglikelihood(ctx, " "+"Inland")
-        ll_etat = rf.loglikelihood(ctx, " "+"Etat")
-        ll_wissenschaft = rf.loglikelihood(ctx, " "+"Wissenschaft")
-        ll_kultur = rf.loglikelihood(ctx, " "+"Kultur")
+        ll_web = rf.loglikelihood(ctx, " "+str(0))
+        ll_panorama = rf.loglikelihood(ctx, " "+str(1))
+        ll_international = rf.loglikelihood(ctx, " "+str(2))
+        ll_wirtschaft = rf.loglikelihood(ctx, " "+str(3))
+        ll_sport = rf.loglikelihood(ctx, " "+str(4))
+        ll_inland = rf.loglikelihood(ctx, " "+str(5))
+        ll_etat = rf.loglikelihood(ctx, " "+str(6))
+        ll_wissenschaft = rf.loglikelihood(ctx, " "+str(7))
+        ll_kultur = rf.loglikelihood(ctx, " "+str(8))
         #print(ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur)
         return ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur
 
@@ -128,29 +128,38 @@ class GNAD10(Task):
             The results of the requests created in construct_requests.
         """
         ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur = results
-        print(results)
+        print(list(zip(*results))[0])
         pred = max(ll_web[0], ll_panorama[0], ll_international[0], ll_wirtschaft[0], ll_sport[0], ll_inland[0], 
                                  ll_etat[0], ll_wissenschaft[0], ll_kultur[0])
         
         # Evaluation metrics will only work with numerical labels
         if pred == ll_web[0]:
-          pred = "Web"
+          #pred = "Web"
+          pred = 0
         elif pred == ll_panorama[0]:
-          pred = "Panorama"
+          #pred = "Panorama"
+          pred = 1
         elif pred == ll_international[0]:
-          pred = "International"
+          #pred = "International"
+          pred = 2
         elif pred == ll_wirtschaft[0]:
-          pred == "Wirtschaft"
+          #pred == "Wirtschaft"
+          pred = 3
         elif pred == ll_sport[0]:
-          pred == "Sport"
+          #pred == "Sport"
+          pred = 4
         elif pred == ll_inland[0]:
-          pred == "Inland"
+          #pred == "Inland"
+          pred = 5
         elif pred == ll_etat[0]:
-          pred == "Etat"
+          #pred == "Etat"
+          pred = 6
         elif pred == ll_wissenschaft[0]:
-          pred == "Wissenschaft"
+          #pred == "Wissenschaft"
+          pred = 7
         else:
-          pred == "Kultur"
+          #pred = "Kultur"
+          pred = 8
               
         true_label = doc["label"]
         
