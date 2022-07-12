@@ -68,22 +68,25 @@ class GNAD10(Task):
             # few-shot processing. If the data is too large to fit in memory,
             # return the training data as a generator instead of a list.
             if self._training_docs is None:
-                self._training_docs = list(map(self._process_doc, self.dataset["train"]))
+                #self._training_docs = list(map(self._process_doc, self.dataset["train"]))
+                self._training_docs = list(self.dataset["train"])
             return self._training_docs
 
     def validation_docs(self):
         if self.has_validation_docs():
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"validation"`.
+            #return map(self._process_doc, self.dataset["validation"])
             return map(self._process_doc, self.dataset["validation"])
 
     def test_docs(self):
         if self.has_test_docs():
             # In most case you can leave this as is unless the dataset split is
             # named differently than the default `"test"`.
+            #return map(self._process_doc, self.dataset["test"])
             return map(self._process_doc, self.dataset["test"])
           
-    def _process_doc(self, doc):
+    """def _process_doc(self, doc):
       # Truncate examples which exceed the maximum token length for the model (1024)
       text = doc["text"]
       
@@ -103,7 +106,7 @@ class GNAD10(Task):
       return {
             'text': text,
             'label': doc["label"],
-      }
+      }"""
       
     def doc_to_text(self, doc):
       # Truncate examples which exceed the maximum token length for the model (1024)
