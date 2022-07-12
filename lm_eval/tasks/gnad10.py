@@ -95,6 +95,9 @@ class GNAD10(Task):
       }
       
     def doc_to_text(self, doc):
+      if len(doc["text"] > 1024:
+        return "text: "+ doc["text"][0:1023]+ "\n\n"+ "label: "
+      else:
         return "text: "+ doc["text"]+ "\n\n"+ "label: "
 
     def doc_to_target(self, doc):
