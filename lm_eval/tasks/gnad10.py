@@ -94,6 +94,9 @@ class GNAD10(Task):
           for t in doc['text'].split(' '):
             text += t + ' '
             c += 2
+            if c > 1023:
+              break;
+            
         #text = doc['text'][:1023]
         print(len(text.split(' ')))
       else:
