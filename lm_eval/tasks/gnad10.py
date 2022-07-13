@@ -44,14 +44,6 @@ def _gnad10_agg_f1(key, items):
     references, predictions = zip(*items)
     f1_metric = datasets.load_metric("f1")
     return f1_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions))[key]
-  
-def _gnad10_truncate_docs(text):
-  if len(text.split(' ')) > 1024:
-    tmp = " "
-    for t in text.split(' ')[:1023]:
-        tmp += t + ' '
-    text = tmp
-  return text
 
 class GNAD10(Task):
     VERSION = 0
@@ -96,20 +88,7 @@ class GNAD10(Task):
         tmp = " "
         for t in doc['text'].split(' ')[:1023]:
           tmp += t + ' '
-        doc['text'] = tmp
-      """text = doc['text']
-      
-      if len(doc['text'].split(' ')) > 1024:
-        print(len(doc['text'].split(' ')))
-        #c = 0
-        text = ''
-        for t in doc['text'].split(' ')[:1023]:
-            text += t + ' '
-            #c += 2
-            
-        #text = doc['text'][:1023]
-        print(len(text.split(' ')))"""
-      
+        doc['text'] = tmp      
       
       return {
         'text' : doc['text'],
@@ -138,15 +117,6 @@ class GNAD10(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        """ll_web = rf.loglikelihood(ctx, " "+str(0))
-        ll_panorama = rf.loglikelihood(ctx, " "+str(1))
-        ll_international = rf.loglikelihood(ctx, " "+str(2))
-        ll_wirtschaft = rf.loglikelihood(ctx, " "+str(3))
-        ll_sport = rf.loglikelihood(ctx, " "+str(4))
-        ll_inland = rf.loglikelihood(ctx, " "+str(5))
-        ll_etat = rf.loglikelihood(ctx, " "+str(6))
-        ll_wissenschaft = rf.loglikelihood(ctx, " "+str(7))
-        ll_kultur = rf.loglikelihood(ctx, " "+str(8))"""
         
         ll_web = rf.loglikelihood(ctx, " "+"Web")
         ll_panorama = rf.loglikelihood(ctx, " "+"Panorama")
@@ -172,43 +142,12 @@ class GNAD10(Task):
         """
         ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur = results
         
-        #pred = max(ll_web[0], ll_panorama[0], ll_international[0], ll_wirtschaft[0], ll_sport[0], ll_inland[0], ll_etat[0], ll_wissenschaft[0], ll_kultur[0])
-        
         pred = float('-inf')
         
         for i in results:
           if i[0] > pred:
             pred = results.index(i)
-        
-        # Evaluation metrics will only work with numerical labels
-        """if pred == ll_web[0]:
-          #pred = "Web"
-          pred = 0
-        elif pred == ll_panorama[0]:
-          #pred = "Panorama"
-          pred = 1
-        elif pred == ll_international[0]:
-          #pred = "International"
-          pred = 2
-        elif pred == ll_wirtschaft[0]:
-          #pred == "Wirtschaft"
-          pred = 3
-        elif pred == ll_sport[0]:
-          #pred == "Sport"
-          pred = 4
-        elif pred == ll_inland[0]:
-          #pred == "Inland"
-          pred = 5
-        elif pred == ll_etat[0]:
-          #pred == "Etat"
-          pred = 6
-        elif pred == ll_wissenschaft[0]:
-          #pred == "Wissenschaft"
-          pred = 7
-        else:
-          #pred = "Kultur"
-          pred = 8"""
-              
+                      
         true_label = doc["label"]
         
         return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
