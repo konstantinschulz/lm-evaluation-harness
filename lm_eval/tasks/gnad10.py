@@ -48,9 +48,9 @@ def _gnad10_agg_f1(key, items):
 def _gnad10_truncate_docs(text):
   if len(text) > 1024:
     tmp = " "
-        for t in text.split(' ')[:1023]:
-            tmp += t + ' '
-        text = tmp
+    for t in text.split(' ')[:1023]:
+        tmp += t + ' '
+    text = tmp
   return text
 
 class GNAD10(Task):
