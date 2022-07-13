@@ -94,6 +94,7 @@ class GNAD10(Task):
             text += t + ' '
             c += 2"""
         text = doc['text'][:1023]
+        print(text)
       else:
         text = doc['text']
       
