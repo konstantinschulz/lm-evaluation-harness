@@ -94,7 +94,7 @@ class GNAD10(Task):
       # Truncate documents which exceed the maximum token length (1024) of the model
       if len(doc['text']) > 1024:
         tmp = " "
-        for t in text.split(' ')[:1023]:
+        for t in doc['text'].split(' ')[:1023]:
           tmp += t + ' '
         doc['text'] = tmp
       """text = doc['text']
