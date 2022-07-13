@@ -88,6 +88,7 @@ class GNAD10(Task):
       text = ''
       
       if len(doc['text'].split(' ')) > 1024:
+        print(len(doc['text'].split(' ')))
         c = 0
         while c < 1023:
           for t in doc['text'].split(' '):
@@ -97,7 +98,7 @@ class GNAD10(Task):
         #print(text + "\n\n")
       else:
         text = doc['text']
-      print(str(len(text.split(' '))) + "\n\n")
+      
       return {
         'text' : text.strip(),
         'label' : doc['label'],
