@@ -45,7 +45,14 @@ def _gnad10_agg_f1(key, items):
     f1_metric = datasets.load_metric("f1")
     return f1_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions))[key]
   
-  
+def _gnad10_truncate_docs(text):
+  if len(text) > 1024:
+    tmp = " "
+        for t in text.split(' ')[:1023]:
+            tmp += t + ' '
+        text = tmp
+  return text
+
 class GNAD10(Task):
     VERSION = 0
     DATASET_PATH = "gnad10"
@@ -91,7 +98,7 @@ class GNAD10(Task):
         print(len(doc['text'].split(' ')))
         #c = 0
         text = ''
-        for t in doc['text'].split(' ')[:1024]:
+        for t in doc['text'].split(' ')[:1023]:
             text += t + ' '
             #c += 2
             
@@ -105,7 +112,7 @@ class GNAD10(Task):
       }
       
     def doc_to_text(self, doc): 
-      return "text: "+ doc["text"] + "\n\n"+ "label: "
+      return "text: "+ _gnad10_truncate_doc(doc["text"]) + "\n\n"+ "label: "
 
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
