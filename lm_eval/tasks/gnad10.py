@@ -90,7 +90,7 @@ class GNAD10(Task):
       if len(doc['text']) > 1024:
         c = 0
         while c < 1023:
-          for t in doc['text']:
+          for t in doc['text'].split(' '):
             text += t + ' '
             c += 2
         #text = doc['text'][:1023]
