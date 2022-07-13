@@ -68,9 +68,7 @@ class GNAD10(Task):
             # return the training data as a generator instead of a list.
             if self._training_docs is None:
                 self._training_docs = map(self._process_doc, list(self.dataset["train"]))
-            for d in self._training_docs:
-              if len(d["text"].split(' ')) < 1024:
-                print(len(d["text"].split(' ')))
+            
             return self._training_docs
 
     def validation_docs(self):
@@ -87,20 +85,20 @@ class GNAD10(Task):
           
     def _process_doc(self, doc):
       # Truncate documents which exceed the maximum token length (1024) of the model
-      text = ""
+      text = ''
       
-      if len(doc["text"].split(' ')) > 1024:
+      if len(doc['text'].split(' ')) > 1024:
         c = 0
         while c < 1023:
-          for t in doc["text"]:
-            text += t + " "
+          for t in doc['text']:
+            text += t + ' '
             c += 2
       else:
-        text = doc["text"]
+        text = doc['text']
       
       return {
-        "text" : text.strip(),
-        "label" : doc["label"],
+        'text' : text.strip(),
+        'label' : doc['label'],
       }
       
     def doc_to_text(self, doc): 
