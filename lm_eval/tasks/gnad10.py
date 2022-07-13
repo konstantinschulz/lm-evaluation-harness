@@ -89,13 +89,11 @@ class GNAD10(Task):
       
       if len(doc['text'].split(' ')) > 1024:
         print(len(doc['text'].split(' ')))
-        c = 0
+        #c = 0
         while c < 1023:
-          for t in doc['text'].split(' '):
+          for t in doc['text'].split(' ')[:1024]:
             text += t + ' '
-            c += 2
-            if c > 1023:
-              break;
+            #c += 2
             
         #text = doc['text'][:1023]
         print(len(text.split(' ')))
