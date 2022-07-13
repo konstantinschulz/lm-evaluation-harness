@@ -88,12 +88,12 @@ class GNAD10(Task):
       text = ''
       
       if len(doc['text']) > 1024:
-        """c = 0
+        c = 0
         while c < 1023:
           for t in doc['text']:
             text += t + ' '
-            c += 2"""
-        text = doc['text'][:1023]
+            c += 2
+        #text = doc['text'][:1023]
         print(text + "\n\n")
       else:
         text = doc['text']
