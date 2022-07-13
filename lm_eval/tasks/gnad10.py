@@ -68,6 +68,9 @@ class GNAD10(Task):
             # return the training data as a generator instead of a list.
             if self._training_docs is None:
                 self._training_docs = map(self._process_doc, list(self.dataset["train"]))
+            for d in self._training_docs:
+              if len(d["text"].split(' ')) > 1024:
+                print(len(d["text"].split(' ')))
             return self._training_docs
 
     def validation_docs(self):
