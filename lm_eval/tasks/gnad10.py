@@ -85,19 +85,19 @@ class GNAD10(Task):
           
     def _process_doc(self, doc):
       # Truncate documents which exceed the maximum token length (1024) of the model
-      text = ''
+      text = doc['text']
       
       if len(doc['text'].split(' ')) > 1024:
         print(len(doc['text'].split(' ')))
         #c = 0
+        text = ''
         for t in doc['text'].split(' ')[:1024]:
             text += t + ' '
             #c += 2
             
         #text = doc['text'][:1023]
         print(len(text.split(' ')))
-      else:
-        text = doc['text']
+      
       
       return {
         'text' : text.strip(),
