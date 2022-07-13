@@ -97,7 +97,7 @@ class GNAD10(Task):
         #print(text + "\n\n")
       else:
         text = doc['text']
-      print(len(text.split(' ')) + "\n\n")
+      print(str(len(text.split(' '))) + "\n\n")
       return {
         'text' : text.strip(),
         'label' : doc['label'],
