@@ -117,7 +117,7 @@ class GNAD10(Task):
       }
       
     def doc_to_text(self, doc): 
-      return "text: "+ _gnad10_truncate_docs(doc["text"]) + "\n\n"+ "label: "
+      return "text: "+ _gnad10_truncate_docs(doc['text']) + "\n\n"+ "label: "
 
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
