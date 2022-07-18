@@ -89,7 +89,7 @@ class GNAD10(Task):
         for t in doc['text'].split(' ')[:1023]:
           tmp += t + ' '
         doc['text'] = tmp      
-      
+      print(len(doc['text'].split(' ')))
       return {
         'text' : doc['text'],
         'label' : doc['label'],
