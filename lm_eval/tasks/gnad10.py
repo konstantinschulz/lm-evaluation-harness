@@ -88,7 +88,7 @@ class GNAD10(Task):
         tmp = " "
         for t in doc['text'].split(' ')[:1023]:
           tmp += t + ' '
-        doc['text'] = tmp      
+        doc['text'] = tmp[:-1]    
       print(len(doc['text'].split(' ')))
       return {
         'text' : doc['text'],
