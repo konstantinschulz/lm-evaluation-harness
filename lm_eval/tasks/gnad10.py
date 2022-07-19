@@ -29,7 +29,7 @@ _CITATION = """
   Month     = aug
 }"""
 
-# Helper functions for aggregation (separate function for each metric)
+# Helper functions for aggregation
 def _gnad10_agg_precision(key, items):
     references, predictions = zip(*items)
     precision_metric = datasets.load_metric("precision")
@@ -79,9 +79,9 @@ class GNAD10(Task):
       if len(doc['text'].split(' ')) > 1024:
         tmp = " "
         for t in doc['text'].split(' ')[:1023]:
-          tmp += t + ' '
-        doc['text'] = tmp[:-1]    
-      print(doc['text'])
+          tmp += t + " "
+        doc['text'] = tmp[:-1] 
+
       return {
         'text' : doc['text'],
         'label' : doc['label'],
