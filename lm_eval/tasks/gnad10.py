@@ -62,24 +62,16 @@ class GNAD10(Task):
       
     def training_docs(self):
         if self.has_training_docs():
-            # We cache training documents in `self._training_docs` for faster
-            # few-shot processing. If the data is too large to fit in memory,
-            # return the training data as a generator instead of a list.
             if self._training_docs is None:
                 self._training_docs = map(self._process_doc, list(self.dataset["train"]))
             
             return self._training_docs
 
     def validation_docs(self):
-        if self.has_validation_docs():
-            # In most case you can leave this as is unless the dataset split is
-            # named differently than the default `"validation"`.
-            return map(self._process_doc, self.dataset["validation"])
+        pass
 
     def test_docs(self):
         if self.has_test_docs():
-            # In most case you can leave this as is unless the dataset split is
-            # named differently than the default `"test"`.
             return map(self._process_doc, self.dataset["test"])
           
     def _process_doc(self, doc):
@@ -89,7 +81,7 @@ class GNAD10(Task):
         for t in doc['text'].split(' ')[:1023]:
           tmp += t + ' '
         doc['text'] = tmp[:-1]    
-      print(len(doc['text'].split(' ')))
+      print(doc['text'])
       return {
         'text' : doc['text'],
         'label' : doc['label'],
@@ -145,7 +137,7 @@ class GNAD10(Task):
         pred = float('-inf')
         
         for i in results:
-          if i[0] > pred:
+          if i[1] > pred:
             pred = results.index(i)
                       
         true_label = doc["label"]
