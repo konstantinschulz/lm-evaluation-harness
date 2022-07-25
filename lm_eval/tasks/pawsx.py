@@ -40,17 +40,22 @@ def _pawsx_agg_recall(key, items):
                                  predictions=predictions, average='macro',
                                  labels= np.unique(predictions))[key]
 
-def _paws_agg_f1(key, items):
+def _pawsx_agg_f1(key, items):
     references, predictions = zip(*items)
     f1_metric = datasets.load_metric("f1")
     return f1_metric.compute(references=references,
                              predictions=predictions, average='macro',
                              labels= np.unique(predictions))[key]
+def yesno(x):
+    if x:
+        return "ja"
+    else:
+        return "nein"
 
 class PAWSX(Task):
     VERSION = 0
     DATASET_PATH = "paws-x"
-    DATASET_NAME = None
+    DATASET_NAME = 'de'
 
     def has_training_docs(self):
         return True
@@ -74,12 +79,13 @@ class PAWSX(Task):
              return self.dataset["test"]
           
     def doc_to_text(self, doc): 
-        return "satz1: "+ doc['sentence1'] + "satz2: "+ doc['sentence2'] + "\n\n"+ "etikett: "
+        return "Satz 1: {}\nSatz 2: {}\nFrage: Bedeuten beide Sätze dasselbe?\nAntwort:".format(
+            doc["sentence1"],
+            doc["sentence2"],
+        )
 
     def doc_to_target(self, doc):
-        target = doc["label"]
-
-        return " " + str(target)
+        return " {}".format(yesno(doc["label"]))
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
@@ -94,11 +100,10 @@ class PAWSX(Task):
             part of the document for `doc`.
         """
         
-        ll_0 = rf.loglikelihood(ctx, " "+"0")
-        ll_1 = rf.loglikelihood(ctx, " "+"1")
-   
-        
-        return ll_0, ll_1
+        ll_yes, _ = rf.loglikelihood(ctx, " ja")
+        ll_no, _ = rf.loglikelihood(ctx, " nein")
+        print(ll_yes, ll_no)
+        return ll_yes, ll_no
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -110,17 +115,14 @@ class PAWSX(Task):
         :param results:
             The results of the requests created in construct_requests.
         """
-        ll_0, ll_1 = results
+        ll_yes, ll_no = results
         
-        pred = float('-inf')
-        
-        for i in results:
-            if i[1] > pred:
-                pred = results.index(i)
+        pred = ll_yes > ll_no
                       
         true_label = doc["label"]
         
-        return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
+        return {"acc": pred==true_label, "precision":(true_label, pred),
+                "recall":(true_label, pred), "f1":(true_label, pred)}
 
     def aggregation(self):
         """
@@ -129,8 +131,9 @@ class PAWSX(Task):
             functions that aggregate a list of metric scores
         """
         return {"acc":mean, "precision": partial(_pawsx_agg_precision, "precision"), 
-                "recall" : partial(_paws_agg_recall, "recall"), 
+                "recall" : partial(_pawsx_agg_recall, "recall"), 
                 "f1" : partial(_pawsx_agg_f1, "f1")}
 
     def higher_is_better(self):
         return {"acc":True, "precision":True, "recall":True, "f1":True}
+    
