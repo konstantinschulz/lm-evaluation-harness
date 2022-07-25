@@ -79,7 +79,7 @@ class MLQA(Task):
             return map(self._convert_standard, self.data["test"])
 
     def doc_to_text(self, doc):
-        return 'Context: '+ doc['context'] + '\n\n' + 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
+        return 'Kontext: '+ doc['context'] + '\n\n' + 'Frage: ' + doc['question'] + '\n\n' + 'Antwort:'
 
     def doc_to_target(self, doc):
         answer_list = doc['answers']['text']
