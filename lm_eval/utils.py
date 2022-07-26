@@ -116,7 +116,9 @@ def get_rolling_token_windows(token_list, prefix_token, max_seq_len, context_len
                 window_b,
             )
         else:
-            print(f'WARNING: Skip... Rolling windows too small: {window_a=};\n {window_b=}')
+            print(
+                f"WARNING: Skip... Rolling windows too small: {window_a=};\n {window_b=}"
+            )
 
         predicted += window_pred_len
 

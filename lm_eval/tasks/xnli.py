@@ -4,7 +4,7 @@ https://arxiv.org/abs/1809.05053
 
 
 XNLI is an evaluation corpus for language transfer and cross-lingual sentence classification in 15 languages.
-""""""
+""" """
 
 Homepage: https://github.com/facebookresearch/XNLI
 """
@@ -55,7 +55,6 @@ class XNLIBase(MultipleChoiceTask):
             return map(self._process_doc, self.dataset["test"])
 
 
-
 class XNLIDe(XNLIBase):
     DATASET_NAME = "de"  # German part of xnli
 
@@ -64,7 +63,9 @@ class XNLIDe(XNLIBase):
             "premise": doc["premise"],
             "hypothesis": doc["hypothesis"],
             "choices": ["Wahr", "Neutral", "Falsch"],  # The list of choices.
-            "gold": doc["label"],  # The integer used to index into the correct element of `"choices"`.
+            "gold": doc[
+                "label"
+            ],  # The integer used to index into the correct element of `"choices"`.
         }
 
     def doc_to_text(self, doc):
@@ -74,4 +75,3 @@ class XNLIDe(XNLIBase):
             doc["hypothesis"].strip()
             + ("" if doc["hypothesis"].strip().endswith(".") else "."),
         )
-

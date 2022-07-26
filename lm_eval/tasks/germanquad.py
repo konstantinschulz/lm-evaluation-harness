@@ -16,7 +16,7 @@ from packaging import version
 
 _CITATION = """
 @misc{möller2021germanquad,
-      title={GermanQuAD and GermanDPR: Improving Non-English Question Answering and Passage Retrieval}, 
+      title={GermanQuAD and GermanDPR: Improving Non-English Question Answering and Passage Retrieval},
       author={Timo Möller and Julian Risch and Malte Pietsch},
       year={2021},
       eprint={2104.12741},
@@ -46,7 +46,8 @@ class GermanQuAD(Task):
 
     # HF changed squad on us so we have to make sure we aren't running the old one
     assert version.parse(datasets.__version__) >= version.parse(
-        "1.11.0"), "datasets v1.11.0 or later required for GermanQuAD"
+        "1.11.0"
+    ), "datasets v1.11.0 or later required for GermanQuAD"
 
     def has_training_docs(self):
         return True
@@ -71,23 +72,30 @@ class GermanQuAD(Task):
                 self.TEST_DATASET = list(self.dataset["test"])
             target_property: str = "context"
             context: str = doc[target_property]
-            relevant_items = [x for x in self.TRAIN_DATASET if x[target_property] == context]
+            relevant_items = [
+                x for x in self.TRAIN_DATASET if x[target_property] == context
+            ]
             if not relevant_items:
-                relevant_items = [x for x in self.TEST_DATASET if x[target_property] == context]
+                relevant_items = [
+                    x for x in self.TEST_DATASET if x[target_property] == context
+                ]
             relevant_items.remove(doc)
-            qa_strings: list[str] = [f"Question: {x['question']}\n\nAnswer: {x['answers']['text'][0]}" for x in
-                                     relevant_items]  # [:5]
-            return '\n\n'.join(qa_strings) + ''
+            qa_strings: list[str] = [
+                f"Question: {x['question']}\n\nAnswer: {x['answers']['text'][0]}"
+                for x in relevant_items
+            ]  # [:5]
+            return "\n\n".join(qa_strings) + ""
+
         # 'Background: ' + doc['context'] + '\n\n' + 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
         # return 'How long is the answer to the following question: ' + doc['question'] + '\n\n' + 'Answer:'
         # return 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
         # return 'Background: ' + doc['context'] + '\n\n' + 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
         # example_qa_string: str = get_qa_string()
         # return f"Background: {context}\n\n{example_qa_string}\n\nQuestion: {doc['question']}\n\nAnswer:"
-        return 'Question: ' + doc['question'] + '\n\n' + 'Answer:'
+        return "Question: " + doc["question"] + "\n\n" + "Answer:"
 
     def doc_to_target(self, doc):
-        answer_list = doc['answers']['text']
+        answer_list = doc["answers"]["text"]
         if len(answer_list) > 0:
             answer = answer_list[0]  # len(answer_list[0])
         else:
@@ -95,7 +103,7 @@ class GermanQuAD(Task):
         return " " + str(answer)  # answer
 
     def construct_requests(self, doc, ctx):
-        """ Uses RequestFactory to construct Requests and returns an iterable of
+        """Uses RequestFactory to construct Requests and returns an iterable of
         Requests which will be sent to the LM.
 
         :param doc:
@@ -105,7 +113,7 @@ class GermanQuAD(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        continuation = rf.greedy_until(ctx, ['\n'])
+        continuation = rf.greedy_until(ctx, ["\n"])
         # there are no unanswerable questions in GermanQuAD
         # is_unanswerable = rf.loglikelihood(ctx, " " + "unanswerable")
         return continuation  # , is_unanswerable
@@ -125,28 +133,40 @@ class GermanQuAD(Task):
         # no_answer_probability = exp(logprob_unanswerable)
 
         predictions = {
-            'id': doc['id'],
-            'prediction_text': continuation,
+            "id": doc["id"],
+            "prediction_text": continuation,
             # all questions have an answer in GermanQuAD
-            'no_answer_probability': 0,  # no_answer_probability,
+            "no_answer_probability": 0,  # no_answer_probability,
         }
 
         references = {
-            'id': doc['id'],
-            'answers': doc['answers'],  # str(len(doc['answers']['text'][0]))
+            "id": doc["id"],
+            "answers": doc["answers"],  # str(len(doc['answers']['text'][0]))
         }
 
         return {
-            'exact': (predictions, references),  # Exact match (the normalized answer exactly match the gold answer)
-            'f1': (predictions, references),  # The F-score of predicted tokens versus the gold answer
-            'HasAns_exact': (predictions, references),
+            "exact": (
+                predictions,
+                references,
+            ),  # Exact match (the normalized answer exactly match the gold answer)
+            "f1": (
+                predictions,
+                references,
+            ),  # The F-score of predicted tokens versus the gold answer
+            "HasAns_exact": (predictions, references),
             # Exact match (the normalized answer exactly match the gold answer)
-            'HasAns_f1': (predictions, references),  # The F-score of predicted tokens versus the gold answer
+            "HasAns_f1": (
+                predictions,
+                references,
+            ),  # The F-score of predicted tokens versus the gold answer
             # 'NoAns_exact': (predictions, references),
             # Exact match (the normalized answer exactly match the gold answer)
             # 'NoAns_f1': (predictions, references),  # The F-score of predicted tokens versus the gold answer
-            'best_exact': (predictions, references),  # Best exact match (with varying threshold)
-            'best_f1': (predictions, references),  # Best F1 (with varying threshold)
+            "best_exact": (
+                predictions,
+                references,
+            ),  # Best exact match (with varying threshold)
+            "best_f1": (predictions, references),  # Best F1 (with varying threshold)
         }
 
     def aggregation(self):
@@ -156,16 +176,28 @@ class GermanQuAD(Task):
             functions that aggregate a list of metrics
         """
         return {
-            'exact': partial(_squad_agg, 'exact'),  # Exact match (the normalized answer exactly match the gold answer)
-            'f1': partial(_squad_agg, 'f1'),  # The F-score of predicted tokens versus the gold answer
-            'HasAns_exact': partial(_squad_agg, 'HasAns_exact'),
+            "exact": partial(
+                _squad_agg, "exact"
+            ),  # Exact match (the normalized answer exactly match the gold answer)
+            "f1": partial(
+                _squad_agg, "f1"
+            ),  # The F-score of predicted tokens versus the gold answer
+            "HasAns_exact": partial(_squad_agg, "HasAns_exact"),
             # Exact match (the normalized answer exactly match the gold answer)
-            'HasAns_f1': partial(_squad_agg, 'HasAns_f1'),  # The F-score of predicted tokens versus the gold answer
-            'NoAns_exact': partial(_squad_agg, 'NoAns_exact'),
+            "HasAns_f1": partial(
+                _squad_agg, "HasAns_f1"
+            ),  # The F-score of predicted tokens versus the gold answer
+            "NoAns_exact": partial(_squad_agg, "NoAns_exact"),
             # Exact match (the normalized answer exactly match the gold answer)
-            'NoAns_f1': partial(_squad_agg, 'NoAns_f1'),  # The F-score of predicted tokens versus the gold answer
-            'best_exact': partial(_squad_agg, 'best_exact'),  # Best exact match (with varying threshold)
-            'best_f1': partial(_squad_agg, 'best_f1'),  # Best F1 (with varying threshold)
+            "NoAns_f1": partial(
+                _squad_agg, "NoAns_f1"
+            ),  # The F-score of predicted tokens versus the gold answer
+            "best_exact": partial(
+                _squad_agg, "best_exact"
+            ),  # Best exact match (with varying threshold)
+            "best_f1": partial(
+                _squad_agg, "best_f1"
+            ),  # Best F1 (with varying threshold)
         }
 
     def higher_is_better(self):
@@ -175,12 +207,12 @@ class GermanQuAD(Task):
             whether a higher value of the submetric is better
         """
         return {
-            'exact': True,  # Exact match (the normalized answer exactly match the gold answer)
-            'f1': True,  # The F-score of predicted tokens versus the gold answer
-            'HasAns_exact': True,  # Exact match (the normalized answer exactly match the gold answer)
-            'HasAns_f1': True,  # The F-score of predicted tokens versus the gold answer
-            'NoAns_exact': True,  # Exact match (the normalized answer exactly match the gold answer)
-            'NoAns_f1': True,  # The F-score of predicted tokens versus the gold answer
-            'best_exact': True,  # Best exact match (with varying threshold)
-            'best_f1': True,  # Best F1 (with varying threshold)
+            "exact": True,  # Exact match (the normalized answer exactly match the gold answer)
+            "f1": True,  # The F-score of predicted tokens versus the gold answer
+            "HasAns_exact": True,  # Exact match (the normalized answer exactly match the gold answer)
+            "HasAns_f1": True,  # The F-score of predicted tokens versus the gold answer
+            "NoAns_exact": True,  # Exact match (the normalized answer exactly match the gold answer)
+            "NoAns_f1": True,  # The F-score of predicted tokens versus the gold answer
+            "best_exact": True,  # Best exact match (with varying threshold)
+            "best_f1": True,  # Best F1 (with varying threshold)
         }

@@ -62,12 +62,18 @@ def simple_evaluate(
 
     assert tasks != [], "No tasks specified"
 
-    if model_args is None: model_args = ""
+    if model_args is None:
+        model_args = ""
     if isinstance(model, str):
         if model_args is None:
             model_args = ""
         lm = lm_eval.models.get_model(model).create_from_arg_string(
-            model_args, {"batch_size": batch_size, "device": device, "no_tokenizer_check": no_tokenizer_check}
+            model_args,
+            {
+                "batch_size": batch_size,
+                "device": device,
+                "no_tokenizer_check": no_tokenizer_check,
+            },
         )
     else:
         assert isinstance(model, lm_eval.base.LM)
@@ -214,7 +220,7 @@ def evaluate(
 
         for doc_id, doc in enumerate(itertools.islice(task_docs, 0, limit)):
             if skip is not None and doc_id < skip:
-                print(f'skip {doc_id}')
+                print(f"skip {doc_id}")
                 continue
 
             # print(f'{doc_id=}  {doc=}')
@@ -268,7 +274,9 @@ def evaluate(
             process_res_queue[(task_name, doc_id)].append((i, resp))
 
     vals = collections.defaultdict(list)
-    questions: List[str] = [x.args[0].split("\n\n")[-2] for x in requests['greedy_until']]
+    questions: List[str] = [
+        x.args[0].split("\n\n")[-2] for x in requests["greedy_until"]
+    ]
     # [x.args[0].split("\n\n")[-2] for x in reqs]
     # [x.args[0].split("\n\n")[-2] for x in requests['greedy_until']]
     true_answers: List[List[str]] = []
@@ -282,8 +290,13 @@ def evaluate(
 
         metrics = task.process_results(doc, requests)
 
-        if 'f1' in metrics and len(metrics['f1']) >= 1 and 'answers' in metrics['f1'][1] and 'text' in metrics['f1'][1]['answers']:
-            true_answers.append(metrics['f1'][1]['answers']['text'])
+        if (
+            "f1" in metrics
+            and len(metrics["f1"]) >= 1
+            and "answers" in metrics["f1"][1]
+            and "text" in metrics["f1"][1]["answers"]
+        ):
+            true_answers.append(metrics["f1"][1]["answers"]["text"])
 
         for metric, value in metrics.items():
             vals[(task_name, metric)].append(value)

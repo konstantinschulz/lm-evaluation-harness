@@ -15,8 +15,8 @@ from lm_eval.base import PerplexityTask
 
 class WechselDE(PerplexityTask):
     VERSION = 1
-    DATASET_PATH = 'valid.json.gz'
-    DATASET_NAME = 'malteos/wechsel_de'
+    DATASET_PATH = "valid.json.gz"
+    DATASET_NAME = "malteos/wechsel_de"
     dataset = None
 
     def download(self, data_dir=None, cache_dir=None, download_mode=None):
@@ -25,7 +25,7 @@ class WechselDE(PerplexityTask):
             data_files={"test": self.DATASET_PATH},
             split="test",
             cache_dir=cache_dir,
-            download_mode=download_mode
+            download_mode=download_mode,
         )
 
     def has_training_docs(self):
@@ -47,11 +47,11 @@ class WechselDE(PerplexityTask):
     def test_docs(self):
         # enforce minimum length
         #  if len(t) > 1
-        return [t for t in self.dataset['text']]
+        return [t for t in self.dataset["text"]]
 
     def doc_to_target(self, doc):
         if len(doc) < 1:
-            raise ValueError(f'Empty document')
+            raise ValueError(f"Empty document")
 
         return doc
 

@@ -285,12 +285,10 @@ TASK_REGISTRY = {
     "blimp_wh_vs_that_with_gap": blimp.BlimpWhVsThatWithGap,
     "blimp_wh_vs_that_with_gap_long_distance": blimp.BlimpWhVsThatWithGapLongDistance,
     # xglue
-
     # German tasks
     "xnli_de": xnli.XNLIDe,
     "wechsel_de": wechsel_de.WechselDE,
     "germanquad": germanquad.GermanQuAD,
-
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,

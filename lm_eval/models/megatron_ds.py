@@ -9,9 +9,17 @@ from unittest.mock import patch
 
 
 class MegatronDSLM(LM):
-
-    def __init__(self, checkpoint_path, batch_size=1, args=None, args_overrides=None,
-                 world_size=1, rank=0, local_rank=0, no_tokenizer_check=False):
+    def __init__(
+        self,
+        checkpoint_path,
+        batch_size=1,
+        args=None,
+        args_overrides=None,
+        world_size=1,
+        rank=0,
+        local_rank=0,
+        no_tokenizer_check=False,
+    ):
         """Megatron-DeepSpeed LM.
 
         :param checkpoint_path: str
@@ -75,7 +83,8 @@ class MegatronDSLM(LM):
         # Need to map some values to Enums
         if isinstance(self.args.position_embedding_type, str):
             self.args.position_embedding_type = megatron.enums.PositionEmbeddingType[
-                self.args.position_embedding_type]
+                self.args.position_embedding_type
+            ]
 
         # Environmental variables for distributed running
         distributed_env_variables = {
@@ -92,12 +101,14 @@ class MegatronDSLM(LM):
         # saying that the args have already initialized.
         with patch("megatron.global_vars._GLOBAL_ARGS", self.args):
             with mockenv_context(**distributed_env_variables):
-                with patch('megatron.global_vars._parse_args') as parse_args_func:
+                with patch("megatron.global_vars._parse_args") as parse_args_func:
                     parse_args_func.return_value = self.args
                     deepspeed.init_distributed()
                     initialize_megatron()
                     self.megatron_tokenizer = get_tokenizer()
-                    megatron_ds_model, _, _ = setup_model_and_optimizer(gpt_model_provider)
+                    megatron_ds_model, _, _ = setup_model_and_optimizer(
+                        gpt_model_provider
+                    )
                     # Override load path here
                     self.args.load = checkpoint_path
                     load_checkpoint(megatron_ds_model, None, None)
@@ -144,18 +155,25 @@ class MegatronDSLM(LM):
 
         loglikelihoods = []
         with torch.no_grad():
-            for string, in tqdm(requests):
-                rolling_token_windows = list(map(utils.make_disjoint_window, utils.get_rolling_token_windows(
-                    token_list=self.tokenizer_encode(string),
-                    prefix_token=self.EOT_TOKEN_ID,
-                    max_seq_len=self.max_length,
-                    context_len=1,
-                )))
+            for (string,) in tqdm(requests):
+                rolling_token_windows = list(
+                    map(
+                        utils.make_disjoint_window,
+                        utils.get_rolling_token_windows(
+                            token_list=self.tokenizer_encode(string),
+                            prefix_token=self.EOT_TOKEN_ID,
+                            max_seq_len=self.max_length,
+                            context_len=1,
+                        ),
+                    )
+                )
 
                 rolling_token_windows = [(None,) + x for x in rolling_token_windows]
 
                 # TODO: extract out this call so it only gets called once and also somehow figure out partial caching for that
-                string_nll = self._loglikelihood_tokens(rolling_token_windows, disable_tqdm=True)
+                string_nll = self._loglikelihood_tokens(
+                    rolling_token_windows, disable_tqdm=True
+                )
 
                 # discard is_greedy
                 string_nll = [x[0] for x in string_nll]
@@ -182,7 +200,9 @@ class MegatronDSLM(LM):
 
             # TODO: automatic (variable) batch size detection for vectorization
             reord = utils.Reorderer(requests, _collate)
-            for chunk in utils.chunks(tqdm(reord.get_reordered(), disable=disable_tqdm), self.batch_size):
+            for chunk in utils.chunks(
+                tqdm(reord.get_reordered(), disable=disable_tqdm), self.batch_size
+            ):
                 inps = []
                 contlens = []
                 inplens = []
@@ -208,33 +228,45 @@ class MegatronDSLM(LM):
 
                     # when too long to fit in context, truncate from the left
                     inp = torch.tensor(
-                        (context_enc + continuation_enc)[-(self.max_length + 1):][:-1]
-                        , dtype=torch.long).to(self.device)
-                    inplen, = inp.shape
+                        (context_enc + continuation_enc)[-(self.max_length + 1) :][:-1],
+                        dtype=torch.long,
+                    ).to(self.device)
+                    (inplen,) = inp.shape
 
                     cont = continuation_enc
 
                     # since in _collate we make sure length is descending, the longest is always the first one.
-                    padding_length = padding_length if padding_length is not None else inplen
+                    padding_length = (
+                        padding_length if padding_length is not None else inplen
+                    )
 
                     # pad to length
-                    inp = torch.cat([
-                        inp,  # [seq]
-                        torch.zeros(padding_length - inplen, dtype=torch.long).to(inp.device)  # [padding_length - seq]
-                    ], dim=0)
+                    inp = torch.cat(
+                        [
+                            inp,  # [seq]
+                            torch.zeros(padding_length - inplen, dtype=torch.long).to(
+                                inp.device
+                            ),  # [padding_length - seq]
+                        ],
+                        dim=0,
+                    )
 
                     inps.append(inp.unsqueeze(0))
                     contlens.append(cont)
                     inplens.append(inplen)
 
-                multi_logits = F.log_softmax(self._model_call(torch.cat(inps, dim=0)),
-                                             dim=-1).cpu()  # [batch, seq, vocab]
+                multi_logits = F.log_softmax(
+                    self._model_call(torch.cat(inps, dim=0)), dim=-1
+                ).cpu()  # [batch, seq, vocab]
 
-                for (cache_key, _, _), logits, inp, inplen, cont_toks in zip(chunk, multi_logits, inps, inplens,
-                                                                             contlens):
+                for (cache_key, _, _), logits, inp, inplen, cont_toks in zip(
+                    chunk, multi_logits, inps, inplens, contlens
+                ):
                     contlen = len(cont_toks)
 
-                    logits = logits[inplen - contlen:inplen].unsqueeze(0)  # [1, seq, vocab]
+                    logits = logits[inplen - contlen : inplen].unsqueeze(
+                        0
+                    )  # [1, seq, vocab]
 
                     greedy_tokens = logits.argmax(dim=-1)
 
@@ -245,7 +277,9 @@ class MegatronDSLM(LM):
 
                     # last_token_slice = logits[:, -1, :].squeeze(0).tolist()
 
-                    logits = torch.gather(logits, 2, cont_toks.unsqueeze(-1)).squeeze(-1)  # [1, seq]
+                    logits = torch.gather(logits, 2, cont_toks.unsqueeze(-1)).squeeze(
+                        -1
+                    )  # [1, seq]
 
                     answer = (float(logits.sum()), bool(max_equal))
 
@@ -267,10 +301,11 @@ class MegatronDSLM(LM):
         """
         from megatron import mpu
         from megatron.utils import get_ltor_masks_and_position_ids
+
         with patch("megatron.global_vars._GLOBAL_ARGS", self.args):
             # Logic taken from pretrain_gpt.get_batch_pipe
             data_b = mpu.broadcast_data(["text"], {"text": inps}, torch.int64)
-            tokens = data_b['text'].long()
+            tokens = data_b["text"].long()
             attention_mask, loss_mask, position_ids = get_ltor_masks_and_position_ids(
                 tokens,
                 self.megatron_tokenizer.eod,
@@ -283,7 +318,9 @@ class MegatronDSLM(LM):
             self.args.attn_mask = attention_mask
 
             # Provide Inputs
-            self.megatron_ds_model.pipe_buffers["inputs"] = [(tokens, position_ids, attention_mask)]
+            self.megatron_ds_model.pipe_buffers["inputs"] = [
+                (tokens, position_ids, attention_mask)
+            ]
             self.megatron_ds_model.pipe_buffers["outputs"] = [None]
 
             # Run model
@@ -299,16 +336,19 @@ class MegatronDSLM(LM):
             self.megatron_ds_model.total_loss = None
             self.megatron_ds_model.fwd_outputs = []
             self.megatron_ds_model.pipe_buffers["outputs"] = [None]
-        return megatron_ds_output[:, :, :self.megatron_tokenizer.vocab_size]
+        return megatron_ds_output[:, :, : self.megatron_tokenizer.vocab_size]
 
     def tokenizer_encode(self, text):
         """Tokenize text *without* adding special tokens."""
         # Splitting this into its own method in case we need to handle special cases for different tokenizers
         from megatron.tokenizer.gpt2_tokenization import GPT2Tokenizer
+
         if isinstance(self.megatron_tokenizer.tokenizer, GPT2Tokenizer):
             return self.megatron_tokenizer.tokenizer.encode(text)
         else:
-            return self.megatron_tokenizer.tokenizer.encode(text, add_special_tokens=False)
+            return self.megatron_tokenizer.tokenizer.encode(
+                text, add_special_tokens=False
+            )
 
     def greedy_until(self, requests):
         raise NotImplementedError()
