@@ -89,6 +89,9 @@ class HFLM(BaseLM):
 
     @property
     def max_length(self):
+        if self.gpt2.config.model_type == "bloom":
+            return self.gpt2.config.seq_length
+
         try:
             return self.gpt2.config.n_ctx
         except AttributeError:
