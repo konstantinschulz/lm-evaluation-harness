@@ -15,7 +15,7 @@ from lm_eval.base import PerplexityTask
 
 class WechselDE(PerplexityTask):
     VERSION = 1
-    DATASET_PATH = 'valid.json.gz'
+    DATASET_PATH = 'valid.random_1636.json.gz'  # use random 1% instead of full set
     DATASET_NAME = 'malteos/wechsel_de'
     dataset = None
 
