@@ -55,6 +55,7 @@ class HFLM(BaseLM):
                 transformers.GPT2TokenizerFast,
                 transformers.T5Tokenizer,
                 transformers.T5TokenizerFast,
+                transformers.BloomTokenizerFast,
             ),
         ), "this tokenizer has not been checked for compatibility yet!"
 
