@@ -127,8 +127,10 @@ class HFLM(BaseLM):
         logits returned from the model
         """
         with torch.no_grad():
-            res = self.gpt2(inps)[0][:, :, :self.gpt2.config.vocab_size]
-            print(f'_model_call: {res=}')
+            raw_res = self.gpt2(inps)[0]
+            res = raw_res[:, :, :self.gpt2.config.vocab_size]
+
+            print(f'_model_call: {raw_res.shape=} ; {res.shape=}')
 
             return res
 

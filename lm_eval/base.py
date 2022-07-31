@@ -295,6 +295,8 @@ class BaseLM(LM):
                 self._model_call(batched_inps), dim=-1
             ).cpu()  # [batch, padding_length, vocab]
 
+            print(f'multi_logits = {multi_logits.shape}')
+
             for (cache_key, _, _), logits, inp, inplen, cont_toks in zip(
                 chunk, multi_logits, inps, inplens, cont_toks_list
             ):
