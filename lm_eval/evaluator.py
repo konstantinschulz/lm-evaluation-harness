@@ -282,6 +282,8 @@ def evaluate(
             )  # decontaminated still uses the same metric
         results[task_name][metric] = task.aggregation()[real_metric](items)
 
+        print(f'- aggregate: {items=}')
+
         # hotfix: bleu, chrf, ter seem to be really expensive to bootstrap
         # so we run them less iterations. still looking for a cleaner way to do this
 

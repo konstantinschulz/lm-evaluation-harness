@@ -737,6 +737,9 @@ class PerplexityTask(Task, abc.ABC):
         (loglikelihood,) = results
         words = self.count_words(doc)
         bytes_ = self.count_bytes(doc)
+
+        print(f'- process_results: {loglikelihood=}')
+
         return {
             "word_perplexity": (loglikelihood, words),
             "byte_perplexity": (loglikelihood, bytes_),
