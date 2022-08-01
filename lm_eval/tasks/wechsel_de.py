@@ -37,9 +37,9 @@ class WechselDE(PerplexityTask):
     def has_test_docs(self):
         return True
 
-    def _process_doc(self, doc):
-        print(f'process doc: {doc}')
-        return doc
+    # def _process_doc(self, doc):
+    #     print(f'process doc: {doc}')
+    #     return doc
 
     def test_docs(self):
         return self.dataset['text']
@@ -47,6 +47,6 @@ class WechselDE(PerplexityTask):
     def doc_to_target(self, doc):
         return doc
 
-    def count_words(self, doc):
-        # count number of words in *original doc before detokenization*
-        return len(re.split(r"\s+", doc))
+    # def count_words(self, doc):
+    #     # count number of words in *original doc before detokenization*
+    #     return len(re.split(r"\s+", doc))

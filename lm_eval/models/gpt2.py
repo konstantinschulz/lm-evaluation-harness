@@ -1,3 +1,5 @@
+import os
+
 import transformers
 import torch
 from lm_eval.base import BaseLM
@@ -41,12 +43,18 @@ class HFLM(BaseLM):
         ).to(self.device)
         self.gpt2.eval()
 
+        print(os.path.exists('/Volumes/data/repo/data/bert/gpt2/config.json'))
+
         # pretrained tokenizer for neo is broken for now so just hard-coding this to gpt2
+        print(f'{pretrained=} {revision=} {subfolder=}')
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(
             pretrained if tokenizer is None else tokenizer,
-            revision=revision,
-            subfolder=subfolder,
+            # revision=revision,
+            # subfolder=subfolder,
         )
+        # self.tokenizer = transformers.AutoTokenizer.from_pretrained(
+        #     '/Volumes/data/repo/data/bert/gpt2/',
+        # )
 
         assert isinstance(
             self.tokenizer,
