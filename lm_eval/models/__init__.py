@@ -1,6 +1,7 @@
 from . import gpt2
 from . import gpt3
 from . import dummy
+from . import megatron_ds
 
 MODEL_REGISTRY = {
     "hf": gpt2.HFLM,
