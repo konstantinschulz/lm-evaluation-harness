@@ -53,8 +53,6 @@ from . import storycloze
 
 from . import x_stance
 from . import gnad10
-from . import german_legal_entity_recognition
-
 
 ########################################
 # Translation tasks
@@ -292,7 +290,6 @@ TASK_REGISTRY = {
     # X-Stance, GNAD10, German Legal Entity Recognition
     "x_stance": x_stance.XStance,
     "gnad10": gnad10.GNAD10,
-    "german_legal_entity_recognition": german_legal_entity_recognition.GermanLegalEntityRecognition,
 }
 
 
