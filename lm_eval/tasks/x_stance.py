@@ -74,10 +74,9 @@ class XStance(Task):
             return self.dataset["test"]
         
     def doc_to_text(self, doc):
-        return "Thema: "+ doc["question"]+ "\n\n"+ "Meine Meinung: "+ doc["comment"]+ "\n\n"+ "Meine Meinung ist (dafür oder dagegen): " # Formatting the prompts capitalized in German gives the highest scores
+        return "Thema: "+ doc["question"]+ "\n\n"+ "Meine Meinung (dafür oder dagegen): "+ doc["comment"]+ "\n\n"+ "Meine Meinung ist (dafür oder dagegen): " # Formatting the prompts capitalized in German gives the highest scores
 
     def doc_to_target(self, doc):
-        print("doc_to_target method used")
         target = doc["label"]
         return " " + target
 
