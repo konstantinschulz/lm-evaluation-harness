@@ -74,7 +74,7 @@ class XStance(Task):
             return self.dataset["test"]
         
     def doc_to_text(self, doc):
-        return "Thema: "+ doc["question"]+ "\n\n"+ "Meine Meinung: "+ doc["comment"]+ "\n\n"+ "Meine Meinung ist (dafür oder dagegen): " # Formatting the prompts capitalized in German gives the highest scores
+        return "Thema: "+ doc["question"]+ "\n\n"+ "Meine Meinung(pro oder contra): "+ doc["comment"]+ "\n\n"+ "Meine Meinung ist(pro oder contra): " # Formatting the prompts capitalized in German gives the highest scores
 
     def doc_to_target(self, doc):
         target = doc["label"]
@@ -95,8 +95,8 @@ class XStance(Task):
         # rf.loglikelihood as the task is a classification problem. For each document the model predicts loglikelihood for the correct label
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
         
-        ll_favor = rf.loglikelihood(ctx, " dafür")
-        ll_against = rf.loglikelihood(ctx, " dagegen")
+        ll_favor = rf.loglikelihood(ctx, " pro")
+        ll_against = rf.loglikelihood(ctx, " contra")
 
         return ll_favor, ll_against
 
