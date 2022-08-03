@@ -47,7 +47,7 @@ class XStance(Task):
     VERSION = 0
     DATASET_PATH = "strombergnlp/x-stance"
     # Select only German part of the dataset
-    DATASET_NAME = "de"
+    DATASET_NAME = None
     
     def has_training_docs(self):
         return True
@@ -136,3 +136,15 @@ class XStance(Task):
 
     def higher_is_better(self):
         return {"acc":True, "precision":True, "recall":True, "f1":True}
+  
+class XStanceDE(XStance):
+    VERSION = 0
+    DATASET_PATH = "strombergnlp/x-stance"
+    # Select only German part of the dataset
+    DATASET_NAME = "de"
+
+class XStanceFR(XStance):
+    VERSION = 0
+    DATASET_PATH = "strombergnlp/x-stance"
+    # Select only French part of the dataset
+    DATASET_NAME = "fr"
