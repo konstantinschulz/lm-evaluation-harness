@@ -74,7 +74,7 @@ class XStance(Task):
             return self.dataset["test"]
         
     def doc_to_text(self, doc):
-        return "Thema: "+ doc["question"]+ "\n\n"+ "Meine Meinung (pro oder contra): "+ doc["comment"]+ "\n\n"+ "Meine Meinung ist (pro oder contra): " # Formatting the prompts capitalized in German gives the highest scores
+        return "Thema: "+ doc["question"]+ "\n\n"+ "Meine Meinung (pro oder kontra): "+ doc["comment"]+ "\n\n"+ "Meine Meinung ist (pro oder kontra): " # Formatting the prompts capitalized in German gives the highest scores
 
     def doc_to_target(self, doc):
         target = doc["label"]
@@ -96,7 +96,7 @@ class XStance(Task):
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
         
         ll_favor = rf.loglikelihood(ctx, " pro")
-        ll_against = rf.loglikelihood(ctx, " contra")
+        ll_against = rf.loglikelihood(ctx, " kontra")
 
         return ll_favor, ll_against
 
