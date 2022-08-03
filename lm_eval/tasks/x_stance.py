@@ -97,7 +97,7 @@ class XStance(Task):
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
         
         ll_favor = rf.loglikelihood(ctx, " dafür")
-        ll_against = rf.loglikelihood(ctx, " dagegen)
+        ll_against = rf.loglikelihood(ctx, " dagegen")
 
         return ll_favor, ll_against
 
