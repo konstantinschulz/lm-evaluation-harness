@@ -28,7 +28,7 @@ _CITATION = """
 
 
 def _squad_metric(predictions, references):
-    squad_metric = datasets.load_metric("squad")
+    squad_metric = datasets.load_metric("squad_v2")
     return squad_metric.compute(predictions=predictions, references=references)
 
 
@@ -48,9 +48,6 @@ class MLQA(Task):
     # HF changed squad on us so we have to make sure we aren't running the old one
     assert version.parse(datasets.__version__) >= version.parse(
         "1.11.0"), "datasets v1.11.0 or later required for MLQA"
-    
-    def download(self):
-        self.data = datasets.load_dataset(path=self.DATASET_PATH, name=self.DATASET_NAME)
         
     def has_training_docs(self):
         return False
@@ -67,20 +64,20 @@ class MLQA(Task):
     def training_docs(self):
         if self.has_training_docs():
             if self._training_docs is None:
-                self._training_docs = list(map(self._convert_standard, self.data["train"]))
+                self._training_docs = list(map(self._convert_standard, self.dataset["train"]))
             return self._training_docs
 
     def validation_docs(self):
         if self.has_validation_docs():
-            return map(self._convert_standard, self.data["validation"])
+            return map(self._convert_standard, self.dataset["validation"])
 
     def test_docs(self):
         if self.has_test_docs():
-            return map(self._convert_standard, self.data["test"])
+            return map(self._convert_standard, self.dataset["test"])
 
     def doc_to_text(self, doc):
         return 'Kontext: '+ doc['context'] + '\n\n' + 'Frage: ' + doc['question'] + '\n\n' + 'Antwort:'
-
+    
     def doc_to_target(self, doc):
         answer_list = doc['answers']['text']
         if len(answer_list) > 0:
@@ -122,25 +119,25 @@ class MLQA(Task):
             'id': doc['id'],
             'prediction_text': continuation,
             # all questions have an answer in GermanQuAD
-#             'no_answer_probability': 0,  # no_answer_probability,
+            'no_answer_probability': 0,  # no_answer_probability,
         }
 
         references = {
             'id': doc['id'],
             'answers': doc['answers'],  # str(len(doc['answers']['text'][0]))
-        }
+        }S
 
         return {
-            'exact_match': (predictions, references),  # Exact match (the normalized answer exactly match the gold answer)
+            'exact': (predictions, references),  # Exact match (the normalized answer exactly match the gold answer)
             'f1': (predictions, references),  # The F-score of predicted tokens versus the gold answer
-#             'HasAns_exact': (predictions, references),
+            'HasAns_exact': (predictions, references),
             # Exact match (the normalized answer exactly match the gold answer)
-#             'HasAns_f1': (predictions, references),  # The F-score of predicted tokens versus the gold answer
+            'HasAns_f1': (predictions, references),  # The F-score of predicted tokens versus the gold answer
             # 'NoAns_exact': (predictions, references),
             # Exact match (the normalized answer exactly match the gold answer)
             # 'NoAns_f1': (predictions, references),  # The F-score of predicted tokens versus the gold answer
-#             'best_exact': (predictions, references),  # Best exact match (with varying threshold)
-#             'best_f1': (predictions, references),  # Best F1 (with varying threshold)
+            'best_exact': (predictions, references),  # Best exact match (with varying threshold)
+            'best_f1': (predictions, references),  # Best F1 (with varying threshold)
         }
 
     def aggregation(self):
@@ -150,16 +147,16 @@ class MLQA(Task):
             functions that aggregate a list of metrics
         """
         return {
-            'exact_match': partial(_squad_agg, 'exact_match'),  # Exact match (the normalized answer exactly match the gold answer)
+            'exact': partial(_squad_agg, 'exact'),  # Exact match (the normalized answer exactly match the gold answer)
             'f1': partial(_squad_agg, 'f1'),  # The F-score of predicted tokens versus the gold answer
-#             'HasAns_exact': partial(_squad_agg, 'HasAns_exact'),
+            'HasAns_exact': partial(_squad_agg, 'HasAns_exact'),
             # Exact match (the normalized answer exactly match the gold answer)
-#             'HasAns_f1': partial(_squad_agg, 'HasAns_f1'),  # The F-score of predicted tokens versus the gold answer
-#             'NoAns_exact': partial(_squad_agg, 'NoAns_exact'),
+            'HasAns_f1': partial(_squad_agg, 'HasAns_f1'),  # The F-score of predicted tokens versus the gold answer
+            'NoAns_exact': partial(_squad_agg, 'NoAns_exact'),
             # Exact match (the normalized answer exactly match the gold answer)
-#             'NoAns_f1': partial(_squad_agg, 'NoAns_f1'),  # The F-score of predicted tokens versus the gold answer
-#             'best_exact': partial(_squad_agg, 'best_exact'),  # Best exact match (with varying threshold)
-#             'best_f1': partial(_squad_agg, 'best_f1'),  # Best F1 (with varying threshold)
+            'NoAns_f1': partial(_squad_agg, 'NoAns_f1'),  # The F-score of predicted tokens versus the gold answer
+            'best_exact': partial(_squad_agg, 'best_exact'),  # Best exact match (with varying threshold)
+            'best_f1': partial(_squad_agg, 'best_f1'),  # Best F1 (with varying threshold)
         }
 
     def higher_is_better(self):
@@ -169,12 +166,12 @@ class MLQA(Task):
             whether a higher value of the submetric is better
         """
         return {
-            'exact_match': True,  # Exact match (the normalized answer exactly match the gold answer)
+            'exact': True,  # Exact match (the normalized answer exactly match the gold answer)
             'f1': True,  # The F-score of predicted tokens versus the gold answer
-#             'HasAns_exact': True,  # Exact match (the normalized answer exactly match the gold answer)
-#             'HasAns_f1': True,  # The F-score of predicted tokens versus the gold answer
-#             'NoAns_exact': True,  # Exact match (the normalized answer exactly match the gold answer)
-#             'NoAns_f1': True,  # The F-score of predicted tokens versus the gold answer
-#             'best_exact': True,  # Best exact match (with varying threshold)
-#             'best_f1': True,  # Best F1 (with varying threshold)
+            'HasAns_exact': True,  # Exact match (the normalized answer exactly match the gold answer)
+            'HasAns_f1': True,  # The F-score of predicted tokens versus the gold answer
+            'NoAns_exact': True,  # Exact match (the normalized answer exactly match the gold answer)
+            'NoAns_f1': True,  # The F-score of predicted tokens versus the gold answer
+            'best_exact': True,  # Best exact match (with varying threshold)
+            'best_f1': True,  # Best F1 (with varying threshold)
         }
