@@ -47,7 +47,13 @@ class XStance(Task):
     VERSION = 0
     DATASET_PATH = "strombergnlp/x-stance"
     # Select only German part of the dataset
-    DATASET_NAME = "de"
+    DATASET_NAME = None
+    TOPIC = "Thema: "
+    OPINION = "Meine Meinung (pro oder contra): "
+    STANCE = "Meine Meinung ist (pro oder contra): "
+    FAVOR = "pro"
+    AGAINST = "contra"
+    
     
     def has_training_docs(self):
         return True
@@ -74,7 +80,7 @@ class XStance(Task):
             return self.dataset["test"]
         
     def doc_to_text(self, doc):
-        return "Thema: "+ doc["question"]+ "\n\n"+ "Meine Meinung (pro oder contra): "+ doc["comment"]+ "\n\n"+ "Meine Meinung ist (pro oder contra): " # Formatting the prompts capitalized in German gives the highest scores
+        return self.TOPIC + doc["question"]+ "\n\n"+ self.OPINION + doc["comment"]+ "\n\n" + self.STANCE # Formatting the prompts capitalized in German gives the highest scores
 
     def doc_to_target(self, doc):
         target = doc["label"]
@@ -137,14 +143,24 @@ class XStance(Task):
     def higher_is_better(self):
         return {"acc":True, "precision":True, "recall":True, "f1":True}
   
-"""class XStanceDE(XStance):
+class XStanceDE(XStance):
     VERSION = 0
     DATASET_PATH = "strombergnlp/x-stance"
     # Select only German part of the dataset
-    DATASET_NAME = "de"
+    DATASET_NAME = None
+    TOPIC = "Thema: "
+    OPINION = "Meine Meinung (pro oder contra): "
+    STANCE = "Meine Meinung ist (pro oder contra): "
+    FAVOR = "pro"
+    AGAINST = "contra"
 
 class XStanceFR(XStance):
     VERSION = 0
     DATASET_PATH = "strombergnlp/x-stance"
-    # Select only French part of the dataset
-    DATASET_NAME = "fr"""
+    # Select only German part of the dataset
+    DATASET_NAME = None
+    TOPIC = "Thema: "
+    OPINION = "Mon opinion (pour ou contre): "
+    STANCE = "Mon opinion est (pour ou contre): "
+    FAVOR = "pour"
+    AGAINST = "contre"
