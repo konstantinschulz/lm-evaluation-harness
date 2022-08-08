@@ -88,7 +88,7 @@ class GNAD10(Task):
       }
       
     def doc_to_text(self, doc): 
-      return "text: "+ doc['text'] + "\n\n"+ "label: "
+      return "Artikel (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "+ doc['text'] + "\n\n"+ "Thema (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "
 
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
