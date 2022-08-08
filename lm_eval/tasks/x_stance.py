@@ -147,7 +147,7 @@ class XStanceDE(XStance):
     VERSION = 0
     DATASET_PATH = "strombergnlp/x-stance"
     # Select only German part of the dataset
-    DATASET_NAME = None
+    DATASET_NAME = "de"
     TOPIC = "Thema: "
     OPINION = "Meine Meinung (pro oder contra): "
     STANCE = "Meine Meinung ist (pro oder contra): "
@@ -158,7 +158,7 @@ class XStanceFR(XStance):
     VERSION = 0
     DATASET_PATH = "strombergnlp/x-stance"
     # Select only German part of the dataset
-    DATASET_NAME = None
+    DATASET_NAME = "fr"
     TOPIC = "Thema: "
     OPINION = "Mon opinion (pour ou contre): "
     STANCE = "Mon opinion est (pour ou contre): "
