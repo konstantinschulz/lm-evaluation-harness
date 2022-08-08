@@ -142,24 +142,23 @@ class XStance(Task):
 
     def higher_is_better(self):
         return {"acc":True, "precision":True, "recall":True, "f1":True}
-  
+# German part of the dataset  
 class XStanceDE(XStance):
     VERSION = 0
     DATASET_PATH = "strombergnlp/x-stance"
-    # Select only German part of the dataset
     DATASET_NAME = "de"
     TOPIC = "Thema: "
     OPINION = "Meine Meinung (pro oder contra): "
     STANCE = "Meine Meinung ist (pro oder contra): "
     FAVOR = "pro"
     AGAINST = "contra"
-
+    
+# French part of the dataset
 class XStanceFR(XStance):
     VERSION = 0
-    DATASET_PATH = "strombergnlp/x-stance"
-    # Select only German part of the dataset
+    DATASET_PATH = "strombergnlp/x-stance" 
     DATASET_NAME = "fr"
-    TOPIC = "Thema: "
+    TOPIC = "Thème: "
     OPINION = "Mon opinion (pour ou contre): "
     STANCE = "Mon opinion est (pour ou contre): "
     FAVOR = "pour"
