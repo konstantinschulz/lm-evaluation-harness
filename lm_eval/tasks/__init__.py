@@ -285,8 +285,9 @@ TASK_REGISTRY = {
     # "storycloze_2018": storycloze.StoryCloze2018,
     # "sat": sat.SATAnalogies,
 
-    # X-Stance
-    "x_stance":x_stance.XStance,
+    # X-Stance tasks
+    "x_stance_de":x_stance.XStanceDE,
+    "x_stance_fr":x_stance.XStanceFR,
 }
 
 
