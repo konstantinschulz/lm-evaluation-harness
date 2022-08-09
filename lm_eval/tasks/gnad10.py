@@ -38,7 +38,7 @@ def _gnad10_agg_precision(key, items):
 def _gnad10_agg_recall(key, items):
     references, predictions = zip(*items)
     recall_metric = datasets.load_metric("recall")
-    return recall_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions), zero_division=1)[key]
+    return recall_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions))[key]
 
 def _gnad10_agg_f1(key, items):
     references, predictions = zip(*items)
@@ -74,21 +74,8 @@ class GNAD10(Task):
         if self.has_test_docs():
             return self.dataset["test"]
           
-    """def _process_doc(self, doc):
-      # Truncate documents which exceed the maximum token length (1024) of the model
-      if len(doc['text'].split(' ')) > 1024:
-        tmp = " "
-        for t in doc['text'].split(' ')[:1023]:
-          tmp += t + " "
-        doc['text'] = tmp[:-1] 
-
-      return {
-        'text' : doc['text'],
-        'label' : doc['label'],
-      }"""
-      
     def doc_to_text(self, doc): 
-      return "Artikel (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "+ doc['text'] + "\n\n"+ "Thema (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "
+      return "Artikel (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "+ doc['text'] + "\n\n"+ "Kategorie (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "
 
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
