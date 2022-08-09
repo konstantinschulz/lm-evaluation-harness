@@ -138,7 +138,7 @@ class GNAD10(Task):
         
         scores = [i[0] for i in results]
         print(scores)
-        pred = scores.index(min(scores))
+        pred = scores.index(max(scores))
         print(pred)              
         true_label = doc["label"]
        
