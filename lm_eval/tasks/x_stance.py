@@ -80,12 +80,15 @@ class XStance(Task):
             return self.dataset["test"]
         
     def doc_to_text(self, doc):
-        return self.TOPIC + doc["question"]+ "\n\n"+ self.OPINION + doc["comment"]+ "\n\n" + self.STANCE # Formatting the prompts capitalized in German gives the highest scores
+        return self.TOPIC + doc["question"]+ "\n\n"+ self.OPINION + doc["comment"]+ "\n\n" + self.STANCE
 
     def doc_to_target(self, doc):
         target = doc["label"]
-        return " " + target
-
+        if target == 0:
+            return " " + self.AGAINST
+        else
+            return " " + self.FAVOR
+        
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
         Requests which will be sent to the LM.
@@ -126,7 +129,7 @@ class XStance(Task):
         else:
             pred = 0     
         true_label = doc["label"]
-        print(self.FAVOR)
+        
         return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
     
     def aggregation(self):
@@ -142,6 +145,7 @@ class XStance(Task):
 
     def higher_is_better(self):
         return {"acc":True, "precision":True, "recall":True, "f1":True}
+    
 # German part of the dataset  
 class XStanceDE(XStance):
     VERSION = 0
