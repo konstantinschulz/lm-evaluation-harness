@@ -63,7 +63,7 @@ class GNAD10(Task):
     def training_docs(self):
         if self.has_training_docs():
             if self._training_docs is None:
-                self._training_docs = map(self._process_doc, list(self.dataset["train"]))
+                self._training_docs = list(self.dataset["train"])
             
             return self._training_docs
 
@@ -72,9 +72,9 @@ class GNAD10(Task):
 
     def test_docs(self):
         if self.has_test_docs():
-            return map(self._process_doc, self.dataset["test"])
+            return self.dataset["test"]
           
-    def _process_doc(self, doc):
+    """def _process_doc(self, doc):
       # Truncate documents which exceed the maximum token length (1024) of the model
       if len(doc['text'].split(' ')) > 1024:
         tmp = " "
@@ -85,7 +85,7 @@ class GNAD10(Task):
       return {
         'text' : doc['text'],
         'label' : doc['label'],
-      }
+      }"""
       
     def doc_to_text(self, doc): 
       return "Artikel (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "+ doc['text'] + "\n\n"+ "Thema (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "
