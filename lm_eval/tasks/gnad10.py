@@ -136,10 +136,10 @@ class GNAD10(Task):
         print(results)
         pred = float('-inf')
         
-        for i in results:
-          if i[1] > pred:
-            pred = results.index(i)
-                      
+        scores = [i[0] for i in results]
+        
+        pred = scores.index(min(scores))
+        print(pred)              
         true_label = doc["label"]
        
         return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
