@@ -137,7 +137,7 @@ class GNAD10(Task):
         pred = float('-inf')
         
         scores = [i[0] for i in results]
-        
+        print(scores)
         pred = scores.index(min(scores))
         print(pred)              
         true_label = doc["label"]
