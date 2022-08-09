@@ -38,7 +38,7 @@ def _gnad10_agg_precision(key, items):
 def _gnad10_agg_recall(key, items):
     references, predictions = zip(*items)
     recall_metric = datasets.load_metric("recall")
-    return recall_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions))[key]
+    return recall_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions), zero_division=1)[key]
 
 def _gnad10_agg_f1(key, items):
     references, predictions = zip(*items)
