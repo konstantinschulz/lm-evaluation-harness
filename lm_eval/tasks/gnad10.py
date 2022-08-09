@@ -75,13 +75,12 @@ class GNAD10(Task):
             return self.dataset["test"]
           
     def doc_to_text(self, doc): 
-      return "Artikel (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "+ doc['text'] + "\n\n"+ "Kategorie (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "
+      return "Artikel (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "+ doc['text'] + "\n\n"+ "Thema (Web, Panorama, International, Wirtschaft, Sport, Inland, Etat, Wissenschaft, Kultur): "
 
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         label = doc["label"]
-        print(label)
         target = ""
         
         if label == 0:
@@ -147,9 +146,7 @@ class GNAD10(Task):
         pred = float('-inf')
         
         scores = [i[0] for i in results]
-        
         pred = scores.index(max(scores))
-                     
         true_label = doc["label"]
        
         return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
