@@ -93,9 +93,31 @@ class GNAD10(Task):
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
-        target = doc["label"]
+        label = doc["label"]
+        target = ""
         
-        return " " + str(target)
+        if label == 0:
+          target = "Web"
+        elif label == 1:
+          target = "Panorama"
+        elif label == 2:
+          target = "International"
+        elif label == 3:
+          target = "Wirtschaft"
+        elif label == 4:
+          target = "Sport"
+        elif label == 5:
+          target = "Inland"
+        elif label == 6:
+          target = "Etat"
+        elif label == 7:
+          target = "Wissenschaft"
+        elif label == 8:
+          target = "Kultur"
+        else:
+          target = ""
+        
+        return " " + target
 
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns an iterable of
