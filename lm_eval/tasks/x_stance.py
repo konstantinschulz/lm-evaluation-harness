@@ -126,7 +126,7 @@ class XStance(Task):
         else:
             pred = 0      
         true_label = doc["label"]
-        
+        print(true_label)
         return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
     
     def aggregation(self):
