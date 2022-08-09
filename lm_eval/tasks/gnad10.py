@@ -43,7 +43,7 @@ def _gnad10_agg_recall(key, items):
 def _gnad10_agg_f1(key, items):
     references, predictions = zip(*items)
     f1_metric = datasets.load_metric("f1")
-    return f1_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions))[key]
+    return f1_metric.compute(references=references, predictions=predictions, average='macro', labels= np.unique(predictions), zero_division=1)[key]
 
 class GNAD10(Task):
     VERSION = 0
