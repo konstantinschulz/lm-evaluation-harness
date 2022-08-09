@@ -94,6 +94,7 @@ class GNAD10(Task):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         label = doc["label"]
+        print(label)
         target = ""
         
         if label == 0:
@@ -155,13 +156,13 @@ class GNAD10(Task):
             The results of the requests created in construct_requests.
         """
         ll_web, ll_panorama, ll_international, ll_wirtschaft, ll_sport, ll_inland, ll_etat, ll_wissenschaft, ll_kultur = results
-        print(results)
+        
         pred = float('-inf')
         
         scores = [i[0] for i in results]
-        print(scores)
+        
         pred = scores.index(max(scores))
-        print(pred)              
+                     
         true_label = doc["label"]
        
         return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
