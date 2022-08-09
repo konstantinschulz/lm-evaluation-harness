@@ -86,7 +86,7 @@ class XStance(Task):
         target = doc["label"]
         if target == 0:
             return " " + self.AGAINST
-        else
+        else:
             return " " + self.FAVOR
         
     def construct_requests(self, doc, ctx):
