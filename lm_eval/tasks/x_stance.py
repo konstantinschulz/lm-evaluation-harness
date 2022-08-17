@@ -103,7 +103,6 @@ class XStance(Task):
         """
         # rf.loglikelihood as the task is a classification problem. For each document the model predicts loglikelihood for the correct label
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
-        
         ll_favor = rf.loglikelihood(ctx, " " + self.FAVOR)
         ll_against = rf.loglikelihood(ctx, " " + self.AGAINST)
 
@@ -122,14 +121,12 @@ class XStance(Task):
 
         pred = 0
         favor, against = results
-        
         # Evaluation metrics will only work with numerical labels
         if favor[0] > against[0]:
             pred = 1
         else:
             pred = 0     
         true_label = doc["label"]
-        
         return {"acc": pred==true_label, "precision":(true_label, pred), "recall":(true_label, pred), "f1":(true_label, pred)}
     
     def aggregation(self):
