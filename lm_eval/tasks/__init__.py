@@ -51,6 +51,9 @@ from . import asdiv
 from . import gsm8k
 from . import storycloze
 from . import mlqa
+from . import xnli
+from . import xquad
+from . import pawsx
 ########################################
 # Translation tasks
 ########################################
@@ -130,7 +133,6 @@ TASK_REGISTRY = {
     "swag": swag.SWAG,
     "openbookqa": openbookqa.OpenBookQA,
     "squad2": squad.SQuAD2,
-    "mlqa": mlqa.MLQA,
     "race": race.RACE,
     # "naturalqs": naturalqs.NaturalQs, # not implemented yet
     "headqa": headqa.HeadQAEsDeprecated,  # for backwards compat - headqa used to default to es
@@ -283,7 +285,11 @@ TASK_REGISTRY = {
     # Requires manual download of data.
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
-    # "sat": sat.SATAnalogies,
+    # "sat": sat.SATAnalogies,s
+    **xquad.construct_tasks(),
+    **mlqa.construct_tasks(),
+    **xnli.construct_tasks(),
+    **pawsx.construct_tasks(),
 }
 
 
