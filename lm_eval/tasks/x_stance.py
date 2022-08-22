@@ -49,10 +49,10 @@ class XStance(Task):
     # Select only German part of the dataset
     DATASET_NAME = None
     TOPIC = "Thema: "
-    OPINION = "Meine Meinung (pro oder contra): "
-    STANCE = "Meine Meinung ist (pro oder contra): "
-    FAVOR = "pro"
-    AGAINST = "contra"
+    OPINION = "Meine Meinung (dafür oder dagegen): "
+    STANCE = "Meine Meinung ist (dafür oder dagegen): "
+    FAVOR = "dafür"
+    AGAINST = "dagegen"
     
     
     def has_training_docs(self):
@@ -149,10 +149,10 @@ class XStanceDE(XStance):
     DATASET_PATH = "strombergnlp/x-stance"
     DATASET_NAME = "de"
     TOPIC = "Thema: "
-    OPINION = "Meine Meinung (pro oder contra): "
-    STANCE = "Meine Meinung ist (pro oder contra): "
-    FAVOR = "pro"
-    AGAINST = "contra"
+    OPINION = "Meine Meinung (dafür oder dagegen): "
+    STANCE = "Meine Meinung ist (dafür oder dagegen): "
+    FAVOR = "dafür"
+    AGAINST = "dagegen"
     
 # French part of the dataset
 class XStanceFR(XStance):
