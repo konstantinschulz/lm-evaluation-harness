@@ -1,6 +1,5 @@
 import datasets
-from lm_eval.base import rf
-from .common import HFTask
+from lm_eval.base import rf, Task
 from functools import partial
 
 
@@ -14,13 +13,13 @@ def _mlsum_agg(key, items):
     return _mlsum_metric(predictions=predictions, references=references)[key].mid.fmeasure
 
 
-class MLSUM(HFTask):
+class MLSUM(Task):
     VERSION = None
     DATASET_PATH = "mlsum"
     DATASET_NAME = 'de'
 
     def has_training_docs(self):
-        return False
+        return True
 
     def has_validation_docs(self):
         return True
@@ -34,8 +33,11 @@ class MLSUM(HFTask):
     def validation_docs(self):
         return self.data["validation"]
 
-    def fewshot_description(self):
-        return "Summarize the following articles."
+    def test_docs(self):
+        return self.dataset["test"]
+
+    # def fewshot_description(self):
+    #     return "Summarize the following articles."
 
     def doc_to_text(self, doc):
         return 'Article: ' + doc['text'] + '\n\n' + 'TL;DR:'

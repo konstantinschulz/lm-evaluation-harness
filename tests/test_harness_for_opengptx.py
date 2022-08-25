@@ -19,20 +19,20 @@ import time
 from datetime import datetime
 
 
-@pytest.mark.parametrize("eval_task", [("mlsum_de")])
+@pytest.mark.parametrize("eval_task", [("cnndm")])
 def test_downstream_task_evaluator(
         eval_task,
-        provide_description=True,
+        provide_description=False,
         num_fewshot=0,
-        limit=5,
+        limit=4,
         bootstrap_iters=1000
     ):
 
-    model_name = 'gptx'
+    model_name = "gpt2"
     batch_size = 8
     device = "cuda" if torch.cuda.is_available() else "cpu"
     model = models.get_model(model_name).create_from_arg_string("", {
-    'batch_size': batch_size, 'device': device
+    'batch_size': batch_size, 'device': device, 'pretrained':'gpt2'
     })
 
     task_dict = tasks.get_task_dict([eval_task])
@@ -49,7 +49,7 @@ def test_downstream_task_evaluator(
 
     output_path = f'output/results_{str(eval_task)}_{str(num_fewshot)}shots_{datetime.now().strftime("%m-%d-%Y-%H-%M-%S")}.json'
     configuration = {
-        'model': model.gptx.config._name_or_path,
+        'model': model.gpt2.config._name_or_path,
         'batch_size': batch_size,
         'num_fewshot': num_fewshot,
         'running_time': end_time-start_time

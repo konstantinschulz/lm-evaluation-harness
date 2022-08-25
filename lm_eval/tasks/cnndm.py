@@ -1,6 +1,5 @@
 import datasets
-from lm_eval.base import rf
-from .common import HFTask
+from lm_eval.base import rf, Task
 from functools import partial
 from packaging import version
 
@@ -15,7 +14,7 @@ def _cnndm_agg(key, items):
     return _cnndm_metric(predictions=predictions, references=references)[key].mid.fmeasure
 
 
-class CNNDM(HFTask):
+class CNNDM(Task):
     VERSION = '1.0.0'
     DATASET_PATH = "ccdv/cnn_dailymail"
     DATASET_NAME = '3.0.0'
@@ -24,7 +23,7 @@ class CNNDM(HFTask):
         "1.0.0"), "datasets 1.0.0 or later required for cnn_dailymail"
 
     def has_training_docs(self):
-        return False
+        return True
 
     def has_validation_docs(self):
         return True
@@ -38,8 +37,11 @@ class CNNDM(HFTask):
     def validation_docs(self):
         return self.data["validation"]
 
-    def fewshot_description(self):
-        return "Summarize the following articles."
+    def test_docs(self):
+        return self.dataset["test"]
+
+    # def fewshot_description(self):
+    #     return "Summarize the following articles."
 
     def doc_to_text(self, doc):
         return 'Article: ' + doc['article'] + '\n\n' + 'TL;DR:'
