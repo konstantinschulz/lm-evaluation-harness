@@ -120,6 +120,9 @@ class HFLM(BaseLM):
     def tok_decode(self, tokens):
         return self.tokenizer.decode(tokens)
 
+    def do_sample(self):
+        return self.gpt2.config.task_specific_params.generation.do_sample
+
     def _model_call(self, inps):
         """
         inps: a torch tensor of shape [batch, sequence]
@@ -131,9 +134,9 @@ class HFLM(BaseLM):
         with torch.no_grad():
             return self.gpt2(inps)[0][:, :, : len(self.tokenizer)]
 
-    def _model_generate(self, context, max_length, eos_token_id):
+    def _model_generate(self, context, max_length, eos_token_id, top_k=2, do_sample=False):
         return self.gpt2.generate(
-            context, max_length=max_length, eos_token_id=eos_token_id, do_sample=False
+            context, max_length=max_length, pad_token_id=self.eot_token_id, eos_token_id=eos_token_id, do_sample=do_sample, top_k=top_k
         )
 
 
