@@ -6,21 +6,26 @@ from packaging import version
 
 def _cnndm_metric(predictions, references):
     summarization_metric = datasets.load_metric("rouge")
-    return summarization_metric.compute(predictions=predictions, references=references, use_agregator=True)
+    return summarization_metric.compute(
+        predictions=predictions, references=references, use_agregator=True
+    )
 
 
 def _cnndm_agg(key, items):
     predictions, references = zip(*items)
-    return _cnndm_metric(predictions=predictions, references=references)[key].mid.fmeasure
+    return _cnndm_metric(predictions=predictions, references=references)[
+        key
+    ].mid.fmeasure
 
 
 class CNNDM(Task):
-    VERSION = '1.0.0'
+    VERSION = "1.0.0"
     DATASET_PATH = "ccdv/cnn_dailymail"
-    DATASET_NAME = '3.0.0'
+    DATASET_NAME = "3.0.0"
 
     assert version.parse(datasets.__version__) >= version.parse(
-        "1.0.0"), "datasets 1.0.0 or later required for cnn_dailymail"
+        "1.0.0"
+    ), "datasets 1.0.0 or later required for cnn_dailymail"
 
     def has_training_docs(self):
         return True
@@ -44,14 +49,14 @@ class CNNDM(Task):
     #     return "Summarize the following articles."
 
     def doc_to_text(self, doc):
-        return 'Article: ' + doc['article'] + '\n\n' + 'TL;DR:'
+        return "Article: " + doc["article"] + "\n\n" + "TL;DR:"
 
     def doc_to_target(self, doc):
-        summary = doc['highlights']
+        summary = doc["highlights"]
         return " " + summary
 
     def construct_requests(self, doc, ctx):
-        """ Uses RequestFactory to construct Requests and returns an iterable of
+        """Uses RequestFactory to construct Requests and returns an iterable of
         Requests which will be sent to the LM.
 
         :param doc:
@@ -61,7 +66,8 @@ class CNNDM(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        continuation = rf.greedy_until(ctx, ['\n'], True, 2, 100) #arg3: do sampling, arg4: top k, arg5: max gen tokens
+        continuation = rf.greedy_until(ctx, ["\n"], True, 2, 100)
+        # arg3: do sampling, arg4: top k, arg5: max gen tokens
         return continuation
 
     def process_results(self, doc, results):
@@ -77,20 +83,20 @@ class CNNDM(Task):
         continuation = results
 
         predictions = {
-            'id': doc['id'],
-            'prediction_text': continuation,
-            'no_answer_probability': 0,
+            "id": doc["id"],
+            "prediction_text": continuation,
+            "no_answer_probability": 0,
         }
 
         references = {
-            'id': doc['id'],
-            'answers': [doc['highlights']],
+            "id": doc["id"],
+            "answers": [doc["highlights"]],
         }
 
         return {
-            'rouge1': (predictions, references),
-            'rouge2': (predictions, references),
-            'rougeL': (predictions, references)
+            "rouge1": (predictions, references),
+            "rouge2": (predictions, references),
+            "rougeL": (predictions, references),
         }
 
     def aggregation(self):
@@ -100,9 +106,9 @@ class CNNDM(Task):
             functions that aggregate a list of metrics
         """
         return {
-            'rouge1': partial(_cnndm_agg, 'rouge1'),
-            'rouge2': partial(_cnndm_agg, 'rouge2'),
-            'rougeL': partial(_cnndm_agg, 'rougeL')
+            "rouge1": partial(_cnndm_agg, "rouge1"),
+            "rouge2": partial(_cnndm_agg, "rouge2"),
+            "rougeL": partial(_cnndm_agg, "rougeL"),
         }
 
     def higher_is_better(self):
@@ -111,8 +117,4 @@ class CNNDM(Task):
             A dictionary where keys are the names of submetrics and values are
             whether a higher value of the submetric is better
         """
-        return {
-            'rouge1': True,
-            'rouge2': True,
-            'rougeL': True
-        }
+        return {"rouge1": True, "rouge2": True, "rougeL": True}
