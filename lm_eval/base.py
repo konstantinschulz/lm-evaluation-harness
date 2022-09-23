@@ -152,7 +152,9 @@ class BaseLM(LM):
         pass
 
     @abstractmethod
-    def _model_generate(self, context, max_length, eos_token_id, top_k=2, do_sample=False):
+    def _model_generate(
+        self, context, max_length, eos_token_id, top_k=2, do_sample=False
+    ):
         pass
 
     @abstractmethod
@@ -345,20 +347,27 @@ class BaseLM(LM):
         print(re_ord)
 
         if len(re_ord.get_reordered()[0]) == 5:
-            for context, until, do_sample, top_k, max_gen_tokens in tqdm(re_ord.get_reordered()):
+            for context, until, do_sample, top_k, max_gen_tokens in tqdm(
+                re_ord.get_reordered()
+            ):
                 if isinstance(until, str):
                     until = [until]
 
-                primary_until, = self.tok_encode(until[0])
+                (primary_until,) = self.tok_encode(until[0])
 
-                context_enc = torch.tensor([self.tok_encode(context)[max_gen_tokens - self.max_length:]])\
-                    .to(self.device)
+                context_enc = torch.tensor(
+                    [self.tok_encode(context)[max_gen_tokens - self.max_length :]]
+                ).to(self.device)
 
                 cont = self._model_generate(
-                    context_enc, context_enc.shape[1] + max_gen_tokens, primary_until, top_k=top_k, do_sample=do_sample
+                    context_enc,
+                    context_enc.shape[1] + max_gen_tokens,
+                    primary_until,
+                    top_k=top_k,
+                    do_sample=do_sample,
                 )
 
-                s = self.tok_decode(cont[0].tolist()[context_enc.shape[1]:])
+                s = self.tok_decode(cont[0].tolist()[context_enc.shape[1] :])
 
                 for term in until:
                     s = s.split(term)[0]

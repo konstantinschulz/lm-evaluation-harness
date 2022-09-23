@@ -5,18 +5,22 @@ from functools import partial
 
 def _mlsum_metric(predictions, references):
     summarization_metric = datasets.load_metric("rouge")
-    return summarization_metric.compute(predictions=predictions, references=references, use_agregator=True)
+    return summarization_metric.compute(
+        predictions=predictions, references=references, use_agregator=True
+    )
 
 
 def _mlsum_agg(key, items):
     predictions, references = zip(*items)
-    return _mlsum_metric(predictions=predictions, references=references)[key].mid.fmeasure
+    return _mlsum_metric(predictions=predictions, references=references)[
+        key
+    ].mid.fmeasure
 
 
 class MLSUM(Task):
     VERSION = None
     DATASET_PATH = "mlsum"
-    DATASET_NAME = 'de'
+    DATASET_NAME = "de"
 
     def has_training_docs(self):
         return True
@@ -40,14 +44,14 @@ class MLSUM(Task):
     #     return "Summarize the following articles."
 
     def doc_to_text(self, doc):
-        return 'Article: ' + doc['text'] + '\n\n' + 'TL;DR:'
+        return "Article: " + doc["text"] + "\n\n" + "TL;DR:"
 
     def doc_to_target(self, doc):
-        summary = doc['summary']
+        summary = doc["summary"]
         return " " + summary
 
     def construct_requests(self, doc, ctx):
-        """ Uses RequestFactory to construct Requests and returns an iterable of
+        """Uses RequestFactory to construct Requests and returns an iterable of
         Requests which will be sent to the LM.
 
         :param doc:
@@ -57,8 +61,9 @@ class MLSUM(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        continuation = rf.greedy_until(ctx, ['\n'], True, 2, 100) #arg3: do sampling, arg4: top k, arg5: max gen tokens
-        # arg4 and 5 are taken from gpt2 paper
+        continuation = rf.greedy_until(ctx, ["\n"], True, 2, 100)
+        #  arg3: do sampling, arg4: top k, arg5: max gen tokens
+        #  arg4 and 5 are taken from gpt2 paper
         return continuation
 
     def process_results(self, doc, results):
@@ -74,20 +79,20 @@ class MLSUM(Task):
         continuation = results
 
         predictions = {
-            'id': doc['topic'],
-            'prediction_text': continuation,
-            'no_answer_probability': 0,
+            "id": doc["topic"],
+            "prediction_text": continuation,
+            "no_answer_probability": 0,
         }
 
         references = {
-            'id': doc['topic'],
-            'answers': [doc['summary']],
+            "id": doc["topic"],
+            "answers": [doc["summary"]],
         }
 
         return {
-            'rouge1': (predictions, references),
-            'rouge2': (predictions, references),
-            'rougeL': (predictions, references)
+            "rouge1": (predictions, references),
+            "rouge2": (predictions, references),
+            "rougeL": (predictions, references),
         }
 
     def aggregation(self):
@@ -97,9 +102,9 @@ class MLSUM(Task):
             functions that aggregate a list of metrics
         """
         return {
-            'rouge1': partial(_mlsum_agg, 'rouge1'),
-            'rouge2': partial(_mlsum_agg, 'rouge2'),
-            'rougeL': partial(_mlsum_agg, 'rougeL')
+            "rouge1": partial(_mlsum_agg, "rouge1"),
+            "rouge2": partial(_mlsum_agg, "rouge2"),
+            "rougeL": partial(_mlsum_agg, "rougeL"),
         }
 
     def higher_is_better(self):
@@ -108,8 +113,4 @@ class MLSUM(Task):
             A dictionary where keys are the names of submetrics and values are
             whether a higher value of the submetric is better
         """
-        return {
-            'rouge1': True,
-            'rouge2': True,
-            'rougeL': True
-        }
+        return {"rouge1": True, "rouge2": True, "rougeL": True}
