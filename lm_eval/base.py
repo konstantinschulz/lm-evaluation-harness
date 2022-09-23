@@ -344,8 +344,6 @@ class BaseLM(LM):
 
         re_ord = utils.Reorderer(requests, _collate)
 
-        print(re_ord)
-
         if len(re_ord.get_reordered()[0]) == 5:
             for context, until, do_sample, top_k, max_gen_tokens in tqdm(
                 re_ord.get_reordered()
