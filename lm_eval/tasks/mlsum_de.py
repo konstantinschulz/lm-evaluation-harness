@@ -44,7 +44,7 @@ class MLSUM(Task):
     #     return "Summarize the following articles."
 
     def doc_to_text(self, doc):
-        return "Article: " + doc["text"] + "\n\n" + "TL;DR:"
+        return "Artikel: " + doc["text"] + "\n\n" + "Zusammenfassung:"
 
     def doc_to_target(self, doc):
         summary = doc["summary"]
