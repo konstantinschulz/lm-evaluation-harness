@@ -32,10 +32,10 @@ class MLSUM(Task):
         return True
 
     def training_docs(self):
-        return self.data["train"]
+        return self.dataset["train"]
 
     def validation_docs(self):
-        return self.data["validation"]
+        return self.dataset["validation"]
 
     def test_docs(self):
         return self.dataset["test"]
