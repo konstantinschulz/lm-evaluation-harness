@@ -57,6 +57,7 @@ from . import x_stance
 from . import stereoset
 from . import mlqa
 from . import gnad10
+from . import x_stance_tc
 
 ########################################
 # Translation tasks
@@ -298,6 +299,7 @@ TASK_REGISTRY = {
     "gnad10": gnad10.GNAD10,
     **stereoset.construct_tasks(),
     **mlqa.construct_tasks(),
+    "xstance_tc": x_stance_tc.XSTANCE,
 }
 
 
