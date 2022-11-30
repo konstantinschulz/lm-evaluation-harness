@@ -1,3 +1,46 @@
+# OpenGPT-X: Language Model Evaluation Harness
+
+A fork of [EleutherAI's lm-evaluation-harness](https://github.com/EleutherAI/lm-evaluation-harness), which extends the framework with mostly **multilingual evaluation** tasks.
+The current implementation progress is tracked under [GitHub issues](https://github.com/OpenGPTX/lm-evaluation-harness/issues).
+
+## Additional tasks
+
+- XNLI (`xnli_{en,de,fr,es,el,bg,ar}`)
+- XQUAD (`xquad_{ar,de,el,en,es,hi,ru,th,tr,vi,zh`)
+- PAWSX (`pawsx_{en,fr,de}`)
+- MLQA (`mlqa_{en, es, hi, vi, de, ar})
+
+## Install
+
+```
+pip install git+https://github.com/OpenGPTX/lm-evaluation-harness.git
+```
+
+##  Basic Usage
+
+With this example, you can evaluate a German GPT model ([malteos/gpt2-xl-wechsel-german](https://huggingface.co/malteos/gpt2-xl-wechsel-german)) on the German subsets of the evaluation tasks:
+
+```bash
+python main.py \
+  --model gpt2 \
+  --model_args pretrained=malteos/gpt2-xl-wechsel-german \
+  --device 0 \
+  --no_tokenizer_check \
+  --tasks xnli_de,xquad_de,pawsx_de
+```
+
+
+
+## Other changes
+
+- Support for additional tokenizers (Bloom, XGLM) and `--no_tokenizer_check` argument.
+
+For other details on how to use the evaluation framework, please see the original documentation below:
+
+---
+
+The `READMD.md` from [EleutherAI's original repository](https://github.com/EleutherAI/lm-evaluation-harness):
+
 # Language Model Evaluation Harness
 
 ![](https://github.com/EleutherAI/lm-evaluation-harness/workflows/Build/badge.svg)

@@ -63,18 +63,23 @@ class HFLM(BaseLM):
                 transformers.GPT2TokenizerFast,
                 transformers.T5Tokenizer,
                 transformers.T5TokenizerFast,
+                transformers.XGLMTokenizer,
+                transformers.XGLMTokenizerFast,
                 transformers.BloomTokenizerFast,
             ),
         ), "this tokenizer has not been checked for compatibility yet!"
 
         self.vocab_size = self.tokenizer.vocab_size
 
-        if isinstance(
-            self.tokenizer, (transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast)
-        ):
-            if no_tokenizer_check:
-                print('Tokenizer NOT checked (only do this when NOT using the standard GPT2 tokenizer (English vocab)')
-            else:
+        if no_tokenizer_check:
+            print(
+                "Tokenizer NOT checked (only do this when NOT using the standard GPT2 tokenizer (English vocab)"
+            )
+        else:
+            if isinstance(
+                self.tokenizer,
+                (transformers.GPT2Tokenizer, transformers.GPT2TokenizerFast),
+            ):
                 assert self.tokenizer.encode("hello\n\nhello") == [
                     31373,
                     198,
@@ -135,12 +140,7 @@ class HFLM(BaseLM):
         logits returned from the model
         """
         with torch.no_grad():
-            raw_res = self.gpt2(inps)[0]
-            res = raw_res[:, :, :self.gpt2.config.vocab_size]
-
-            print(f'_model_call: {raw_res.shape=} ; {res.shape=}')
-
-            return res
+            return self.gpt2(inps)[0][:, :, : len(self.tokenizer)]
 
     def _model_generate(self, context, max_length, eos_token_id):
         res = self.gpt2.generate(

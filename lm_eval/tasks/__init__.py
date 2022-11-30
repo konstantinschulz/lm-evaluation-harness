@@ -50,7 +50,13 @@ from . import blimp
 from . import asdiv
 from . import gsm8k
 from . import storycloze
-from . import wechsel_de
+from . import xnli
+from . import xquad
+from . import pawsx
+from . import x_stance
+from . import stereoset
+from . import mlqa
+from . import gnad10
 
 ########################################
 # Translation tasks
@@ -285,6 +291,14 @@ TASK_REGISTRY = {
     # "storycloze_2016": storycloze.StoryCloze2016,
     # "storycloze_2018": storycloze.StoryCloze2018,
     # "sat": sat.SATAnalogies,
+    "x_stance_de": x_stance.XStanceDE,
+    "x_stance_fr": x_stance.XStanceFR,
+    **xquad.construct_tasks(),
+    **xnli.construct_tasks(),
+    **pawsx.construct_tasks(),
+    "gnad10": gnad10.GNAD10,
+    **stereoset.construct_tasks(),
+    **mlqa.construct_tasks(),
 }
 
 
