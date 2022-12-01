@@ -100,17 +100,17 @@ class GermEval2017(Task):
 
     def training_docs(self):
         return self.dataset["train"].filter(
-            lambda doc: doc["relevance"] == "True" \
-                and doc["text"] is not None \
-                and doc["sentiment"] is not None \
-                and doc["sentiment"] in self.LABEL_TO_INDEX
+            lambda doc: doc["relevance"] == "True"
+            and doc["text"] is not None
+            and doc["sentiment"] is not None
+            and doc["sentiment"] in self.LABEL_TO_INDEX
         )
 
     def test_docs(self):
         return self.dataset["test"].filter(
-            lambda doc: doc["text"] is not None \
-                and doc["sentiment"] is not None \
-                and doc["sentiment"] in self.LABEL_TO_INDEX
+            lambda doc: doc["text"] is not None
+            and doc["sentiment"] is not None
+            and doc["sentiment"] in self.LABEL_TO_INDEX
         )
 
     def doc_to_text(self, doc):
