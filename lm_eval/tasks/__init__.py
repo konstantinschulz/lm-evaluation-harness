@@ -299,7 +299,7 @@ TASK_REGISTRY = {
     "gnad10": gnad10.GNAD10,
     **stereoset.construct_tasks(),
     **mlqa.construct_tasks(),
-    "xstance_tc": x_stance_tc.XSTANCE,
+    **x_stance_tc.construct_tasks(),
 }
 
 

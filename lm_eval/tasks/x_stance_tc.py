@@ -63,25 +63,15 @@ def _xstance_agg_f1(key, items):
     )[key]
 
 
-class XSTANCE(Task):
+class XSTANCE_TC_Base(Task):
     VERSION = 0
     DATASET_PATH = "x_stance"
     DATASET_NAME = None
+    LANGUAGE = None
+    ARTICLE = None
+    THEMA = None
 
-    topic_dict = {
-        "Digitisation": "Digitalisierung",
-        "Economy": "Wirtschaft",
-        "Education": "Bildung",
-        "Finances": "Finanzen",
-        "Foreign Policy": "Außenpolitik",
-        "Immigration": "Einwanderung",
-        "Infrastructure & Environment": "Infrastruktur & Umwelt",
-        "Security": "Sicherheit",
-        "Society": "Gesellschaft",
-        "Welfare": "Soziales",
-        "Healthcare": "Gesundheitswesen",
-        "Political System": "Politisches System",
-    }
+    TOPIC_DICT = None
 
     def has_training_docs(self):
         return True
@@ -94,31 +84,32 @@ class XSTANCE(Task):
 
     def training_docs(self):
         if self.has_training_docs():
-            return self.dataset["train"]
+            return self.dataset["train"].filter(
+                lambda example: example["language"] == self.LANGUAGE
+            )
 
     def validation_docs(self):
         if self.has_validation_docs():
-            return self.dataset["validation"]
+            return self.dataset["validation"].filter(
+                lambda example: example["language"] == self.LANGUAGE
+            )
 
     def test_docs(self):
         if self.has_test_docs():
-            return self.dataset["test"]
+            return self.dataset["test"].filter(
+                lambda example: example["language"] == self.LANGUAGE
+            )
 
     def doc_to_text(self, doc):
-        return (
-            "Artikel (Digitalisierung, Wirtschaft, Bildung, Finanzen, Außenpolitik, Einwanderung, Infrastruktur & Umwelt, Sicherheit, Gesellschaft, Soziales, Gesundheitswesen, Politisches System): "
-            + doc["question"]  # + doc['comment']
-            + "\n\n"
-            + "Thema (Digitalisierung, Wirtschaft, Bildung, Finanzen, Außenpolitik, Einwanderung, Infrastruktur & Umwelt, Sicherheit, Gesellschaft, Soziales, Gesundheitswesen, Politisches System): "
-        )
+        return self.ARTICLE + doc["question"] + "\n\n" + self.THEMA  # + doc['comment']
 
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
         # `doc_to_target` strings.
         label = doc["topic"]
         target = ""
-        if label in self.topic_dict.keys():
-            target = self.topic_dict(label)
+        if label in self.TOPIC_DICT.keys():
+            target = self.TOPIC_DICT(label)
         else:
             target = ""
 
@@ -138,7 +129,7 @@ class XSTANCE(Task):
         """
 
         request_list = []
-        for key, value in self.topic_dict.items():
+        for key, value in self.TOPIC_DICT.items():
             request_list.append(rf.loglikelihood(ctx, " " + value))
 
         return tuple(request_list)
@@ -158,7 +149,7 @@ class XSTANCE(Task):
         scores = [i[0] for i in results]
         pred = scores.index(max(scores))
         topic = doc["topic"]
-        true_label = list(self.topic_dict).index(topic)
+        true_label = list(self.TOPIC_DICT).index(topic)
 
         return {
             "acc": pred == true_label,
@@ -182,3 +173,86 @@ class XSTANCE(Task):
 
     def higher_is_better(self):
         return {"acc": True, "precision": True, "recall": True, "f1": True}
+
+
+class XSTANCE_TC_De(XSTANCE_TC_Base):  # german
+    VERSION = 0
+    LANGUAGE = "de"
+    TOPIC_DICT = {
+        "Digitisation": "Digitalisierung",
+        "Economy": "Wirtschaft",
+        "Education": "Bildung",
+        "Finances": "Finanzen",
+        "Foreign Policy": "Außenpolitik",
+        "Immigration": "Einwanderung",
+        "Infrastructure & Environment": "Infrastruktur & Umwelt",
+        "Security": "Sicherheit",
+        "Society": "Gesellschaft",
+        "Welfare": "Soziales",
+        "Healthcare": "Gesundheitswesen",
+        "Political System": "Politisches System",
+    }
+    ARTICLE = "Artikel (Digitalisierung, Wirtschaft, Bildung, Finanzen, Außenpolitik, Einwanderung, Infrastruktur & Umwelt, Sicherheit, Gesellschaft, Soziales, Gesundheitswesen, Politisches System): "
+    THEMA = "Thema (Digitalisierung, Wirtschaft, Bildung, Finanzen, Außenpolitik, Einwanderung, Infrastruktur & Umwelt, Sicherheit, Gesellschaft, Soziales, Gesundheitswesen, Politisches System): "
+
+
+class XSTANCE_TC_Fr(XSTANCE_TC_Base):  # French
+    VERSION = 0
+    LANGUAGE = "fr"
+    TOPIC_DICT = {
+        "Digitisation": "Numérisation",
+        "Economy": "Économie",
+        "Education": "Éducation",
+        "Finances": "Finances",
+        "Foreign Policy": "Police étrangère",
+        "Immigration": "Immigration",
+        "Infrastructure & Environment": "Infrastructures & Environnement",
+        "Security": "Sécurité",
+        "Society": "Société",
+        "Welfare": "Bien-être",
+        "Healthcare": "Soins de santé",
+        "Political System": "Système politique",
+    }
+    ARTICLE = "Article (Numérisation, Économie, Éducation, Finances, Police étrangère, Immigration, Infrastructures & Environnement, Sécurité, Société, Bien-être, Soins de santé, Système politique): "
+    THEMA = "Thème (Numérisation, Économie, Éducation, Finances, Police étrangère, Immigration, Infrastructures & Environnement, Sécurité, Société, Bien-être, Soins de santé, Système politique): "
+
+
+class XSTANCE_TC_It(XSTANCE_TC_Base):  # Italian
+    VERSION = 0
+    LANGUAGE = "it"
+    TOPIC_DICT = {
+        "Digitisation": "Digitalizzazione",
+        "Economy": "Economia",
+        "Education": "Formazione scolastica",
+        "Finances": "Finanze",
+        "Foreign Policy": "Politica estera",
+        "Immigration": "Immigrazione",
+        "Infrastructure & Environment": "Infrastrutture & Ambiente",
+        "Security": "Sicurezza",
+        "Society": "Società",
+        "Welfare": "Benessere",
+        "Healthcare": "Assistenza sanitaria",
+        "Political System": "Sistema politico",
+    }
+    ARTICLE = "Articolo (Digitalizzazione, Economia, Formazione scolastica, Finanze, Politica estera, Immigrazione, Infrastrutture & Ambiente, Sicurezza, Società, Benessere, Assistenza sanitaria, Sistema politico): "
+    THEMA = "Tema (Digitalizzazione, Economia, Formazione scolastica, Finanze, Politica estera, Immigrazione, Infrastrutture & Ambiente, Sicurezza, Società, Benessere, Assistenza sanitaria, Sistema politico): "
+
+
+LANGS = [
+    "de",
+    "fr",
+    "it",
+]
+
+LANG_CLASSES = [
+    XSTANCE_TC_De,
+    XSTANCE_TC_Fr,
+    XSTANCE_TC_It,
+]
+
+
+def construct_tasks():
+    tasks = {}
+    for lang, lang_class in zip(LANGS, LANG_CLASSES):
+        tasks[f"xstance_tc_{lang}"] = lang_class
+    return tasks
