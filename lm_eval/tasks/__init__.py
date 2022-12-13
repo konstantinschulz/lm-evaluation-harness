@@ -62,6 +62,7 @@ from . import germeval2017
 from . import german_ler_ppl
 from . import german_europarl_ppl
 from . import oscar_ppl
+from . import german_ler
 
 ########################################
 # Translation tasks
@@ -310,6 +311,7 @@ TASK_REGISTRY = {
     "german_ler_ppl": german_ler_ppl.GermanLERPerplexity,
     "german_europarl_ppl": german_europarl_ppl.GermanEuroparlPerplexity,
     "oscar_ppl_de": oscar_ppl.OscarPerplexityGerman,
+    "german_ler": german_ler.GermanLER,
 }
 
 
