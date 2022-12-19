@@ -69,7 +69,7 @@ class XSTANCE_TC_Base(Task):
     DATASET_NAME = None
     LANGUAGE = None
     ARTICLE = None
-    THEMA = None
+    TOPIC = None
 
     TOPIC_DICT = None
 
@@ -101,7 +101,7 @@ class XSTANCE_TC_Base(Task):
             )
 
     def doc_to_text(self, doc):
-        return self.ARTICLE + doc["question"] + "\n\n" + self.THEMA  # + doc['comment']
+        return self.ARTICLE + doc["question"] + "\n\n" + self.TOPIC  # + doc['comment']
 
     def doc_to_target(self, doc):
         # The prepended `" "` is required to space out the `doc_to_text` and
@@ -185,7 +185,7 @@ class XSTANCE_TC_De(XSTANCE_TC_Base):  # german
         "Finances": "Finanzen",
         "Foreign Policy": "Außenpolitik",
         "Immigration": "Einwanderung",
-        "Infrastructure & Environment": "Infrastruktur & Umwelt",
+        "Infrastructure & Environment": "Infrastruktur und Umwelt",
         "Security": "Sicherheit",
         "Society": "Gesellschaft",
         "Welfare": "Soziales",
@@ -193,7 +193,7 @@ class XSTANCE_TC_De(XSTANCE_TC_Base):  # german
         "Political System": "Politisches System",
     }
     ARTICLE = "Artikel (Digitalisierung, Wirtschaft, Bildung, Finanzen, Außenpolitik, Einwanderung, Infrastruktur & Umwelt, Sicherheit, Gesellschaft, Soziales, Gesundheitswesen, Politisches System): "
-    THEMA = "Thema (Digitalisierung, Wirtschaft, Bildung, Finanzen, Außenpolitik, Einwanderung, Infrastruktur & Umwelt, Sicherheit, Gesellschaft, Soziales, Gesundheitswesen, Politisches System): "
+    TOPIC = "Thema (Digitalisierung, Wirtschaft, Bildung, Finanzen, Außenpolitik, Einwanderung, Infrastruktur & Umwelt, Sicherheit, Gesellschaft, Soziales, Gesundheitswesen, Politisches System): "
 
 
 class XSTANCE_TC_Fr(XSTANCE_TC_Base):  # French
@@ -206,7 +206,7 @@ class XSTANCE_TC_Fr(XSTANCE_TC_Base):  # French
         "Finances": "Finances",
         "Foreign Policy": "Police étrangère",
         "Immigration": "Immigration",
-        "Infrastructure & Environment": "Infrastructures & Environnement",
+        "Infrastructure & Environment": "Infrastructures et Environnement",
         "Security": "Sécurité",
         "Society": "Société",
         "Welfare": "Bien-être",
@@ -214,7 +214,7 @@ class XSTANCE_TC_Fr(XSTANCE_TC_Base):  # French
         "Political System": "Système politique",
     }
     ARTICLE = "Article (Numérisation, Économie, Éducation, Finances, Police étrangère, Immigration, Infrastructures & Environnement, Sécurité, Société, Bien-être, Soins de santé, Système politique): "
-    THEMA = "Thème (Numérisation, Économie, Éducation, Finances, Police étrangère, Immigration, Infrastructures & Environnement, Sécurité, Société, Bien-être, Soins de santé, Système politique): "
+    TOPIC = "Thème (Numérisation, Économie, Éducation, Finances, Police étrangère, Immigration, Infrastructures & Environnement, Sécurité, Société, Bien-être, Soins de santé, Système politique): "
 
 
 class XSTANCE_TC_It(XSTANCE_TC_Base):  # Italian
@@ -227,7 +227,7 @@ class XSTANCE_TC_It(XSTANCE_TC_Base):  # Italian
         "Finances": "Finanze",
         "Foreign Policy": "Politica estera",
         "Immigration": "Immigrazione",
-        "Infrastructure & Environment": "Infrastrutture & Ambiente",
+        "Infrastructure & Environment": "Infrastrutture e Ambiente",
         "Security": "Sicurezza",
         "Society": "Società",
         "Welfare": "Benessere",
@@ -235,7 +235,7 @@ class XSTANCE_TC_It(XSTANCE_TC_Base):  # Italian
         "Political System": "Sistema politico",
     }
     ARTICLE = "Articolo (Digitalizzazione, Economia, Formazione scolastica, Finanze, Politica estera, Immigrazione, Infrastrutture & Ambiente, Sicurezza, Società, Benessere, Assistenza sanitaria, Sistema politico): "
-    THEMA = "Tema (Digitalizzazione, Economia, Formazione scolastica, Finanze, Politica estera, Immigrazione, Infrastrutture & Ambiente, Sicurezza, Società, Benessere, Assistenza sanitaria, Sistema politico): "
+    TOPIC = "Tema (Digitalizzazione, Economia, Formazione scolastica, Finanze, Politica estera, Immigrazione, Infrastrutture & Ambiente, Sicurezza, Società, Benessere, Assistenza sanitaria, Sistema politico): "
 
 
 LANGS = [
