@@ -1,0 +1,57 @@
+# runnerdeployment.yaml
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: RunnerDeployment
+metadata:
+  name: action-runner-deploymment
+  namespace: project-ns-opengptx
+spec:
+  replicas: 0
+  template:
+    spec:
+      repository: OpenGPTX/lm-evaluation-harness
+      ephemeral: true
+      dockerEnabled: false
+
+      env:
+      - name: RUNNER_ASSETS_DIR
+        value: "/actions-runner"
+
+      
+      # Old image: hub.cc-asp.fraunhofer.de/dockerhub_proxy_cache/malteos/obmd:22.08-py3-runner
+      image: ghcr.io/opengptx/obmd:22.08-py3-actions_runner-main
+      imagePullPolicy: Always
+      resources:
+        requests:
+          cpu: 3            #<-- same value for requests and limits
+          memory: "10Gi"    
+          nvidia.com/gpu: 1	#Assign the same values for GPU requests and limits.
+        limits:
+          cpu: 3            #<-- same value for requests and limits
+          memory: "10Gi"    
+          nvidia.com/gpu: 1	#Assign integer values. GPU has no fraction values.
+
+      tolerations:
+      - key: "nvidia.com"
+        operator: "Equal"
+        value: "a100"
+        effect: "NoSchedule"
+
+---
+apiVersion: actions.summerwind.dev/v1alpha1
+kind: HorizontalRunnerAutoscaler
+metadata:
+  name: example-runner-autoscaler
+  namespace: project-ns-opengptx
+spec:
+  minReplicas: 0
+  maxReplicas: 1
+
+  scaleDownDelaySecondsAfterScaleOut: 120
+  scaleTargetRef:
+    kind: RunnerDeployment
+    name: action-runner-deploymment
+
+  metrics:
+  - type: TotalNumberOfQueuedAndInProgressWorkflowRuns
+    repositoryNames:
+    - OpenGPTX/lm-evaluation-harness
