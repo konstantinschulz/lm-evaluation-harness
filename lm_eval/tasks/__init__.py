@@ -63,6 +63,7 @@ from . import germeval2017
 from . import german_ler_ppl
 from . import german_europarl_ppl
 from . import oscar_ppl
+from . import wino_x
 
 ########################################
 # Translation tasks
@@ -307,12 +308,13 @@ TASK_REGISTRY = {
     **stereoset.construct_tasks(),
     **mlqa.construct_tasks(),
     **mlsum.construct_tasks(),
-    "germeval2018_coarse": germeval_2018.GermEval2018,
-    "germeval2018_fine": germeval_2018.GermEval2018_fine,
+    "germeval18_coarse": germeval_2018.GermEval2018,
+    "germeval18_fine": germeval_2018.GermEval2018_fine,
     "germeval2017": germeval2017.GermEval2017,
     "german_ler_ppl": german_ler_ppl.GermanLERPerplexity,
     "german_europarl_ppl": german_europarl_ppl.GermanEuroparlPerplexity,
     "oscar_ppl_de": oscar_ppl.OscarPerplexityGerman,
+    "wino_de": wino_x.WinograndeXDe,
 }
 
 
