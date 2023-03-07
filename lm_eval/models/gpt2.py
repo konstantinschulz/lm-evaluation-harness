@@ -45,6 +45,7 @@ class HFLM(BaseLM):
 
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(
             pretrained if tokenizer is None else tokenizer,
+            model_max_length=self.max_length,
             revision=revision,
         )
 
