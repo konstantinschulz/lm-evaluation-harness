@@ -37,10 +37,18 @@ class HFLM(BaseLM):
         # TODO: update this to be less of a hack once subfolder is fixed in HF
         revision = revision + ("/" + subfolder if subfolder is not None else "")
 
-        self.gpt2 = transformers.AutoModelForCausalLM.from_pretrained(
-            pretrained,
-            revision=revision,
-        ).to(self.device)
+        try:
+            self.gpt2 = transformers.AutoModelForCausalLM.from_pretrained(
+                pretrained,
+                revision=revision,
+            ).to(self.device)
+            self.is_seq2seq = False
+        except ValueError:
+            self.gpt2 = transformers.AutoModelForSeq2SeqLM.from_pretrained(
+                pretrained,
+                revision=revision,
+            ).to(self.device)
+            self.is_seq2seq = True
         self.gpt2.eval()
 
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(
@@ -99,11 +107,18 @@ class HFLM(BaseLM):
             # Bloom does not store max length in model config
             return 2048
         else:
-            try:
-                return self.gpt2.config.n_ctx
-            except AttributeError:
-                # gptneoconfig doesn't have n_ctx apparently
-                return self.gpt2.config.max_position_embeddings
+            for max_len_name in [
+                "n_ctx",
+                "max_position_embeddings",
+                "n_positions",
+            ]:
+                try:
+                    return getattr(self.gpt2.config, max_len_name)
+                except AttributeError:
+                    pass
+            raise AttributeError(
+                "no matching attribute for finding maximum length found"
+            )
 
     @property
     def max_gen_toks(self):
@@ -134,7 +149,19 @@ class HFLM(BaseLM):
         logits returned from the model
         """
         with torch.no_grad():
-            return self.gpt2(inps)[0][:, :, : len(self.tokenizer)]
+            if self.is_seq2seq:
+                enc_inps = (
+                    torch.tensor(
+                        self.eot_token_id,
+                    )
+                    .tile(len(inps), 1)
+                    .to(inps)
+                )
+                return self.gpt2(enc_inps, decoder_input_ids=inps)[0][
+                    :, :, : len(self.tokenizer)
+                ]
+            else:
+                return self.gpt2(inps)[0][:, :, : len(self.tokenizer)]
 
     def _model_generate(self, context, max_length, eos_token_id):
         return self.gpt2.generate(
