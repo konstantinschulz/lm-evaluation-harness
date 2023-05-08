@@ -67,6 +67,7 @@ from . import german_ler_ppl
 from . import german_europarl_ppl
 from . import oscar_ppl
 from .aam.all_tasks_registry import TASK_REGISTRY as AAM_TASK_REGISTRY
+from . import json
 
 ########################################
 # Translation tasks
@@ -349,9 +350,42 @@ ALL_TASKS = sorted(list(TASK_REGISTRY))
 # append the multilingual tasks to the registry
 TASK_REGISTRY.update(AAM_TASK_REGISTRY)
 
+_EXAMPLE_JSON_PATH = "split:key:/absolute/path/to/data.json"
+
+
+def add_json_task(task_name):
+    """Add a JSON perplexity task if the given task name matches the
+    JSON task specification.
+
+    See `json.JsonPerplexity`.
+    """
+    if not task_name.startswith("json"):
+        return
+
+    def create_json_task():
+        splits = task_name.split("=", 1)
+        if len(splits) != 2 or not splits[1]:
+            raise ValueError(
+                "json tasks need a path argument pointing to the local "
+                "dataset, specified like this: json="
+                + _EXAMPLE_JSON_PATH
+                + ' (if there are no splits, use "train")'
+            )
+
+        json_path = splits[1]
+        if json_path == _EXAMPLE_JSON_PATH:
+            raise ValueError(
+                "please do not copy the example path directly, but substitute "
+                "it with a path to your local dataset"
+            )
+        return lambda: json.JsonPerplexity(json_path)
+
+    TASK_REGISTRY[task_name] = create_json_task()
+
 
 def get_task(task_name):
     try:
+        add_json_task(task_name)
         return TASK_REGISTRY[task_name]
     except KeyError:
         print("Available tasks:")
