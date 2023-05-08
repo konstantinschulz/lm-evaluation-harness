@@ -12,6 +12,7 @@ class HFLM(BaseLM):
         subfolder=None,
         tokenizer=None,
         batch_size=1,
+        max_length=None,
         no_tokenizer_check=False,
     ):
         super().__init__()
@@ -50,6 +51,8 @@ class HFLM(BaseLM):
             ).to(self.device)
             self.is_seq2seq = True
         self.gpt2.eval()
+
+        self._max_length = self._get_max_length(max_length)
 
         self.tokenizer = transformers.AutoTokenizer.from_pretrained(
             pretrained if tokenizer is None else tokenizer,
@@ -101,9 +104,10 @@ class HFLM(BaseLM):
         # we use EOT because end of *text* is more accurate for what we're doing than end of *sentence*
         return self.tokenizer.eos_token_id
 
-    @property
-    def max_length(self):
-        if isinstance(self.gpt2.config, transformers.BloomConfig):
+    def _get_max_length(self, max_length):
+        if max_length:
+            return max_length
+        elif isinstance(self.gpt2.config, transformers.BloomConfig):
             # Bloom does not store max length in model config
             return 2048
         else:
@@ -119,6 +123,10 @@ class HFLM(BaseLM):
             raise AttributeError(
                 "no matching attribute for finding maximum length found"
             )
+
+    @property
+    def max_length(self):
+        return self._max_length
 
     @property
     def max_gen_toks(self):
