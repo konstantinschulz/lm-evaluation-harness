@@ -282,7 +282,7 @@ class MegatronServerLM(BaseLM):
         )
 
         if response.status_code != 200:
-            raise
+            raise Exception(f"{response.status_code} {response.content}")
 
         return response.json()
 
