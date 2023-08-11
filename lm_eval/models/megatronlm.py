@@ -34,7 +34,9 @@ def get_result(logprobs, is_max_logprobs, ctxlen):
 
     is_greedy = True
 
-    for i in range(ctxlen, len(is_max_logprobs)):  # Zählt nur über die Indizes der Continuation
+    for i in range(
+        ctxlen, len(is_max_logprobs)
+    ):  # Zählt nur über die Indizes der Continuation
         if not is_max_logprobs[i]:
             is_greedy = False
             break
@@ -96,7 +98,7 @@ class MegatronServerLM(BaseLM):
     # TODO implement batching
     def tok_encode_batch(self, string_batch: str):
         return self.tokenizer_query(string_batch)
-    
+
     # TODO implement batching
     def tok_decode_batch(self, tokens_batch):
         return self.detokenizer_query(tokens_batch)
@@ -139,9 +141,12 @@ class MegatronServerLM(BaseLM):
                 logprobs=10,
             )
 
-            for logprobs, is_max_logprobs, ctxlen, (cache_key, context_enc, continuation_enc) in zip(
-                response["logprobs"], response["is_max_logprobs"], ctxlens, chunk
-            ):
+            for (
+                logprobs,
+                is_max_logprobs,
+                ctxlen,
+                (cache_key, context_enc, continuation_enc),
+            ) in zip(response["logprobs"], response["is_max_logprobs"], ctxlens, chunk):
                 answer = get_result(logprobs, is_max_logprobs, ctxlen)
 
                 res.append(answer)
@@ -258,7 +263,9 @@ class MegatronServerLM(BaseLM):
 
         return response.json()["text"]
 
-    def megatron_query(self, model_name, prompts, echo, max_tokens, temperature, logprobs, top_k=None):
+    def megatron_query(
+        self, model_name, prompts, echo, max_tokens, temperature, logprobs, top_k=None
+    ):
         headers = {
             "Content-Type": "application/json",
         }
@@ -296,7 +303,7 @@ class MegatronServerLM(BaseLM):
         while True:
             try:
                 return self.megatron_query(**kwargs)
-            except:
+            except Exception:
                 import traceback
 
                 traceback.print_exc()
