@@ -67,13 +67,18 @@ class MegatronServerLM(BaseLM):
 
         self.truncate = truncate
 
+        meglm_metadata = self.megatron_metadata()
+        self.vocab_size = meglm_metadata["vocab_size"]
+        self._eod_token_id = meglm_metadata["eod_token_id"]
+        self._max_length = meglm_metadata["max_length"] - self.max_gen_toks
+
     @property
     def eot_token_id(self):
-        return self.tokenizer.eos_token_id
+        return self._eod_token_id
 
     @property
     def max_length(self):
-        return 2048
+        return self._max_length
 
     @property
     def max_gen_toks(self):
@@ -221,6 +226,17 @@ class MegatronServerLM(BaseLM):
         # Isn't used because we override greedy_until
         raise NotImplementedError()
 
+    def megatron_metadata(self):
+        headers = {
+            "Content-Type": "application/json",
+        }
+        response = requests.put(f"{self.server_url}/metadata", headers=headers)
+
+        if response.status_code != 200:
+            print(f"Error {response.status_code}: {response.json()['message']}")
+
+        return response.json()
+
     def tokenizer_query(self, prompts):
         headers = {
             "Content-Type": "application/json",
@@ -275,6 +291,7 @@ class MegatronServerLM(BaseLM):
             "prompts": prompts,
             "tokens_to_generate": max_tokens,
             "logprobs": logprobs > 0,
+            "stop_token": self.eot_token_id,
         }
 
         if temperature == 0:
