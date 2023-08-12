@@ -1,13 +1,12 @@
 import json
-import os
-import numpy as np
-import transformers
-from lm_eval.base import BaseLM
-from lm_eval import utils
-from tqdm import tqdm
+import time
+from typing import List
 
 import requests
-import time
+from tqdm import tqdm
+
+from lm_eval import utils
+from lm_eval.base import BaseLM
 
 
 def get_result(logprobs, is_max_logprobs, ctxlen):
@@ -45,9 +44,7 @@ def get_result(logprobs, is_max_logprobs, ctxlen):
 
 
 class MegatronServerLM(BaseLM):
-    REQ_CHUNK_SIZE = 20
-
-    def __init__(self, server_url, model_name, truncate=False):
+    def __init__(self, server_url, model_name, batch_size=20, truncate=False):
         """
 
         :param server_url: str
@@ -64,6 +61,8 @@ class MegatronServerLM(BaseLM):
         self.server_url = server_url
 
         self.model_name = model_name
+
+        self._batch_size = batch_size
 
         self.truncate = truncate
 
@@ -86,8 +85,7 @@ class MegatronServerLM(BaseLM):
 
     @property
     def batch_size(self):
-        # Isn't used because we override _loglikelihood_tokens
-        raise NotImplementedError()
+        return self._batch_size
 
     @property
     def device(self):
@@ -100,13 +98,33 @@ class MegatronServerLM(BaseLM):
     def tok_decode(self, tokens):
         return self.detokenizer_query([tokens])[0]
 
-    # TODO implement batching
-    def tok_encode_batch(self, string_batch: str):
+    def tok_encode_batch(self, string_batch: List[str]) -> List[List[int]]:
         return self.tokenizer_query(string_batch)
 
-    # TODO implement batching
     def tok_decode_batch(self, tokens_batch):
         return self.detokenizer_query(tokens_batch)
+
+    def loglikelihood(self, requests):
+        new_reqs = []
+        contexts = []
+        continuations = []
+
+        for context, continuation in requests:
+            contexts.append(context)
+            continuations.append(continuation)
+
+        contexts_enc = self.tok_encode_batch(contexts)
+        continuations_enc = self.tok_encode_batch(continuations)
+
+        for context_enc, continuation_enc, request in zip(
+            contexts_enc, continuations_enc, requests
+        ):
+            if len(context_enc) == 0:
+                context_enc = [self.eot_token_id]
+
+            new_reqs.append((request, context_enc, continuation_enc))
+
+        return self._loglikelihood_tokens(new_reqs)
 
     def _loglikelihood_tokens(self, requests, disable_tqdm=False):
         res = []
@@ -121,7 +139,7 @@ class MegatronServerLM(BaseLM):
         re_ord = utils.Reorderer(requests, _collate)
 
         for chunk in tqdm(
-            list(utils.chunks(re_ord.get_reordered(), self.REQ_CHUNK_SIZE)),
+            list(utils.chunks(re_ord.get_reordered(), self.batch_size)),
             disable=disable_tqdm,
         ):
             inps = []
@@ -188,7 +206,7 @@ class MegatronServerLM(BaseLM):
 
         # todo: more intelligent batching for heterogeneous `until`
         for chunk, until in tqdm(
-            list(sameuntil_chunks(re_ord.get_reordered(), self.REQ_CHUNK_SIZE))
+            list(sameuntil_chunks(re_ord.get_reordered(), self.batch_size))
         ):
             inps = []
             for context, _ in chunk:
@@ -272,10 +290,19 @@ class MegatronServerLM(BaseLM):
         )
 
         if response.status_code != 200:
-            print(f"Error {response.status_code}: {response.json()['message']}")
-        else:
-            print("Megatron Response: ")
-            print(response.json())
+            raise Exception(
+                f"Error {response.status_code}: {response.json()['message']}"
+            )
+
+        response_json = response.json()
+
+        if not isinstance(response_json, dict):
+            raise Exception(
+                f"Unexpected response {response.status_code}: {response_json}"
+            )
+
+        print("Megatron Response: ")
+        print(response_json)
 
         return response.json()["text"]
 
@@ -307,6 +334,13 @@ class MegatronServerLM(BaseLM):
 
         if response.status_code != 200:
             raise Exception(f"{response.status_code} {response.content}")
+
+        response_json = response.json()
+
+        if not isinstance(response_json, dict):
+            raise Exception(
+                f"Unexpected HTTP response {response.status_code}: {repr(response_json)}"
+            )
 
         return response.json()
 
