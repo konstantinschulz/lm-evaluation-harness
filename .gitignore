@@ -5,3 +5,6 @@ lm_cache
 .idea
 
 tests/test_cache.db
+*.err
+*.out
+*.json
