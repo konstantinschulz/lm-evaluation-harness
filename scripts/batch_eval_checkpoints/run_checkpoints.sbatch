@@ -9,7 +9,7 @@
 #SBATCH --partition=booster
 #SBATCH --output=logs/%x-%A_%a.out  # output file name
 #SBATCH --error=logs/%x-%A_%a.err   # error file name
-#SBATCH --array=1-27
+#SBATCH --array=0-26
 
 # This script launches an array of server-client pair jobs for evaluation of Megatron-LM model checkpoints.
 
@@ -89,7 +89,7 @@ EVAL_CMD="/p/project/opengptx-elm/thellmann1/workdir/lm_eval_setup/opengptx/lm-e
     --model megatronlm \
     --model_args server_url=$api_addr,model_name=$model_name \
     --tasks "$TASK_LIST" \
-    --output_path "$RESULTS_PATH/$model_name-${SLURM_JOB_ID}-out.json" \
+    --output_path "$RESULTS_PATH/$model_name-${SLURM_ARRAY_JOB_ID}-out.json" \
     --no_cache \
     --batch_size 8 \
     "
