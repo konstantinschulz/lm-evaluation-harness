@@ -29,7 +29,8 @@ def get_result(logprobs, is_max_logprobs, ctxlen):
             Whether the continuation could have been the result of greedy generation
             Ob, gegeben den Context, die Continuation greedy generiert werden hätte können
     """
-    continuation_logprobs = sum(logprobs[ctxlen:])
+    first_continuation_logprob_index = ctxlen - 1
+    continuation_logprobs = logprobs[first_continuation_logprob_index:]
 
     is_greedy = True
 
@@ -40,7 +41,7 @@ def get_result(logprobs, is_max_logprobs, ctxlen):
             is_greedy = False
             break
 
-    return continuation_logprobs, is_greedy
+    return sum(continuation_logprobs), is_greedy
 
 
 class MegatronServerLM(BaseLM):
@@ -158,7 +159,6 @@ class MegatronServerLM(BaseLM):
             response = self.megatron_completion(
                 model_name=self.model_name,
                 prompts=inps,
-                echo=True,
                 max_tokens=0,
                 temperature=0.0,
                 logprobs=10,
@@ -205,32 +205,41 @@ class MegatronServerLM(BaseLM):
                 yield ret, lastuntil
 
         # todo: more intelligent batching for heterogeneous `until`
-        for chunk, until in tqdm(
+        for chunk, request_args in tqdm(
             list(sameuntil_chunks(re_ord.get_reordered(), self.batch_size))
         ):
             inps = []
+
+            until = request_args["until"]
+
             for context, _ in chunk:
                 context_enc = self.tok_encode(context)
                 inp = context_enc[-(self.max_length - self.max_gen_toks) :]
                 inps.append(inp)
 
+            if isinstance(until, str):
+                until = [until]
+
+            if until:
+                (primary_until,) = self.tok_encode(until[0])
+            else:
+                primary_until = None
+
             response = self.megatron_completion(
                 model_name=self.model_name,
-                prompt=inps,
+                prompts=inps,
                 max_tokens=self.max_gen_toks,
                 temperature=0.0,
-                logprobs=10,
-                stop=until,
+                stop_token=primary_until,
             )
 
-            for text, (context, until_) in zip(response["text"], chunk):
-                s = text
+            for text, (context, _) in zip(response["text"], chunk):
+                s = text.removeprefix(context)
 
-                for term in until_:
+                for term in until:
                     s = s.split(term)[0]
 
-                # partial caching
-                self.cache_hook.add_partial("greedy_until", (context, until_), s)
+                self.cache_hook.add_partial("greedy_until", (context, until), s)
 
                 res.append(s)
 
@@ -301,13 +310,20 @@ class MegatronServerLM(BaseLM):
                 f"Unexpected response {response.status_code}: {response_json}"
             )
 
-        print("Megatron Response: ")
-        print(response_json)
+        # print("Megatron Response: ")
+        # print(response_json)
 
         return response.json()["text"]
 
     def megatron_query(
-        self, model_name, prompts, echo, max_tokens, temperature, logprobs, top_k=None
+        self,
+        model_name,
+        prompts,
+        max_tokens,
+        temperature,
+        logprobs=0,
+        top_k=None,
+        stop_token=None,
     ):
         headers = {
             "Content-Type": "application/json",
@@ -318,7 +334,7 @@ class MegatronServerLM(BaseLM):
             "prompts": prompts,
             "tokens_to_generate": max_tokens,
             "logprobs": logprobs > 0,
-            "stop_token": self.eot_token_id,
+            "stop_token": stop_token if stop_token is not None else self.eot_token_id,
         }
 
         if temperature == 0:
