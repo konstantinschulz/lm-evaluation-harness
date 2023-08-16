@@ -11,15 +11,13 @@ from lm_eval.base import BaseLM
 
 def get_result(logprobs, is_max_logprobs, ctxlen):
     """Process results from Megatron-LM Server API response.
-
-    :param text: list[str]
-        List of texts (context + continuation)
-    :param segments: list[list[str]]
-        List of token sequences as strings (context + continuation, without EOD), e.g. [['_Hel', 'lo', 'World', '!"]]
     :param logprobs
-        List of lists of the log probs of the tokens (context + continuation, without EOD), e.g. [[None, -1.2, -4.5, -5.0]]
-    :param tokens
-        List of lists of the vocab indices of the tokens (context + continuation, without EOD), e.g. [[14, 48, 858, 23]]
+        List of lists of the log probs of the tokens (context + continuation,
+        without EOD and without the first token), e.g. [-1.4, -0.7, -0.5, -0.9]
+    :param is_max_logprobs
+        List of boolean flag indicating for which token the predicted
+        probability was equal to the maximum predicted probability (context + continuation,
+        without EOD and without the first token), e.g. [False, True, True, False]
     :param ctxlen: int
         Length of context (so we can slice them away and only keep the predictions)
     :return:
@@ -27,16 +25,17 @@ def get_result(logprobs, is_max_logprobs, ctxlen):
             Sum of the log probabilities of the continuation tokens (i.e. log probability of continuation)
         is_greedy: bool
             Whether the continuation could have been the result of greedy generation
-            Ob, gegeben den Context, die Continuation greedy generiert werden hätte können
     """
     first_continuation_logprob_index = ctxlen - 1
+
+    if first_continuation_logprob_index < 0:
+        raise Exception("Can't compute log probabilities and is_greedy with empty context")
+
     continuation_logprobs = logprobs[first_continuation_logprob_index:]
 
     is_greedy = True
 
-    for i in range(
-        ctxlen, len(is_max_logprobs)
-    ):  # Zählt nur über die Indizes der Continuation
+    for i in range(first_continuation_logprob_index, len(is_max_logprobs)):
         if not is_max_logprobs[i]:
             is_greedy = False
             break
