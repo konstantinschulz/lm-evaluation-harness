@@ -29,7 +29,9 @@ def get_result(logprobs, is_max_logprobs, ctxlen):
     first_continuation_logprob_index = ctxlen - 1
 
     if first_continuation_logprob_index < 0:
-        raise Exception("Can't compute log probabilities and is_greedy with empty context")
+        raise Exception(
+            "Can't compute log probabilities and is_greedy with empty context"
+        )
 
     continuation_logprobs = logprobs[first_continuation_logprob_index:]
 
@@ -92,14 +94,16 @@ class MegatronServerLM(BaseLM):
         # Isn't used because we override _loglikelihood_tokens
         raise NotImplementedError()
 
-    def tok_encode(self, string: str):
-        return self.tokenizer_query([string])[0]
+    def tok_encode(self, string: str, *, is_continuation: bool = False):
+        return self.tokenizer_query([string], is_continuation=is_continuation)[0]
 
     def tok_decode(self, tokens):
         return self.detokenizer_query([tokens])[0]
 
-    def tok_encode_batch(self, string_batch: List[str]) -> List[List[int]]:
-        return self.tokenizer_query(string_batch)
+    def tok_encode_batch(
+        self, string_batch: List[str], is_continuation: bool = False
+    ) -> List[List[int]]:
+        return self.tokenizer_query(string_batch, is_continuation)
 
     def tok_decode_batch(self, tokens_batch):
         return self.detokenizer_query(tokens_batch)
@@ -108,17 +112,43 @@ class MegatronServerLM(BaseLM):
         new_reqs = []
         contexts = []
         continuations = []
+        contexts_continuations = []
 
         for context, continuation in requests:
             contexts.append(context)
             continuations.append(continuation)
+            contexts_continuations.append(context + continuation)
 
         contexts_enc = self.tok_encode_batch(contexts)
         continuations_enc = self.tok_encode_batch(continuations)
+        continuations_enc_iscont = self.tok_encode_batch(
+            continuations, is_continuation=True
+        )
+        contexts_continuations_enc = self.tok_encode_batch(contexts_continuations)
 
-        for context_enc, continuation_enc, request in zip(
-            contexts_enc, continuations_enc, requests
+        for (
+            context_enc,
+            continuation_enc,
+            continuation_enc_iscont,
+            context_continuation_enc,
+            request,
+        ) in zip(
+            contexts_enc,
+            continuations_enc,
+            continuations_enc_iscont,
+            contexts_continuations_enc,
+            requests,
         ):
+            # Check if encoded context and continuation would return the same tokens
+            # with and without removing the additional white space
+            if context_enc + continuation_enc != context_continuation_enc:
+                if context_enc + continuation_enc_iscont == context_continuation_enc:
+                    continuation_enc = continuation_enc_iscont
+                else:
+                    print(
+                        f"WARNING: Unnatural tokenization of concatenated context '...{context[:-10]}' and continuation '{continuation}'"
+                    )
+
             if len(context_enc) == 0:
                 context_enc = [self.eot_token_id]
 
@@ -263,13 +293,14 @@ class MegatronServerLM(BaseLM):
 
         return response.json()
 
-    def tokenizer_query(self, prompts):
+    def tokenizer_query(self, prompts, is_continuation):
         headers = {
             "Content-Type": "application/json",
         }
 
         data = {
             "prompts": prompts,
+            "is_continuation": is_continuation,
         }
 
         response = requests.put(
