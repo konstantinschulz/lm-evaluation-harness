@@ -12,12 +12,12 @@ from lm_eval.base import BaseLM
 def get_result(logprobs, is_max_logprobs, ctxlen):
     """Process results from Megatron-LM Server API response.
     :param logprobs
-        List of lists of the log probs of the tokens (context + continuation,
-        without EOD and without the first token), e.g. [-1.4, -0.7, -0.5, -0.9]
+        List of lists of the log probs of the tokens (for concatatenated context and continuation without the first token of
+         the context), e.g. [-1.4, -0.7, -0.5, -0.9]
     :param is_max_logprobs
-        List of boolean flag indicating for which token the predicted
-        probability was equal to the maximum predicted probability (context + continuation,
-        without EOD and without the first token), e.g. [False, True, True, False]
+        List of boolean flag indicating for which token the predicted probability was equal to the maximum predicted
+         probability (for concatatenated context and continuation without the first token of the context),
+         e.g. [False, True, True, False]
     :param ctxlen: int
         Length of context (so we can slice them away and only keep the predictions)
     :return:
@@ -146,7 +146,7 @@ class MegatronServerLM(BaseLM):
                     continuation_enc = continuation_enc_iscont
                 else:
                     print(
-                        f"WARNING: Unnatural tokenization of concatenated context '...{context[:-10]}' and continuation '{continuation}'"
+                        f"WARNING: Unnatural tokenization of concatenated context ...{repr(context[-20:])} and continuation {repr(continuation)}"
                     )
 
             if len(context_enc) == 0:
