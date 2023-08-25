@@ -1,4 +1,5 @@
 import json
+import re
 import time
 from typing import List
 
@@ -250,7 +251,11 @@ class MegatronServerLM(BaseLM):
                 until = [until]
 
             if until:
-                (primary_until,) = self.tok_encode(until[0])
+                primary_until_tokens = self.tok_encode(until[0], is_continuation=True)
+                if len(primary_until_tokens) == 1:
+                    primary_until = primary_until_tokens[0]
+                else:
+                    primary_until = None
             else:
                 primary_until = None
 
@@ -262,11 +267,23 @@ class MegatronServerLM(BaseLM):
                 stop_token=primary_until,
             )
 
-            for text, (context, _) in zip(response["text"], chunk):
-                s = text.removeprefix(context)
+            until_escaped = [re.escape(u) for u in until]
+            until_escaped_or = "|".join(until_escaped)
+            until_regex_str = f"(?:{until_escaped_or}).*$"
+            until_regex = re.compile(until_regex_str, re.DOTALL)
 
-                for term in until:
-                    s = s.split(term)[0]
+            for tokens, (context, _), inp in zip(response["tokens"], chunk, inps):
+                continuation_enc = tokens[len(inp) :]
+                text, continuation = self.tok_decode_batch((tokens, continuation_enc))
+
+                # Check if the result of tokenizing and detokenizing the context differs from the original context
+                # to detect problematic samples from the original run
+                if not text.startswith(context):
+                    print(
+                        f"INFO: Decoded text {repr(text[:10])}... does not begin with context {repr(context[:10])}..."
+                    )
+
+                s = until_regex.sub("", continuation)
 
                 self.cache_hook.add_partial("greedy_until", (context, until), s)
 
@@ -368,6 +385,7 @@ class MegatronServerLM(BaseLM):
         }
 
         if temperature == 0:
+            # Choose only the most likely token during generation, i.e. greedy search (no sampling)
             data["top_k"] = 1
         else:
             data["temperature"] = temperature
