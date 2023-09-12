@@ -6,7 +6,7 @@
 #SBATCH --hint=nomultithread         # we get physical cores not logical
 #SBATCH --time 02:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --account=opengptx-elm
-#SBATCH --partition=develbooster
+#SBATCH --partition=booster
 #SBATCH --output=logs/%x-%A_%a.out  # output file name
 #SBATCH --error=logs/%x-%A_%a.err   # error file name
 #SBATCH --array=0-26
@@ -76,7 +76,7 @@ while ! nc -z 127.0.0.1 5000; do
 done
 
 # adjust these paths if necessary
-#export HF_DATASETS_OFFLINE=1
+export HF_DATASETS_OFFLINE=1
 export HF_DATASETS_CACHE='/path/to/.cache/huggingface/datasets'
 export HF_METRICS_CACHE='/path/to/.cache/huggingface/metrics'
 
