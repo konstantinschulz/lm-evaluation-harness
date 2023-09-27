@@ -1,8 +1,9 @@
-import runpy
 import argparse
-import torch
+import runpy
 import sys
-from pathlib import Path
+
+import torch
+
 
 """
 Helper script to load model config from checkpoint file.

@@ -1,25 +1,29 @@
-
 # Basic Info
 
-The sbatch-script `run_megatron_server.sbatch` is designed to perform evaluation of all current model checkpoints for tokenizer ablation, launching Megatron-LM inference server / LM-eval-harness client pairs.
+The sbatch-script `run_megatron_server_client.sbatch` is designed to perform evaluation of a set of \
+model checkpoints for ablation purposed, launching Megatron-LM inference server / LM-eval-harness client pairs.
 
 # Setup
 
-Make sure `run_server_no_opt.py` is present in the same directory as `run_megatron_server.sbatch`.\
-Obtain the current list of model checkpoint locations (`checkpoints.txt`) and place it in this directory.\
-Adjust the working directory and cache paths in `run_megatron_server.sbatch`.
+Make sure `run_server_no_opt.py` is present in the same directory as `run_megatron_server_client.sbatch`.\
+Obtain a list of model checkpoint locations (`checkpoints.txt`) and specify its directory (see below).\
+Adjust the working directory and cache paths in `run_megatron_server_clients.sbatch`.
 
 # Usage
 
-Run the script using
+It is recommended to call the script through a wrapper such as `run_checkpoints.sh`.\
+In there, specify the location of `checkpoints.txt`, the task list, desired output location and batch size as well as the checkpoint iteration.\
+If the latter is not set, it defaults to the last iteration as per `./latest_checkpointed_iteration.txt` in the checkpoint directory.
+
+One may also run the script directly using
 
 ```
-sbatch [sbatch_options] run_megatron_server.sbatch /path/to/checkpoints.txt "list,of,tasks" /path/to/output/directory batch_size
+sbatch [--array=0-N] [other_sbatch_options] run_megatron_server_client.sbatch /path/to/checkpoints.txt "list,of,tasks" /path/to/output/directory batch_size [checkpoint_iter]
 ```
-By default, the list of checkpoint paths to be evaluated is checkpoint_list.txt in the same directory as `run_checkpoints.sbatch`. \
 The results will be stored as a single .json per model checkpoint containing results for all selected tasks, in the directory provided by  `/path/to/output/directory`.\
-Standard output is written to `./logs/eval-harness-%A_%a.out` and `./logs/eval-harness-%A_%a.err` by default.
+Stout and stderr are written to `./logs/eval-harness-%A_%a.out` and `./logs/eval-harness-%A_%a.err` by default.
 
 # Remarks
 
-Script timeout is set at 10 hours by default. Note that this timer applies _per checkpoint_. Further note that depending on the current slurm configuration, only 4 checkpoints will be evaluated at a time.
+Script timeout is set at 10 hours by default. Note that this timer applies _per checkpoint_.\
+Further note that depending on the current slurm configuration, only 4 checkpoints will be evaluated at a time (e.g. on develbooster).

@@ -4,12 +4,11 @@
 #SBATCH --ntasks-per-node=1          # crucial - only 1 task per dist per node!
 #SBATCH --cpus-per-task=48           # number of cores per tasks
 #SBATCH --hint=nomultithread         # we get physical cores not logical
-#SBATCH --time 02:00:00              # maximum execution time (HH:MM:SS)
+#SBATCH --time 10:00:00              # maximum execution time (HH:MM:SS)
 #SBATCH --account=opengptx-elm
 #SBATCH --partition=booster
 #SBATCH --output=logs/%x-%A_%a.out  # output file name
 #SBATCH --error=logs/%x-%A_%a.err   # error file name
-#SBATCH --array=0-26
 
 set -eo pipefail
 set -x
@@ -36,13 +35,14 @@ export NCCL_DEBUG=INFO
 
 module load Stages/2023 GCC CMake Ninja OpenMPI git Python CUDA PyTorch torchvision cuDNN TensorFlow pybind11/.2.9.2
 
-# adjust these paths
-export PATH_TO_FQUAD=/path/to/fquad1.0
-export ROOT_DIR=/path/to/installdir
-export MEGATRON_LM_REPO=$ROOT_DIR/Megatron-LM
-export VENV_DIR=$ROOT_DIR/pyenv_opengptx
-export PYTHONPATH=$VENV_DIR/lib/python3.10/site-packages:$PYTHONPATH
-export PYTHONPATH=$MEGATRON_LM_REPO:$PYTHONPATH
+# adjust these paths, ROOT_DIR should point to the install dir containing lm-evaluation-harness and Megatron-LM
+export PATH_TO_FQUAD="/path/to/fquad1.0"
+export ROOT_DIR="/path/to/installdir"
+
+export MEGATRON_LM_REPO="$ROOT_DIR/Megatron-LM"
+export VENV_DIR="$ROOT_DIR/pyenv_opengptx"
+export PYTHONPATH="$VENV_DIR/lib/python3.10/site-packages:$PYTHONPATH"
+export PYTHONPATH="$MEGATRON_LM_REPO:$PYTHONPATH"
 
 source $VENV_DIR/bin/activate
 
@@ -50,12 +50,20 @@ MODEL_CHECKPOINTS=$1
 TASKS=$2
 OUTPUT_PATH=$3
 BATCH_SIZE=$4
+CHECKPOINT_ITER=$5
 
 readarray -t models < $MODEL_CHECKPOINTS
 MODEL_PATH=${models[$SLURM_ARRAY_TASK_ID]}
 IFS="/" read -ra PTH <<< "$MODEL_PATH"
 IFS="." read -ra NAME <<< "${PTH[-2]}"
 model_name="${NAME[0]}"
+
+if [ -z "$5" ]
+  then
+    read -r CHECKPOINT_ITER < "$MODEL_PATH/latest_checkpointed_iteration.txt"
+fi
+
+CHECKPOINT_ITER_STR="iter_$(printf "%07d" "$CHECKPOINT_ITER")"
 
 SRUN_ARGS=" \
     --overlap \
@@ -65,13 +73,16 @@ SRUN_ARGS=" \
 
 hostname
 
-export CUDA_VISIBLE_DEVICES=0,1
+export CUDA_VISIBLE_DEVICES=0,1,2,3
 
-srun $SRUN_ARGS python run_server_no_opt.py --checkpoint-path ${models[$SLURM_ARRAY_TASK_ID]} --checkpoint-iter-step iter_0053100 --megatron-path $MEGATRON_LM_REPO &
+srun $SRUN_ARGS python run_server_no_opt.py --checkpoint-path ${models[$SLURM_ARRAY_TASK_ID]} --checkpoint-iter-step $CHECKPOINT_ITER_STR --megatron-path $MEGATRON_LM_REPO &
 server_proc_id="$!"
 
-api_addr=http://127.0.0.1:5000
-while ! nc -z 127.0.0.1 5000; do   
+api_scheme=http
+api_host=127.0.0.1
+api_port=5000
+api_addr="$api_scheme://$api_host:$api_port"
+while ! nc -z "$api_host" "$api_port"; do   
   sleep 3
 done
 
@@ -104,7 +115,6 @@ print_task_data() {
 FAIL_PATH=$OUTPUT_PATH/failures/$JOB_IDENTIFIER
 SUCCESS_PATH=$OUTPUT_PATH/successes/$JOB_IDENTIFIER
 
-export CUDA_VISIBLE_DEVICES=2,3
 srun python $EVAL_CMD && print_task_data > $SUCCESS_PATH || print_task_data > $FAIL_PATH
 
 kill "$server_proc_id"
