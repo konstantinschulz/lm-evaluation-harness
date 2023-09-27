@@ -82,7 +82,7 @@ api_scheme=http
 api_host=127.0.0.1
 api_port=5000
 api_addr="$api_scheme://$api_host:$api_port"
-while ! nc -z "$api_host" "$api_port"; do   
+while ! nc -z "$api_host" "$api_port"; do
   sleep 3
 done
 
