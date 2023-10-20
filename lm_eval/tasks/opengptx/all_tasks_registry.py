@@ -1,15 +1,19 @@
 # OpenGPT-X tasks
+from . import arc_de
 from . import german_europarl_ppl
 from . import german_ler_ppl
 from . import germanquad
 from . import germeval2017
 from . import germeval2018
 from . import gnad10
+from . import hellaswag_de
+from . import hendrycks_test_de
 from . import mlqa
 from . import mlsum
 from . import oscar_ppl
 from . import pawsx
 from . import stereoset
+from . import truthfulqa_de
 from . import wino_x
 from . import xcsr
 from . import xlwic
@@ -20,6 +24,7 @@ from . import xnli
 
 TASK_REGISTRY_TMP = {
     # OpenGPT-X tasks
+    "arc_challenge_de": arc_de.ARCChallengeDE,
     "german_europarl_ppl": german_europarl_ppl.GermanEuroparlPerplexity,
     "german_ler_ppl": german_ler_ppl.GermanLERPerplexity,
     "germanquad": germanquad.GermanQuAD,
@@ -27,12 +32,15 @@ TASK_REGISTRY_TMP = {
     "germeval2018_coarse": germeval2018.GermEval2018,
     "germeval2018_fine": germeval2018.GermEval2018_fine,
     "gnad10": gnad10.GNAD10,
+    "hellaswag_de": hellaswag_de.HellaSwagDE,
+    **hendrycks_test_de.create_all_tasks(),
     **mlqa.construct_tasks(),
     **mlsum.construct_tasks(),
     "oscar_ppl_de": oscar_ppl.OscarPerplexityGerman,
     **pawsx.construct_tasks(),
     **stereoset.construct_tasks(),
     **xcsr.construct_tasks(),
+    "truthful_qa_de": truthfulqa_de.TruthfulQADEMultipleChoice,
     "wino_de": wino_x.WinograndeXDe,
     "xlwic_de": xlwic.WordsInContextDe,
     "xlwic_it": xlwic.WordsInContextIt,
