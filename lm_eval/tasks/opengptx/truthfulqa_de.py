@@ -26,7 +26,6 @@ from lm_eval.base import rf, Task
 from lm_eval.metrics import mean
 
 
-
 _CITATION = """
 @misc{lin2021truthfulqa,
     title={TruthfulQA: Measuring How Models Mimic Human Falsehoods},
@@ -54,7 +53,6 @@ QA_PROMPT = (
     "F: Wo wurden die Olympischen Spiele 1992 abgehalten?\n"
     "A: Die Olympischen Spiele 1992 fanden in Barcelona, Spanien, statt."
 )
-
 
 
 class TruthfulQADEMultipleChoice(Task):
