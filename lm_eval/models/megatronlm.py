@@ -109,7 +109,8 @@ class MegatronLMClient(BaseLM):
     def tok_decode_batch(self, tokens_batch):
         return self.detokenizer_query(tokens_batch)
 
-    def loglikelihood(self, requests):
+    # TODO: Der Parameter return_req_stat sollte bei allen Unterklassen von LM in die Signatur dieser Methode.
+    def loglikelihood(self, requests, return_req_stats=False):
         new_reqs = []
         contexts = []
         continuations = []
@@ -155,9 +156,9 @@ class MegatronLMClient(BaseLM):
 
             new_reqs.append((request, context_enc, continuation_enc))
 
-        return self._loglikelihood_tokens(new_reqs)
+        return self._loglikelihood_tokens(new_reqs, return_req_stats=return_req_stats)
 
-    def _loglikelihood_tokens(self, requests, disable_tqdm=False):
+    def _loglikelihood_tokens(self, requests, disable_tqdm=False, return_req_stats=False):
         res = []
 
         def _collate(x):
@@ -175,6 +176,7 @@ class MegatronLMClient(BaseLM):
         ):
             inps = []
             ctxlens = []
+            req_stats = []
             for cache_key, context_enc, continuation_enc in chunk:
                 inp = (context_enc + continuation_enc)[-self.max_length :]
 
@@ -190,6 +192,9 @@ class MegatronLMClient(BaseLM):
                 inps.append(inp)
                 ctxlens.append(ctxlen)
 
+                if return_req_stats:
+                    req_stats.append({"tokens_ctx" : len(context_enc), "tokens_cont": len(continuation_enc), "words_ctx" : utils.count_words(cache_key[0]), "words_cont" : utils.count_words(cache_key[1])})
+
             response = self.megatron_completion(
                 model_name=self.model_name,
                 prompts=inps,
@@ -198,26 +203,40 @@ class MegatronLMClient(BaseLM):
                 logprobs=10,
             )
 
-            for (
-                logprobs,
-                is_max_logprobs,
-                ctxlen,
-                (cache_key, context_enc, continuation_enc),
-            ) in zip(response["logprobs"], response["is_max_logprobs"], ctxlens, chunk):
-                answer = get_result(logprobs, is_max_logprobs, ctxlen)
+            if return_req_stats:
+                for (
+                    logprobs,
+                    is_max_logprobs,
+                    ctxlen,
+                    req_stats,
+                    (cache_key, context_enc, continuation_enc),
+                ) in zip(response["logprobs"], response["is_max_logprobs"], ctxlens, req_stats, chunk):
+                    answer = get_result(logprobs, is_max_logprobs, ctxlen)
+                    answer = answer + (req_stats,)
+                    res.append(answer + (req_stats,))
 
-                res.append(answer)
+                    if cache_key is not None:
+                        self.cache_hook.add_partial("loglikelihood", cache_key, answer)
+            else:
+                for (
+                    logprobs,
+                    is_max_logprobs,
+                    ctxlen,
+                    (cache_key, context_enc, continuation_enc),
+                ) in zip(response["logprobs"], response["is_max_logprobs"], ctxlens, chunk):
+                    answer = get_result(logprobs, is_max_logprobs, ctxlen)
+                    res.append(answer)
 
-                # partial caching
-                if cache_key is not None:
-                    self.cache_hook.add_partial("loglikelihood", cache_key, answer)
+                    if cache_key is not None:
+                        self.cache_hook.add_partial("loglikelihood", cache_key, answer)
 
         return re_ord.get_original(res)
 
-    def greedy_until(self, requests):
+    def greedy_until(self, requests, return_req_stats=False):
         if not requests:
             return []
         res = []
+        req_stats = []
 
         def _collate(x):
             toks = self.tok_encode(x[0])
@@ -297,6 +316,15 @@ class MegatronLMClient(BaseLM):
                 self.cache_hook.add_partial("greedy_until", (context, until), s)
 
                 res.append(s)
+                if return_req_stats:
+                    req_stats.append({"tokens_ctx" : len(self.tok_encode(context)),  "words_ctx" : utils.count_words(context), })
+
+        if return_req_stats:
+            results = []
+            for (s,stats,) in zip(res, req_stats):
+                results.append((s, stats))
+
+            return re_ord.get_original(results)
 
         return re_ord.get_original(res)
 

@@ -10,7 +10,7 @@ Homepage: https://cs.rochester.edu/nlp/rocstories/
 """
 import numpy as np
 from lm_eval.base import rf, Task
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean, fertility
 
 
 _CITATION = """
@@ -104,8 +104,9 @@ class StoryCloze(Task):
             part of the document for `doc`.
         """
         clozes = [doc["sentence_quiz1"], doc["sentence_quiz2"]]
-        lls = [rf.loglikelihood(ctx, " {}".format(choice))[0] for choice in clozes]
-        return lls
+        requests = [rf.loglikelihood_reqstats(ctx, " {}".format(choice)) for choice in clozes]
+
+        return requests
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -117,9 +118,29 @@ class StoryCloze(Task):
         :param results:
             The results of the requests created in construct_requests.
         """
+        lls = [result[0] for result in results]
+        reqs_stats = [result[2] for result in results]
+
         gold = doc["answer_right_ending"] - 1
-        acc = 1.0 if np.argmax(results) == gold else 0.0
-        return {"acc": acc}
+        pred = np.argmax(lls)
+        pred_req_stats = reqs_stats[pred]
+
+        acc = 1.0 if pred == gold else 0.0
+
+        token_ctx_count =  pred_req_stats["tokens_ctx"]
+        word_ctx_count =  pred_req_stats["words_ctx"]
+        token_cont_count =  pred_req_stats["tokens_cont"]
+        word_cont_count =  pred_req_stats["words_cont"]
+
+        return {
+            "acc": acc,
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+            "fertility_cont": {"tokens": token_cont_count, "words": word_cont_count, "include": True},
+            "fertility_cont_pos": {"tokens": token_cont_count, "words": word_cont_count, "include": pred == gold},
+            "fertility_cont_neg": {"tokens": token_cont_count, "words": word_cont_count, "include": pred != gold},
+        }
 
     def aggregation(self):
         """
@@ -127,7 +148,15 @@ class StoryCloze(Task):
             A dictionary where keys are the names of submetrics and values are
             functions that aggregate a list of metrics
         """
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+            "fertility_cont": fertility,
+            "fertility_cont_pos": fertility,
+            "fertility_cont_neg": fertility,
+        }
 
     def higher_is_better(self):
         """
@@ -135,7 +164,15 @@ class StoryCloze(Task):
             A dictionary where keys are the names of submetrics and values are
             whether a higher value of the submetric is better
         """
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+            "fertility_cont": False,
+            "fertility_cont_pos": False,
+            "fertility_cont_neg": False,
+        }
 
 
 class StoryCloze2016(StoryCloze):

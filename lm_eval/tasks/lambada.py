@@ -13,7 +13,7 @@ in the broader discourse.
 Homepage: https://zenodo.org/record/2630551#.X4Xzn5NKjUI
 """
 from lm_eval.base import Task, rf
-from lm_eval.metrics import mean, perplexity
+from lm_eval.metrics import mean, perplexity, fertility
 
 
 _CITATION = """
@@ -56,20 +56,39 @@ class LambadaBase(Task):
         return " " + doc["text"].rsplit(" ", 1)[1]
 
     def construct_requests(self, doc, ctx):
-        ll, is_greedy = rf.loglikelihood(ctx, self.doc_to_target(doc))
+        ll, is_greedy, req_stats = rf.loglikelihood_reqstats(ctx, self.doc_to_target(doc))
 
-        return ll, is_greedy
+        return ll, is_greedy, req_stats
 
     def process_results(self, doc, results):
-        ll, is_greedy = results
+        ll, is_greedy, req_stats = results
 
-        return {"ppl": ll, "acc": int(is_greedy)}
+        token_count = req_stats["tokens_ctx"] + req_stats["tokens_cont"]
+        word_count = req_stats["words_ctx"] + req_stats["words_cont"]
+
+        return {"ppl": ll,
+                "acc": int(is_greedy),
+                "fertility_ctx_cont": {"tokens" : token_count, "words" : word_count, "include": True},
+                "fertility_ctx_cont_pos": {"tokens" : token_count, "words" : word_count, "include": is_greedy},
+                "fertility_ctx_cont_neg": {"tokens" : token_count, "words" : word_count, "include": not is_greedy}}
 
     def aggregation(self):
-        return {"ppl": perplexity, "acc": mean}
+        return {
+            "ppl": perplexity,
+            "acc": mean,
+            "fertility_ctx_cont": fertility,
+            "fertility_ctx_cont_pos": fertility,
+            "fertility_ctx_cont_neg": fertility,
+        }
 
     def higher_is_better(self):
-        return {"ppl": False, "acc": True}
+        return {
+            "ppl": False,
+            "acc": True,
+            "fertility_ctx_cont": False,
+            "fertility_ctx_cont_pos": False,
+            "fertility_ctx_cont_neg": False,
+        }
 
 
 class LambadaStandard(LambadaBase):

@@ -13,7 +13,7 @@ Additionally, this dataset can be used as a benchmark dataset for German topic c
 """
 import datasets
 from lm_eval.base import Task, rf
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean, fertility
 from functools import partial
 import numpy as np
 
@@ -145,27 +145,11 @@ class GNAD10(Task):
             part of the document for `doc`.
         """
 
-        ll_web = rf.loglikelihood(ctx, " " + self.LABELS[0])
-        ll_panorama = rf.loglikelihood(ctx, " " + self.LABELS[1])
-        ll_international = rf.loglikelihood(ctx, " " + self.LABELS[2])
-        ll_wirtschaft = rf.loglikelihood(ctx, " " + self.LABELS[3])
-        ll_sport = rf.loglikelihood(ctx, " " + self.LABELS[4])
-        ll_inland = rf.loglikelihood(ctx, " " + self.LABELS[5])
-        ll_etat = rf.loglikelihood(ctx, " " + self.LABELS[6])
-        ll_wissenschaft = rf.loglikelihood(ctx, " " + self.LABELS[7])
-        ll_kultur = rf.loglikelihood(ctx, " " + self.LABELS[8])
+        # ll = [rf.loglikelihood(ctx, " " +label )[0] for label in self.LABELS]
 
-        return (
-            ll_web,
-            ll_panorama,
-            ll_international,
-            ll_wirtschaft,
-            ll_sport,
-            ll_inland,
-            ll_etat,
-            ll_wissenschaft,
-            ll_kultur,
-        )
+        requests = [rf.loglikelihood_reqstats(ctx, f" {label}") for label in self.LABELS]
+
+        return requests
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -177,29 +161,30 @@ class GNAD10(Task):
         :param results:
             The results of the requests created in construct_requests.
         """
-        (
-            ll_web,
-            ll_panorama,
-            ll_international,
-            ll_wirtschaft,
-            ll_sport,
-            ll_inland,
-            ll_etat,
-            ll_wissenschaft,
-            ll_kultur,
-        ) = results
 
-        pred = float("-inf")
+        lls = [result[0] for result in results]
+        reqs_stats = [result[2] for result in results]
 
-        scores = [i[0] for i in results]
-        pred = scores.index(max(scores))
-        true_label = doc["label"]
+        pred = np.argmax(lls)
+        gold = doc["label"]
+        pred_req_stats = reqs_stats[pred]
+
+        token_ctx_count =  pred_req_stats["tokens_ctx"]
+        word_ctx_count =  pred_req_stats["words_ctx"]
+        token_cont_count =  pred_req_stats["tokens_cont"]
+        word_cont_count =  pred_req_stats["words_cont"]
 
         return {
-            "acc": pred == true_label,
-            "precision": (true_label, pred),
-            "recall": (true_label, pred),
-            "f1": (true_label, pred),
+            "acc": pred == gold,
+            "precision": (gold, pred),
+            "recall": (gold, pred),
+            "f1": (gold, pred),
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+            "fertility_cont": {"tokens": token_cont_count, "words": word_cont_count, "include": True},
+            "fertility_cont_pos": {"tokens": token_cont_count, "words": word_cont_count, "include": pred == gold},
+            "fertility_cont_neg": {"tokens": token_cont_count, "words": word_cont_count, "include": pred != gold},
         }
 
     def aggregation(self):
@@ -213,7 +198,24 @@ class GNAD10(Task):
             "precision": _gnad10_agg_precision,
             "recall": _gnad10_agg_recall,
             "f1": _gnad10_agg_f1,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+            "fertility_cont": fertility,
+            "fertility_cont_pos": fertility,
+            "fertility_cont_neg": fertility,
         }
 
     def higher_is_better(self):
-        return {"acc": True, "precision": True, "recall": True, "f1": True}
+        return {
+            "acc": True,
+            "precision": True,
+            "recall": True,
+            "f1": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+            "fertility_cont": False,
+            "fertility_cont_pos": False,
+            "fertility_cont_neg": False,
+        }

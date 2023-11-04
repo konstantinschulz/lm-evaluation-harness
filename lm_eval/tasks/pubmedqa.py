@@ -17,7 +17,7 @@ Homepage: https://pubmedqa.github.io/
 """
 import numpy as np
 from lm_eval.base import rf, Task
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean, fertility
 
 
 _CITATION = """
@@ -35,6 +35,8 @@ class Pubmed_QA(Task):
     VERSION = 0
     DATASET_PATH = "pubmed_qa"
     DATASET_NAME = "pqa_labeled"
+
+    CHOICES = ["yes", "no", "maybe"]
 
     def has_training_docs(self):
         return False
@@ -63,25 +65,41 @@ class Pubmed_QA(Task):
     def doc_to_target(self, doc):
         return " {}".format(doc["final_decision"])
 
+    # TODO: vgl. TwoChoiceTask
     def construct_requests(self, doc, ctx):
         """Uses RequestFactory to construct Requests and returns
         an iterable of Requests which will be sent to the LM.
         """
-        ll_yes, _ = rf.loglikelihood(ctx, " yes")
-        ll_no, _ = rf.loglikelihood(ctx, " no")
-        ll_maybe, _ = rf.loglikelihood(ctx, " maybe")
-        return ll_yes, ll_no, ll_maybe
+        ll_yes, _, req_stats = rf.loglikelihood_reqstats(ctx, " yes")
+        ll_no, _, _ = rf.loglikelihood_reqstats(ctx, " no")
+        ll_maybe, _, _ = rf.loglikelihood_reqstats(ctx, " maybe")
+
+        return ll_yes, ll_no, ll_maybe, req_stats
 
     def process_results(self, doc, results):
         gold = doc["final_decision"]
-        ll_yes, ll_no, ll_maybe = results
-        pred = np.argmax(results)
+        ll_yes, ll_no, ll_maybe, req_stats = results
+
+        # TODO: pred umbenennen da es nicht direkt mit gold vergleichbar ist
+        pred = np.argmax([ll_yes, ll_no, ll_maybe])
+
+        token_ctx_count =  req_stats["tokens_ctx"]
+        word_ctx_count =  req_stats["words_ctx"]
+
         return {
-            "acc": ["yes", "no", "maybe"][pred] == gold,
+            "acc": self.CHOICES[pred] == gold,
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": self.CHOICES[pred] == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": self.CHOICES[pred] != gold},
         }
 
     def aggregation(self):
-        return {"acc": mean}
+        return {"acc": mean, "fertility_ctx": False, "fertility_ctx_pos": False, "fertility_ctx_neg": False,}
 
     def higher_is_better(self):
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility
+    }

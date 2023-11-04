@@ -13,7 +13,7 @@ import collections
 import datasets
 import numpy as np
 from lm_eval.base import rf, Task
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean, fertility
 
 
 _CITATION = """
@@ -137,10 +137,12 @@ class RACE(Task):
             part of the document for `doc`.
         """
         problem = self.last_problem(doc)
-        ll_choices = [
-            rf.loglikelihood(ctx, " " + problem["options"][i])[0] for i in range(4)
+
+        ll_results = [
+            rf.loglikelihood_reqstats(ctx, " " + problem["options"][i]) for i in range(4)
         ]
-        return ll_choices
+
+        return ll_results
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -153,8 +155,27 @@ class RACE(Task):
             The results of the requests created in construct_requests.
         """
         gold = self.letter_to_num[self.last_problem(doc)["answer"]]
-        pred = np.argmax(results)
-        return {"acc": int(pred == gold)}
+
+        ll = [result[0] for result in results]
+        pred = np.argmax(ll)
+
+        reqs_stats = [result[2] for result in results]
+        pred_req_stats = reqs_stats[pred]
+
+        token_ctx_count =  pred_req_stats["tokens_ctx"]
+        word_ctx_count =  pred_req_stats["words_ctx"]
+        token_cont_count =  pred_req_stats["tokens_cont"]
+        word_cont_count =  pred_req_stats["words_cont"]
+
+        return {
+            "acc": int(pred == gold),
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+            "fertility_cont": {"tokens": token_cont_count, "words": word_cont_count, "include": True},
+            "fertility_cont_pos": {"tokens": token_cont_count, "words": word_cont_count, "include": pred == gold},
+            "fertility_cont_neg": {"tokens": token_cont_count, "words": word_cont_count, "include": pred != gold},
+            }
 
     def aggregation(self):
         """
@@ -162,7 +183,16 @@ class RACE(Task):
             A dictionary where keys are the names of submetrics and values are
             functions that aggregate a list of metrics
         """
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+            "fertility_cont": fertility,
+            "fertility_cont_pos": fertility,
+            "fertility_cont_neg": fertility,
+
+        }
 
     def higher_is_better(self):
         """
@@ -170,4 +200,13 @@ class RACE(Task):
             A dictionary where keys are the names of submetrics and values are
             whether a higher value of the submetric is better
         """
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+            "fertility_cont": False,
+            "fertility_cont_pos": False,
+            "fertility_cont_neg": False,
+
+        }

@@ -11,7 +11,7 @@ https://github.com/ZurichNLP/xstance
 """
 import datasets
 from lm_eval.base import Task, rf
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean, fertility
 from functools import partial
 import numpy as np
 
@@ -121,10 +121,11 @@ class XStance(Task):
         """
         # rf.loglikelihood as the task is a classification problem. For each document the model predicts loglikelihood for the correct label
         # ctx is the fully formatted fewshot example, i.e. K examples + comment to rate
-        ll_against = rf.loglikelihood(ctx, " " + self.AGAINST)
-        ll_favor = rf.loglikelihood(ctx, " " + self.FAVOR)
+        
+        ll_against, _, req_stats = rf.loglikelihood_reqstats(ctx, " " + self.AGAINST)
+        ll_favor, _, _  = rf.loglikelihood_reqstats(ctx, " " + self.FAVOR)
 
-        return ll_against, ll_favor
+        return ll_against, ll_favor, req_stats
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -137,11 +138,13 @@ class XStance(Task):
             The results of the requests created in construct_requests.
         """
 
-        pred = 0
-        against, favor = results
+        against, favor, req_stats = results
+
+        token_ctx_count =  req_stats["tokens_ctx"]
+        word_ctx_count =  req_stats["words_ctx"]
 
         # Evaluation metrics will only work with numerical labels
-        if against[0] > favor[0]:
+        if against > favor:
             pred = self.AGAINST_IDX
         else:
             pred = self.FAVOR_IDX
@@ -153,6 +156,9 @@ class XStance(Task):
             "precision": (true_label, pred),
             "recall": (true_label, pred),
             "f1": (true_label, pred),
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == true_label},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != true_label},
         }
 
     def aggregation(self):
@@ -160,25 +166,36 @@ class XStance(Task):
         :returns: {str: [metric_score] -> float}
             A dictionary where keys are the names of submetrics and values are
             functions that aggregate a list of metric scores
-        """
+"""
 
         return {
             "acc": mean,
             "precision": _xstance_agg_precision,
             "recall": _xstance_agg_recall,
             "f1": _xstance_agg_f1,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility
         }
 
     def higher_is_better(self):
-        return {"acc": True, "precision": True, "recall": True, "f1": True}
+        return {
+            "acc": True,
+            "precision": True,
+            "recall": True,
+            "f1": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
 
 
 # German part of the dataset
 class XStanceDE(XStance):
     DATASET_NAME = "de"
     TOPIC = "Thema: "
-    OPINION = "Meine Meinung (dafür oder dagegen): "
-    STANCE = "Meine Meinung ist (dafür oder dagegen): "
+    OPINION = "Meine Meinung (dafür oder dagegen): " # TODO: Der Whitespace am Ende vom Kontext ist falsch!!
+    STANCE = "Meine Meinung ist (dafür oder dagegen): " # TODO: Der Whitespace am Ende vom Kontext ist falsch!!
     FAVOR = "dafür"
     AGAINST = "dagegen"
 
@@ -187,7 +204,7 @@ class XStanceDE(XStance):
 class XStanceFR(XStance):
     DATASET_NAME = "fr"
     TOPIC = "Thème: "
-    OPINION = "Mon opinion (pour ou contre): "
-    STANCE = "Mon opinion est (pour ou contre): "
+    OPINION = "Mon opinion (pour ou contre): " # TODO: Der Whitespace am Ende vom Kontext ist falsch!!
+    STANCE = "Mon opinion est (pour ou contre): " # TODO: Der Whitespace am Ende vom Kontext ist falsch!!
     FAVOR = "pour"
     AGAINST = "contre"

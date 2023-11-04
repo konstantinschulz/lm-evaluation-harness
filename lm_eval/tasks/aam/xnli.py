@@ -14,7 +14,7 @@ https://arxiv.org/abs/1809.05053
 
 import numpy as np
 from lm_eval.base import rf, Task
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean, fertility
 
 
 class XNLIBase(Task):
@@ -67,14 +67,37 @@ class XNLIBase(Task):
 
     def process_results(self, doc, results):
         gold = doc["label"]
-        pred = np.argmax(results)
-        return {"acc": pred == gold}
+
+        lls = results[:-1]
+        req_stats = results[-1]
+
+        token_ctx_count = req_stats["tokens_ctx"]
+        word_ctx_count = req_stats["words_ctx"]
+
+        pred = np.argmax(lls)
+
+        return {
+            "acc": pred == gold,
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+        }
 
     def higher_is_better(self):
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
 
     def aggregation(self):
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+            }
 
 
 class XNLIDe(XNLIBase):
@@ -96,10 +119,11 @@ class XNLIDe(XNLIBase):
         return " {}".format({0: "Wahr", 1: "Neutral", 2: "Falsch"}[doc["label"]])
 
     def construct_requests(self, doc, ctx):
-        ll_true, _ = rf.loglikelihood(ctx, " Wahr")
-        ll_neither, _ = rf.loglikelihood(ctx, " Neutral")
-        ll_false, _ = rf.loglikelihood(ctx, " Falsch")
-        return ll_true, ll_neither, ll_false
+        ll_true, _, req_stats = rf.loglikelihood_reqstats(ctx, " Wahr")
+        ll_neither, _, _ = rf.loglikelihood_reqstats(ctx, " Neutral")
+        ll_false, _, _ = rf.loglikelihood_reqstats(ctx, " Falsch")
+
+        return ll_true, ll_neither, ll_false, req_stats
 
 
 class XNLIEn(XNLIBase):
@@ -122,10 +146,11 @@ class XNLIEn(XNLIBase):
         return " {}".format({0: "True", 1: "Neither", 2: "False"}[doc["label"]])
 
     def construct_requests(self, doc, ctx):
-        ll_true, _ = rf.loglikelihood(ctx, " True")
-        ll_neither, _ = rf.loglikelihood(ctx, " Neither")
-        ll_false, _ = rf.loglikelihood(ctx, " False")
-        return ll_true, ll_neither, ll_false
+        ll_true, _, req_stats = rf.loglikelihood_reqstats(ctx, " True")
+        ll_neither, _, _ = rf.loglikelihood_reqstats(ctx, " Neither")
+        ll_false, _, _ = rf.loglikelihood_reqstats(ctx, " False")
+
+        return ll_true, ll_neither, ll_false, req_stats
 
 
 class XNLIFr(XNLIBase):
@@ -145,10 +170,11 @@ class XNLIFr(XNLIBase):
         return " {}".format({0: "Vrai", 1: "Neutre", 2: "Faux"}[doc["label"]])
 
     def construct_requests(self, doc, ctx):
-        ll_true, _ = rf.loglikelihood(ctx, " Vrai")
-        ll_neither, _ = rf.loglikelihood(ctx, " Neutre")
-        ll_false, _ = rf.loglikelihood(ctx, " Faux")
-        return ll_true, ll_neither, ll_false
+        ll_true, _, req_stats = rf.loglikelihood_reqstats(ctx, " Vrai")
+        ll_neither, _, _ = rf.loglikelihood_reqstats(ctx, " Neutre")
+        ll_false, _, _ = rf.loglikelihood_reqstats(ctx, " Faux")
+
+        return ll_true, ll_neither, ll_false, req_stats
 
 
 class XNLIEs(XNLIBase):
@@ -170,7 +196,8 @@ class XNLIEs(XNLIBase):
         return " {}".format({0: "Verdadero", 1: "Neutro", 2: "Falso"}[doc["label"]])
 
     def construct_requests(self, doc, ctx):
-        ll_true, _ = rf.loglikelihood(ctx, " Verdadero")
-        ll_neither, _ = rf.loglikelihood(ctx, " Neutro")
-        ll_false, _ = rf.loglikelihood(ctx, " Falso")
-        return ll_true, ll_neither, ll_false
+        ll_true, _, req_stats = rf.loglikelihood_reqstats(ctx, " Verdadero")
+        ll_neither, _, _ = rf.loglikelihood_reqstats(ctx, " Neutro")
+        ll_false, _, _ = rf.loglikelihood_reqstats(ctx, " Falso")
+
+        return ll_true, ll_neither, ll_false, req_stats

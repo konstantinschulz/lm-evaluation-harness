@@ -17,7 +17,7 @@ See: https://aclanthology.org/2021.emnlp-main.670.pdf
 """
 import numpy as np
 from lm_eval.base import rf, Task
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean,fertility
 
 
 _CITATION = """
@@ -94,12 +94,13 @@ class WinograndeXDe(Task):
             part of the document for `doc`.
         """
         target = self.partial_target(doc)
-        lls = []
+        requests = []
         for option in [doc["option1_de"], doc["option2_de"]]:
             partial_ctx = self.partial_context(doc, option)
             full_ctx = self.append_context(ctx, partial_ctx)
-            lls.append(rf.loglikelihood(full_ctx, target)[0])
-        return lls
+            #lls.append(rf.loglikelihood(full_ctx, target)[0])
+            requests.append(rf.loglikelihood_reqstats(full_ctx, target))
+        return requests
 
     @classmethod
     def append_context(cls, ctx, partial_ctx):
@@ -117,7 +118,33 @@ class WinograndeXDe(Task):
         :param results:
             The results of the requests created in construct_requests.
         """
-        return {"acc": np.argmax(results) == self.answer_to_num[doc["answer"]]}
+        lls = [result[0] for result in results]
+        reqs_stats = [result[2] for result in results]
+ 
+
+        pred = np.argmax(lls)
+        gold = self.answer_to_num[doc["answer"]]
+        
+        pred_req_stats = reqs_stats[pred]
+
+        #token_ctx_count = mean([req_stats['tokens_ctx'] for req_stats in reqs_stats])
+        #word_ctx_count = mean([req_stats['words_ctx'] for req_stats in reqs_stats])
+
+        token_ctx_count =  pred_req_stats["tokens_ctx"]
+        word_ctx_count =  pred_req_stats["words_ctx"]
+        token_cont_count =  pred_req_stats["tokens_cont"]
+        word_cont_count =  pred_req_stats["words_cont"]
+
+        return {
+            #"acc": np.argmax(results) == self.answer_to_num[doc["answer"]],
+            "acc": pred == gold,
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+            "fertility_cont": {"tokens": token_cont_count, "words": word_cont_count, "include": True},
+            "fertility_cont_pos": {"tokens": token_cont_count, "words": word_cont_count, "include": pred == gold},
+            "fertility_cont_neg": {"tokens": token_cont_count, "words": word_cont_count, "include": pred != gold},
+            }
 
     def aggregation(self):
         """
@@ -125,7 +152,15 @@ class WinograndeXDe(Task):
             A dictionary where keys are the names of submetrics and values are
             functions that aggregate a list of metrics
         """
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+            "fertility_cont": fertility,
+            "fertility_cont_pos": fertility,
+            "fertility_cont_neg": fertility,
+        }
 
     def higher_is_better(self):
         """
@@ -133,4 +168,12 @@ class WinograndeXDe(Task):
             A dictionary where keys are the names of submetrics and values are
             whether a higher value of the submetric is better
         """
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+            "fertility_cont": False,
+            "fertility_cont_pos": False,
+            "fertility_cont_neg": False,
+        }

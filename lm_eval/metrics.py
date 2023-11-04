@@ -154,6 +154,13 @@ def ter(items):
     return sacrebleu.corpus_ter(preds, refs).score
 
 
+def fertility(items):
+    tokens = sum(item['tokens'] for item in items if item['include'])
+    words = sum(item['words'] for item in items if item['include'])
+
+    return tokens / words if tokens != 0 and words != 0 else float('nan')
+
+
 def is_non_str_iterable(obj):
     return isinstance(obj, Iterable) and not isinstance(obj, str)
 

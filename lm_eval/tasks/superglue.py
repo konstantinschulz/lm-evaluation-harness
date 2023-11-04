@@ -13,7 +13,7 @@ import numpy as np
 import sklearn
 import transformers.data.metrics.squad_metrics as squad_metrics
 from lm_eval.base import rf, Task
-from lm_eval.metrics import mean, acc_all, metric_max_over_ground_truths, yesno
+from lm_eval.metrics import mean, acc_all, metric_max_over_ground_truths, yesno, fertility
 from lm_eval.utils import general_detokenize
 
 
@@ -67,24 +67,45 @@ class BoolQ(Task):
         return " " + yesno(doc["label"])
 
     def construct_requests(self, doc, ctx):
-        ll_yes, _ = rf.loglikelihood(ctx, " yes")
-        ll_no, _ = rf.loglikelihood(ctx, " no")
+        ll_yes, _, req_stats = rf.loglikelihood_reqstats(ctx, " yes")
+        ll_no, _, _ = rf.loglikelihood_reqstats(ctx, " no")
 
-        return ll_yes, ll_no
+        return ll_yes, ll_no, req_stats
 
     def process_results(self, doc, results):
-        ll_yes, ll_no = results
+        ll_yes, ll_no, req_stats = results
+
         gold = doc["label"]
 
-        acc = 1.0 if (ll_yes > ll_no) == gold else 0.0
+        token_ctx_count =  req_stats["tokens_ctx"]
+        word_ctx_count =  req_stats["words_ctx"]
 
-        return {"acc": acc}
+        pred = ll_yes > ll_no
+
+        acc = 1.0 if pred == gold else 0.0
+
+        return {
+            "acc": acc,
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+        }
 
     def higher_is_better(self):
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
 
     def aggregation(self):
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility
+        }
 
 
 class CommitmentBank(Task):
@@ -121,22 +142,42 @@ class CommitmentBank(Task):
         # Neither = neutral
         return " {}".format({0: "True", 1: "False", 2: "Neither"}[doc["label"]])
 
+    # TODO: vgl. Kommentar TwoChoiceTask
     def construct_requests(self, doc, ctx):
-        ll_true, _ = rf.loglikelihood(ctx, " True")
-        ll_false, _ = rf.loglikelihood(ctx, " False")
-        ll_neither, _ = rf.loglikelihood(ctx, " Neither")
+        ll_true, _, req_stats = rf.loglikelihood_reqstats(ctx, " True")
+        ll_false, _, _ = rf.loglikelihood_reqstats(ctx, " False")
+        ll_neither, _, _ = rf.loglikelihood_reqstats(ctx, " Neither")
 
-        return ll_true, ll_false, ll_neither
+        return ll_true, ll_false, ll_neither, req_stats
 
     def process_results(self, doc, results):
+        ll_true, ll_false, ll_neither, req_stats = results
+
         gold = doc["label"]
-        pred = np.argmax(results)
+
+        pred = np.argmax([ll_true, ll_false, ll_neither])
+
         acc = 1.0 if pred == gold else 0.0
 
-        return {"acc": acc, "f1": (pred, gold)}
+        token_ctx_count =  req_stats["tokens_ctx"]
+        word_ctx_count =  req_stats["words_ctx"]
+
+        return {
+            "acc": acc,
+            "f1": (pred, gold),
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+            }
 
     def higher_is_better(self):
-        return {"acc": True, "f1": True}
+        return {
+            "acc": True,
+            "f1": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
 
     @classmethod
     def cb_multi_fi(cls, items):
@@ -153,6 +194,9 @@ class CommitmentBank(Task):
         return {
             "acc": mean,
             "f1": self.cb_multi_fi,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility
         }
 
 
@@ -195,23 +239,56 @@ class Copa(Task):
         choice1 = " " + self.convert_choice(doc["choice1"])
         choice2 = " " + self.convert_choice(doc["choice2"])
 
-        ll_choice1, _ = rf.loglikelihood(ctx, choice1)
-        ll_choice2, _ = rf.loglikelihood(ctx, choice2)
+        ll_choice1, _, req_stats1 = rf.loglikelihood_reqstats(ctx, choice1)
+        ll_choice2, _, req_stats2 = rf.loglikelihood_reqstats(ctx, choice2)
 
-        return ll_choice1, ll_choice2
+        return ll_choice1, ll_choice2, req_stats1, req_stats2
 
     def process_results(self, doc, results):
-        gold = doc["label"]
-        pred = np.argmax(results)
-        acc = 1.0 if pred == gold else 0.0
+        ll_choice1, ll_choice2, req_stats1, req_stats2 = results
 
-        return {"acc": acc}
+        gold = doc["label"]
+        pred = np.argmax([ll_choice1, ll_choice2])
+
+        acc = 1.0 if pred == gold else 0.0
+        req_stats = req_stats1 if pred == 0 else req_stats2
+
+        token_ctx_count = req_stats["tokens_ctx"]
+        word_ctx_count = req_stats["words_ctx"]
+        token_cont_count = req_stats["tokens_cont"]
+        word_cont_count = req_stats["words_cont"]
+
+        return {
+            "acc": acc,
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+            "fertility_cont": {"tokens": token_cont_count, "words": word_cont_count, "include": True},
+            "fertility_cont_pos": {"tokens": token_cont_count, "words": word_cont_count, "include": pred == gold},
+            "fertility_cont_neg": {"tokens": token_cont_count, "words": word_cont_count, "include": pred != gold},
+            }
 
     def higher_is_better(self):
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+            "fertility_cont": False,
+            "fertility_cont_pos": False,
+            "fertility_cont_neg": False,
+        }
 
     def aggregation(self):
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+            "fertility_cont": fertility,
+            "fertility_cont_pos": fertility,
+            "fertility_cont_neg": fertility,
+        }
 
     @staticmethod
     def convert_choice(choice):
@@ -401,24 +478,45 @@ class WordsInContext(Task):
         return " {}".format({0: "no", 1: "yes"}[doc["label"]])
 
     def construct_requests(self, doc, ctx):
-        ll_yes, _ = rf.loglikelihood(ctx, " yes")
-        ll_no, _ = rf.loglikelihood(ctx, " no")
+        ll_yes, _, req_stats = rf.loglikelihood_reqstats(ctx, " yes")
+        ll_no, _, _ = rf.loglikelihood_reqstats(ctx, " no")
 
-        return ll_yes, ll_no
+        return ll_yes, ll_no, req_stats
 
     def process_results(self, doc, results):
-        ll_yes, ll_no = results
+        ll_yes, ll_no, req_stats = results
+
         gold = doc["label"]
 
-        acc = 1.0 if (ll_yes > ll_no) == gold else 0.0
+        pred = ll_yes > ll_no
 
-        return {"acc": acc}
+        acc = 1.0 if pred == gold else 0.0
+
+        token_ctx_count =  req_stats["tokens_ctx"]
+        word_ctx_count =  req_stats["words_ctx"]
+
+        return {
+            "acc": acc,
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+            }
 
     def higher_is_better(self):
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
 
     def aggregation(self):
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility
+            }
 
 
 class SGWinogradSchemaChallenge(Task):
@@ -468,21 +566,42 @@ class SGWinogradSchemaChallenge(Task):
         return " " + yesno(doc["label"])
 
     def construct_requests(self, doc, ctx):
-        ll_yes, _ = rf.loglikelihood(ctx, " yes")
-        ll_no, _ = rf.loglikelihood(ctx, " no")
+        ll_yes, _, req_stats = rf.loglikelihood_reqstats(ctx, " yes")
+        ll_no, _, _ = rf.loglikelihood_reqstats(ctx, " no")
 
-        return ll_yes, ll_no
+        return ll_yes, ll_no, req_stats
 
     def process_results(self, doc, results):
-        ll_yes, ll_no = results
+        ll_yes, ll_no, req_stats = results
+
         gold = doc["label"]
 
-        acc = 1.0 if (ll_yes > ll_no) == gold else 0.0
+        pred = ll_yes > ll_no
 
-        return {"acc": acc}
+        token_ctx_count = req_stats["tokens_ctx"]
+        word_ctx_count = req_stats["words_ctx"]
+
+        acc = 1.0 if pred == gold else 0.0
+
+        return {
+            "acc": acc,
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+            }
 
     def higher_is_better(self):
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+            }
 
     def aggregation(self):
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility
+            }

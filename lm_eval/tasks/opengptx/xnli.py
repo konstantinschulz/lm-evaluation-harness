@@ -16,7 +16,7 @@ and may differ from the ones used by mGPT and XGLM (they do not provide their pr
 """
 import numpy as np
 from lm_eval.base import rf, Task
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean, fertility
 
 _CITATIONS = """
 @InProceedings{conneau2018xnli,
@@ -99,13 +99,13 @@ class XNLIBase(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        ll_true = rf.loglikelihood_rolling(ctx.replace("[MASK]", self.ENTAILMENT_LABEL))
-        ll_neither = rf.loglikelihood_rolling(ctx.replace("[MASK]", self.NEUTRAL_LABEL))
-        ll_false = rf.loglikelihood_rolling(
-            ctx.replace("[MASK]", self.CONTRADICTION_LABEL)
-        )
 
-        return ll_true, ll_neither, ll_false
+        ll_true, req_stats_true = rf.loglikelihood_rolling_reqstats(ctx.replace("[MASK]", self.ENTAILMENT_LABEL))
+        ll_neither, req_stats_neither = rf.loglikelihood_rolling_reqstats(ctx.replace("[MASK]", self.NEUTRAL_LABEL))
+        ll_false, req_stats_false = rf.loglikelihood_rolling_reqstats(ctx.replace("[MASK]", self.CONTRADICTION_LABEL) )
+
+        # TODO vgl TwoChoiceTask --> Gruppieren bzw. Comprehensions verwenden
+        return ll_true, ll_neither, ll_false, req_stats_true, req_stats_neither, req_stats_false
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -117,9 +117,24 @@ class XNLIBase(Task):
         :param results:
             The results of the requests created in construct_requests.
         """
+
+        ll_true, ll_neither, ll_false, req_stats_true, req_stats_neither, req_stats_false = results
+
         gold = doc["label"]
-        pred = np.argmax(results)
-        return {"acc": pred == gold}
+        pred = np.argmax([ll_true, ll_neither, ll_false])
+
+        req_stats = [req_stats_true, req_stats_neither, req_stats_false]
+        pred_req_stats = req_stats[pred]
+
+        token_count =  pred_req_stats["tokens"]
+        word_count =  pred_req_stats["words"]
+
+        return {
+            "acc": pred == gold,
+            "fertility_ctx": {"tokens": token_count, "words": word_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_count, "words": word_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_count, "words": word_count, "include": pred != gold},
+        }
 
     def aggregation(self):
         """
@@ -127,7 +142,12 @@ class XNLIBase(Task):
             A dictionary where keys are the names of submetrics and values are
             functions that aggregate a list of metrics
         """
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+        }
 
     def higher_is_better(self):
         """
@@ -135,7 +155,12 @@ class XNLIBase(Task):
             A dictionary where keys are the names of submetrics and values are
             whether a higher value of the submetric is better
         """
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
 
 
 class XNLI_en(XNLIBase):  # English

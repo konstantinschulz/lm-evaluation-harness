@@ -12,7 +12,7 @@ Homepage: https://nlp.cs.washington.edu/triviaqa/
 import inspect
 import lm_eval.datasets.triviaqa.triviaqa
 from lm_eval.base import Task, rf
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean, fertility
 
 
 _CITATION = """
@@ -74,19 +74,48 @@ class TriviaQA(Task):
         return ret
 
     def construct_requests(self, doc, ctx):
-        ret = []
-        for alias in self._remove_prefixes(doc["answer"]["aliases"]):
-            _, is_prediction = rf.loglikelihood(ctx, " " + alias)
-            ret.append(is_prediction)
-        return ret
+        requests = [rf.loglikelihood_reqstats(ctx, " " + alias) for alias in self._remove_prefixes(doc["answer"]["aliases"])]
+
+        return requests
 
     def process_results(self, doc, results):
-        return {"acc": float(any(results))}
+        preds = [result[1] for result in results]
+        reqs_stats = [result[2] for result in results]
+
+        token_ctx_count = reqs_stats[0]["tokens_ctx"]
+        word_ctx_count = reqs_stats[0]["words_ctx"]
+
+        token_cont_count = mean([req_stats['tokens_cont'] for req_stats in reqs_stats])
+        word_cont_count = mean([req_stats['words_cont'] for req_stats in reqs_stats])
+
+        return {
+            "acc": float(any(preds)),
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": any(preds)},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": not any(preds)},
+            "fertility_cont": {"tokens": token_cont_count, "words": word_cont_count, "include": True},
+            "fertility_cont_pos": {"tokens": token_cont_count, "words": word_cont_count, "include": any(preds)},
+            "fertility_cont_neg": {"tokens": token_cont_count, "words": word_cont_count, "include": not any(preds)},
+        }
 
     def aggregation(self):
         return {
             "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+            "fertility_cont": fertility,
+            "fertility_cont_pos": fertility,
+            "fertility_cont_neg": fertility,
         }
 
     def higher_is_better(self):
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+            "fertility_cont": False,
+            "fertility_cont_pos": False,
+            "fertility_cont_neg": False,
+        }

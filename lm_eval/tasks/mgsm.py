@@ -25,7 +25,7 @@ Homepage: https://github.com/google-research/url-nlp/tree/main/mgsm
 """
 import re
 from lm_eval.base import Task, rf
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean, fertility
 
 
 _CITATION = """
@@ -99,8 +99,10 @@ class MGSM(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        completion = rf.greedy_until(ctx, {"until": ["\n", ":", self.QUESTION]})
-        return completion
+        # completion = rf.greedy_until(ctx, {"until": ["\n", ":", self.QUESTION]})
+        completion, req_stats = rf.greedy_until_reqstats(ctx, {"until": ["\n", ":", self.QUESTION]})
+
+        return completion, req_stats
 
     def _extract_answer(self, completion):
         match = re.findall(ANS_RE, completion)
@@ -124,9 +126,23 @@ class MGSM(Task):
         :param results:
             The results of the requests created in construct_requests.
         """
+
         completion = results[0]
+        req_stats = results[1]
+
         answer = doc["answer_number"]
-        return {"acc": self._is_correct(completion, answer)}
+
+        token_count =  req_stats["tokens_ctx"]
+        word_count =  req_stats["words_ctx"]
+
+        is_correct = self._is_correct(completion, answer)
+
+        return {
+            "acc": is_correct,
+            "fertility_ctx": {"tokens": token_count, "words": word_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_count, "words": word_count, "include": is_correct },
+            "fertility_ctx_neg": {"tokens": token_count, "words": word_count, "include": not is_correct},
+        }
 
     def aggregation(self):
         """
@@ -134,7 +150,12 @@ class MGSM(Task):
             A dictionary where keys are the names of submetrics and values are
             functions that aggregate a list of metrics
         """
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+        }
 
     def higher_is_better(self):
         """
@@ -142,7 +163,12 @@ class MGSM(Task):
             A dictionary where keys are the names of submetrics and values are
             whether a higher value of the submetric is better
         """
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
 
 
 class MGSM_English(MGSM):

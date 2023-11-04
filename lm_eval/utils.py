@@ -11,7 +11,7 @@ from typing import List, Union
 import torch
 
 from omegaconf import OmegaConf
-
+from tokenizers.pre_tokenizers import Whitespace
 
 class ExitCodeError(Exception):
     pass
@@ -83,6 +83,14 @@ def group(arr, fn):
         res[fn(ob)].append(ob)
 
     return list(res.values())
+
+
+whitespace_pre_tokenizer = Whitespace()
+
+
+def count_words(str):
+    str_list = whitespace_pre_tokenizer.pre_tokenize_str(str)
+    return len(str_list)
 
 
 def _is_json_task(task_name):

@@ -27,7 +27,7 @@ and may differ from the ones used by mGPT and XGLM (they do not provide their pr
 """
 import datasets
 from lm_eval.base import Task, rf
-from lm_eval.metrics import mean
+from lm_eval.metrics import mean, fertility
 from functools import partial
 import numpy as np
 
@@ -136,7 +136,10 @@ class PAWSXBase(Task):
         ll_yes = rf.loglikelihood_rolling(ctx.replace("[MASK]", self.YES))
         ll_no = rf.loglikelihood_rolling(ctx.replace("[MASK]", self.NO))
 
-        return ll_yes, ll_no
+        ll_yes, req_stats_yes = rf.loglikelihood_rolling_reqstats(ctx.replace("[MASK]", self.YES))
+        ll_no, req_stats_no = rf.loglikelihood_rolling_reqstats(ctx.replace("[MASK]", self.NO))
+
+        return ll_yes, ll_no, req_stats_yes, req_stats_no
 
     def process_results(self, doc, results):
         """Take a single document and the LM results and evaluates, returning a
@@ -148,9 +151,14 @@ class PAWSXBase(Task):
         :param results:
             The results of the requests created in construct_requests.
         """
-        ll_yes, ll_no = results
+        ll_yes, ll_no, req_stats_yes, req_stats_no = results
 
         pred = ll_yes > ll_no
+
+        pred_req_stats = req_stats_yes if ll_yes > ll_no else req_stats_no
+
+        token_count =  pred_req_stats["tokens"]
+        word_count =  pred_req_stats["words"]
 
         true_label = doc["label"]
 
@@ -159,6 +167,9 @@ class PAWSXBase(Task):
             "precision": (true_label, pred),
             "recall": (true_label, pred),
             "f1": (true_label, pred),
+            "fertility_ctx": {"tokens": token_count, "words": word_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_count, "words": word_count, "include": pred == true_label},
+            "fertility_ctx_neg": {"tokens": token_count, "words": word_count, "include": pred != true_label},
         }
 
     def aggregation(self):
@@ -172,10 +183,21 @@ class PAWSXBase(Task):
             "precision": _pawsx_agg_precision,
             "recall": _pawsx_agg_recall,
             "f1": _pawsx_agg_f1,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
         }
 
     def higher_is_better(self):
-        return {"acc": True, "precision": True, "recall": True, "f1": True}
+        return {
+            "acc": True,
+            "precision": True,
+            "recall": True,
+            "f1": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
 
 
 class PAWSX_en(PAWSXBase):

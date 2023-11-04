@@ -123,8 +123,9 @@ class XCODAHBase(MultipleChoiceTask):
 
     def construct_requests(self, doc, ctx):
         # adapted function for construct_requests to exclude the first sentence of doc["choices"] as this is the context
+        # TODO: Eventuell könnte eine Methode, die für ein doc die zugehörige Continuation liefert, alle Spezialfälle abdecken
         lls = [
-            rf.loglikelihood(ctx, " {}".format(choice[choice.find(".") + 2 :]))[0]
+            rf.loglikelihood_reqstats(ctx, " {}".format(choice[choice.find(".") + 2 :]))
             for choice in doc["choices"]
         ]
         return lls

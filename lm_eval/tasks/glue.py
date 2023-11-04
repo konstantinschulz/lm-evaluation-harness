@@ -15,7 +15,7 @@ Homepage: https://gluebenchmark.com/
 """
 import numpy as np
 from lm_eval.base import rf, Task
-from lm_eval.metrics import mean, matthews_corrcoef, f1_score, yesno
+from lm_eval.metrics import mean, matthews_corrcoef, f1_score, yesno, fertility
 from lm_eval.utils import general_detokenize
 
 
@@ -43,6 +43,43 @@ _CITATION = """
 
 
 # Single-Sentence Tasks
+
+# TODO: In base.py verschieben, evtl. mit MultipleChoiceTask kombinieren oder gemeinsame Oberklasse extrahieren
+# TODO: Wenn man die Labels eine ein Klassenfeld auslagert, dann kann man die construct_requests auch hier implementieren; hier: `LABELS: List[str]`, in der Unterklasse z.B. `LABELS = ['Yes', 'No']``
+class TwoChoiceTask(Task):
+    # TODO: Man müsste die lls eigentlich nicht in Variablen entpacken weil True und False nicht gesondert behandelt werden. Stattdessen könnte man in den zugehörigen construct_requests als Liste oder Tupel zurückgeben, d.h. z.B. `return (ll_true, ll_false), doc_stats`, und hier einfach np.argmax verwenden. Dann wäre es nicht mehr auf 2 Choices beschränkt und würde immer funktionieren wenn man diese vier Metriken benötigt
+    def process_results(self, doc, results):
+        ll_true, ll_false, req_stats = results
+
+        gold = doc["label"]
+
+        pred = ll_true > ll_false
+
+        token_ctx_count = req_stats["tokens_ctx"]
+        word_ctx_count = req_stats["words_ctx"]
+
+        return {
+            "acc": pred == gold,
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+        }
+
+    def higher_is_better(self):
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
+
+    def aggregation(self):
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility
+        }
 
 
 class CoLA(Task):
@@ -99,7 +136,7 @@ class CoLA(Task):
         return {"mcc": matthews_corrcoef}
 
 
-class SST(Task):
+class SST(TwoChoiceTask):
     VERSION = 0
     DATASET_PATH = "glue"
     DATASET_NAME = "sst2"
@@ -130,22 +167,10 @@ class SST(Task):
         return " {}".format({1: "positive", 0: "negative"}[doc["label"]])
 
     def construct_requests(self, doc, ctx):
-        ll_positive, _ = rf.loglikelihood(ctx, " positive")
-        ll_negative, _ = rf.loglikelihood(ctx, " negative")
-        return ll_positive, ll_negative
+        ll_positive, _, req_stats = rf.loglikelihood_reqstats(ctx, " positive")
+        ll_negative, _, _ = rf.loglikelihood_reqstats(ctx, " negative")
 
-    def process_results(self, doc, results):
-        ll_positive, ll_negative = results
-        pred = ll_positive > ll_negative
-        gold = doc["label"]
-        return {"acc": pred == gold}
-
-    def higher_is_better(self):
-        return {"acc": True}
-
-    def aggregation(self):
-        return {"acc": mean}
-
+        return ll_positive, ll_negative, req_stats
 
 # Inference Tasks
 
@@ -190,22 +215,45 @@ class MNLI(Task):
         # Neither = neutral
         return " {}".format({0: "True", 1: "Neither", 2: "False"}[doc["label"]])
 
+    # TODO: Wenn man TwoChoiceTask auf beliebig lange Listen erweitert, könnte man das hier auch damit abdecken. Die Metriken sind ja identisch.
     def construct_requests(self, doc, ctx):
-        ll_true, _ = rf.loglikelihood(ctx, " True")
-        ll_neither, _ = rf.loglikelihood(ctx, " Neither")
-        ll_false, _ = rf.loglikelihood(ctx, " False")
-        return ll_true, ll_neither, ll_false
+        ll_true, _, req_stats = rf.loglikelihood_reqstats(ctx, " True")
+        ll_neither, _, _ = rf.loglikelihood_reqstats(ctx, " Neither")
+        ll_false, _, _ = rf.loglikelihood_reqstats(ctx, " False")
+
+        return ll_true, ll_neither, ll_false, req_stats
 
     def process_results(self, doc, results):
+        ll_true, ll_neither, ll_false, req_stats = results
+
         gold = doc["label"]
-        pred = np.argmax(results)
-        return {"acc": pred == gold}
+        pred = np.argmax([ll_true, ll_neither, ll_false])
+
+        token_ctx_count =  req_stats["tokens_ctx"]
+        word_ctx_count =  req_stats["words_ctx"]
+
+        return {
+            "acc": pred == gold,
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
+        }
 
     def higher_is_better(self):
-        return {"acc": True}
+        return {
+            "acc": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
 
     def aggregation(self):
-        return {"acc": mean}
+        return {
+            "acc": mean,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility
+        }
 
 
 class MNLIMismatched(MNLI):
@@ -273,7 +321,7 @@ class QNLI(Task):
         return {"acc": mean}
 
 
-class WNLI(Task):
+class WNLI(TwoChoiceTask):
     VERSION = 1
     DATASET_PATH = "glue"
     DATASET_NAME = "wnli"
@@ -306,25 +354,15 @@ class WNLI(Task):
         # False = not_entailment
         return " {}".format({0: "False", 1: "True"}[doc["label"]])
 
+    # TODO cf. TwoChoiceTasks.construct_requests
     def construct_requests(self, doc, ctx):
-        ll_true, _ = rf.loglikelihood(ctx, " True")
-        ll_false, _ = rf.loglikelihood(ctx, " False")
-        return ll_true, ll_false
+        ll_true, _, req_stats = rf.loglikelihood_reqstats(ctx, " True")
+        ll_false, _, _ = rf.loglikelihood_reqstats(ctx, " False")
 
-    def process_results(self, doc, results):
-        ll_true, ll_false = results
-        pred = ll_true > ll_false
-        gold = doc["label"]
-        return {"acc": pred == gold}
-
-    def higher_is_better(self):
-        return {"acc": True}
-
-    def aggregation(self):
-        return {"acc": mean}
+        return ll_true, ll_false, req_stats
 
 
-class RTE(Task):
+class RTE(TwoChoiceTask):
     VERSION = 0
     DATASET_PATH = "glue"
     DATASET_NAME = "rte"
@@ -358,21 +396,12 @@ class RTE(Task):
         return " {}".format({0: "True", 1: "False"}[doc["label"]])
 
     def construct_requests(self, doc, ctx):
-        ll_true, _ = rf.loglikelihood(ctx, " True")
-        ll_false, _ = rf.loglikelihood(ctx, " False")
-        return ll_true, ll_false
+        ll_true, _, req_stats = rf.loglikelihood_reqstats(ctx, " True")
+        ll_false, _, _ = rf.loglikelihood_reqstats(ctx, " False")
 
-    def process_results(self, doc, results):
-        ll_true, ll_false = results
-        pred = ll_false > ll_true
-        gold = doc["label"]
-        return {"acc": pred == gold}
+        # switched true and false since pred = ll_false > ll_true for this task
 
-    def higher_is_better(self):
-        return {"acc": True}
-
-    def aggregation(self):
-        return {"acc": mean}
+        return ll_false, ll_true, req_stats
 
 
 # Similarity and Paraphrase Tasks
@@ -410,24 +439,45 @@ class MRPC(Task):
         return " {}".format(yesno(doc["label"]))
 
     def construct_requests(self, doc, ctx):
-        ll_yes, _ = rf.loglikelihood(ctx, " yes")
-        ll_no, _ = rf.loglikelihood(ctx, " no")
-        return ll_yes, ll_no
+        ll_yes, _, req_stats = rf.loglikelihood_reqstats(ctx, " yes")
+        ll_no, _, _ = rf.loglikelihood_reqstats(ctx, " no")
+
+        return ll_yes, ll_no, req_stats
 
     def process_results(self, doc, results):
-        ll_yes, ll_no = results
+        ll_yes, ll_no, req_stats = results
+
         gold = doc["label"]
         pred = ll_yes > ll_no
+
+        token_ctx_count = req_stats["tokens_ctx"]
+        word_ctx_count = req_stats["words_ctx"]
+
         return {
             "acc": pred == gold,
             "f1": (gold, pred),
+            "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+            "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred == gold},
+            "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": pred != gold},
         }
 
     def higher_is_better(self):
-        return {"acc": True, "f1": True}
+        return {
+            "acc": True,
+            "f1": True,
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+        }
 
     def aggregation(self):
-        return {"acc": mean, "f1": f1_score}
+        return {
+            "acc": mean,
+            "f1": f1_score,
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+        }
 
 
 class QQP(Task):
