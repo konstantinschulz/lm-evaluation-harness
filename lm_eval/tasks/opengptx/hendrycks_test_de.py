@@ -185,9 +185,6 @@ class GeneralHendrycksTest(MultipleChoiceTask):
     def validation_docs(self):
         return map(self._process_doc, self.dataset["validation"])
 
-    def test_docs(self):
-        return map(self._process_doc, self.dataset["test"])
-
     def _format_subject(self, subject):
         index = SUBJECTS.index(subject)
         subject = SUBJECTS_DE[index]
@@ -226,17 +223,6 @@ class GeneralHendrycksTest(MultipleChoiceTask):
             if isinstance(doc["answer"], str)
             else doc["answer"],
         }
-
-    def fewshot_examples(self, k, rnd):
-        # fewshot_examples is not just sampling from train_docs because dev is
-        # in the same distribution as val/test but auxiliary_train isn't
-
-        if self._fewshot_docs is None:
-            self._fewshot_docs = list(map(self._process_doc, self.dataset["dev"]))
-
-        # use the unchanged order of the dev set without sampling,
-        # just as in the original code https://github.com/hendrycks/test/blob/master/evaluate.py#L28
-        return self._fewshot_docs[:k]
 
     def doc_to_text(self, doc):
         return doc["query"]
