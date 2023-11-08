@@ -178,7 +178,8 @@ class BaseLM(LM):
             else:
                 context_enc = self.tok_encode(context)
 
-            continuation_enc = self.tok_encode(continuation)
+            continuation_enc = self.tok_encode(
+                continuation, is_continuation=True)
 
             new_reqs.append(((context, continuation), context_enc, continuation_enc))
 

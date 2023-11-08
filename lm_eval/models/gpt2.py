@@ -142,8 +142,15 @@ class HFLM(BaseLM):
         # TODO: fix multi-gpu
         return self._device
 
-    def tok_encode(self, string: str):
-        return self.tokenizer.encode(string, add_special_tokens=False)
+    def tok_encode(self, string: str, is_continuation=False):
+        if self.tokenizer.__class__.__name__ == 'SPTokenizer':
+            return self.tokenizer.encode(
+                string,
+                add_special_tokens=False,
+                is_continuation=is_continuation,
+            )
+        else:
+            return self.tokenizer.encode(string, add_special_tokens=False)
 
     def tok_decode(self, tokens):
         return self.tokenizer.decode(tokens)
