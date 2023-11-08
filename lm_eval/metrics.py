@@ -90,6 +90,9 @@ def metric_max_over_ground_truths(metric_fn, prediction, ground_truths):
         scores_for_ground_truths.append(score)
     return max(scores_for_ground_truths)
 
+def nll(items):
+    return -mean(items)
+
 
 def perplexity(items):
     return math.exp(-mean(items))

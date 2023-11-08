@@ -68,6 +68,7 @@ class FloresBase(Task):
         ll = results[0]
         return {
             "ppl": ll,
+            "nll": ll,
         }
 
     def aggregation(self):
@@ -78,6 +79,7 @@ class FloresBase(Task):
         """
         return {
             "ppl": metrics.perplexity,
+            "nll": metrics.nll,
         }
 
     def higher_is_better(self):
@@ -88,6 +90,7 @@ class FloresBase(Task):
         """
         return {
             "ppl": False,
+            "nll": False,
         }
 
     def __str__(self):
