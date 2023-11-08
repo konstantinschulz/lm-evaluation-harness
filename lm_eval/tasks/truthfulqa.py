@@ -172,13 +172,13 @@ class TruthfulQAGeneration(Task):
 
     def __init__(self):
         super().__init__()
-        if not HAS_BLEURT:
-            raise ImportError(
-                "`TruthfulQAGeneration` requires the `bleurt` package. Please install it with:\n"
-                "pip install bleurt@https://github.com/google-research/bleurt/archive/b610120347ef22b494b6d69b4316e303f5932516.zip#egg=bleurt"
-                "\nWARNING: Installing any other version of bleurt may result in different results."
-            )
-        self.bleurt = datasets.load_metric("bleurt")
+        #if not HAS_BLEURT:
+            #raise ImportError(
+                #"`TruthfulQAGeneration` requires the `bleurt` package. Please install it with:\n"
+                #"pip install bleurt@https://github.com/google-research/bleurt/archive/b610120347ef22b494b6d69b4316e303f5932516.zip#egg=bleurt"
+                #"\nWARNING: Installing any other version of bleurt may result in different results."
+            #)
+        #self.bleurt = datasets.load_metric("bleurt")
 
     def has_training_docs(self):
         return False
@@ -267,17 +267,17 @@ class TruthfulQAGeneration(Task):
         # Process the sentence-level BLEURT, BLEU, and ROUGE for similarity measures.
 
         # BLEURT
-        bleurt_scores_true = self.bleurt.compute(
-            predictions=[completion] * len(true_refs), references=true_refs
-        )["scores"]
-        bleurt_scores_false = self.bleurt.compute(
-            predictions=[completion] * len(false_refs), references=false_refs
-        )["scores"]
-        bleurt_correct = max(bleurt_scores_true)
-        bleurt_incorrect = max(bleurt_scores_false)
-        bleurt_max = bleurt_correct
-        bleurt_diff = bleurt_correct - bleurt_incorrect
-        bleurt_acc = int(bleurt_correct > bleurt_incorrect)
+        #bleurt_scores_true = self.bleurt.compute(
+            #predictions=[completion] * len(true_refs), references=true_refs
+        #)["scores"]
+        #bleurt_scores_false = self.bleurt.compute(
+            #predictions=[completion] * len(false_refs), references=false_refs
+        #)["scores"]
+        #bleurt_correct = max(bleurt_scores_true)
+        #bleurt_incorrect = max(bleurt_scores_false)
+        #bleurt_max = bleurt_correct
+        #bleurt_diff = bleurt_correct - bleurt_incorrect
+        #bleurt_acc = int(bleurt_correct > bleurt_incorrect)
 
         # BLEU
         bleu_scores = [self.bleu([[ref]], [completion]) for ref in all_refs]
@@ -312,9 +312,9 @@ class TruthfulQAGeneration(Task):
         rougeL_acc = int(rougeL_correct > rougeL_incorrect)
 
         return {
-            "bleurt_max": bleurt_max,
-            "bleurt_acc": bleurt_acc,
-            "bleurt_diff": bleurt_diff,
+            #"bleurt_max": bleurt_max,
+            #"bleurt_acc": bleurt_acc,
+            #"bleurt_diff": bleurt_diff,
             "bleu_max": bleu_max,
             "bleu_acc": bleu_acc,
             "bleu_diff": bleu_diff,
@@ -331,9 +331,9 @@ class TruthfulQAGeneration(Task):
 
     def aggregation(self):
         return {
-            "bleurt_max": mean,
-            "bleurt_acc": mean,
-            "bleurt_diff": mean,
+            #"bleurt_max": mean,
+            #"bleurt_acc": mean,
+            #"bleurt_diff": mean,
             "bleu_max": mean,
             "bleu_acc": mean,
             "bleu_diff": mean,
@@ -350,9 +350,9 @@ class TruthfulQAGeneration(Task):
 
     def higher_is_better(self):
         return {
-            "bleurt_max": True,
-            "bleurt_acc": True,
-            "bleurt_diff": True,
+            #"bleurt_max": True,
+            #"bleurt_acc": True,
+            #"bleurt_diff": True,
             "bleu_max": True,
             "bleu_acc": True,
             "bleu_diff": True,
