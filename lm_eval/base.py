@@ -179,7 +179,20 @@ class BaseLM(LM):
                 context_enc = self.tok_encode(context)
 
             continuation_enc = self.tok_encode(continuation)
-            # continuation_enc = self.tok_encode(continuation, is_continuation=True)
+            ctx_cont_enc = self.tok_encode(context + continuation)
+
+            if context_enc + continuation_enc != ctx_cont_enc:
+                if ctx_cont_enc[: len(context_enc)] == context_enc:
+                    # continuation_enc is incorrect and context_enc is correct
+                    continuation_enc = ctx_cont_enc[len(context_enc) :]
+                elif ctx_cont_enc[-len(continuation_enc) :] == continuation_enc:
+                    # continuation_enc is correct and context_enc is incorrect
+                    context_enc = ctx_cont_enc[: -len(continuation_enc)]
+                else:
+                    # Both are incorrect
+                    print(
+                        f"WARNING: Unnatural tokenization of concatenated context ...{repr(context[-20:])} and continuation {repr(continuation)}"
+                    )
 
             new_reqs.append(((context, continuation), context_enc, continuation_enc))
 
