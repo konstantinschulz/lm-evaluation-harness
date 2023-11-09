@@ -224,6 +224,16 @@ class GeneralHendrycksTest(MultipleChoiceTask):
             else doc["answer"],
         }
 
+    def fewshot_context(
+        self, doc, num_fewshot, provide_description=None, rnd=None, description=None
+    ):
+        assert (
+            num_fewshot == 0
+        ), "Fewshot prompts are not supported in this version of the task."
+        return super().fewshot_context(
+            doc=doc, num_fewshot=num_fewshot, rnd=rnd, description=description
+        )
+    
     def doc_to_text(self, doc):
         return doc["query"]
 
