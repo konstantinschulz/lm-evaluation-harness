@@ -65,12 +65,22 @@ class LambadaBase(Task):
 
         token_count = req_stats["tokens_ctx"] + req_stats["tokens_cont"]
         word_count = req_stats["words_ctx"] + req_stats["words_cont"]
+        token_ctx_count = req_stats["tokens_ctx"]
+        word_ctx_count = req_stats["words_ctx"]
+        token_cont_count = req_stats["tokens_cont"]
+        word_cont_count = req_stats["words_cont"]
 
         return {"ppl": ll,
                 "acc": int(is_greedy),
                 "fertility_ctx_cont": {"tokens" : token_count, "words" : word_count, "include": True},
                 "fertility_ctx_cont_pos": {"tokens" : token_count, "words" : word_count, "include": is_greedy},
-                "fertility_ctx_cont_neg": {"tokens" : token_count, "words" : word_count, "include": not is_greedy}}
+                "fertility_ctx_cont_neg": {"tokens" : token_count, "words" : word_count, "include": not is_greedy},
+                "fertility_ctx": {"tokens": token_ctx_count, "words": word_ctx_count, "include": True},
+                "fertility_ctx_pos": {"tokens": token_ctx_count, "words": word_ctx_count, "include": is_greedy},
+                "fertility_ctx_neg": {"tokens": token_ctx_count, "words": word_ctx_count, "include": not is_greedy},
+                "fertility_cont": {"tokens": token_cont_count, "words": word_cont_count, "include": True},
+                "fertility_cont_pos": {"tokens": token_cont_count, "words": word_cont_count, "include": is_greedy},
+                "fertility_cont_neg": {"tokens": token_cont_count, "words": word_cont_count, "include": not is_greedy},}
 
     def aggregation(self):
         return {
@@ -79,7 +89,12 @@ class LambadaBase(Task):
             "fertility_ctx_cont": fertility,
             "fertility_ctx_cont_pos": fertility,
             "fertility_ctx_cont_neg": fertility,
-        }
+            "fertility_ctx": fertility,
+            "fertility_ctx_pos": fertility,
+            "fertility_ctx_neg": fertility,
+            "fertility_cont": fertility,
+            "fertility_cont_pos": fertility,
+            "fertility_cont_neg": fertility,}
 
     def higher_is_better(self):
         return {
@@ -88,7 +103,12 @@ class LambadaBase(Task):
             "fertility_ctx_cont": False,
             "fertility_ctx_cont_pos": False,
             "fertility_ctx_cont_neg": False,
-        }
+            "fertility_ctx": False,
+            "fertility_ctx_pos": False,
+            "fertility_ctx_neg": False,
+            "fertility_cont": False,
+            "fertility_cont_pos": False,
+            "fertility_cont_neg": False,}
 
 
 class LambadaStandard(LambadaBase):
