@@ -1,4 +1,5 @@
 # OpenGPT-X tasks
+from . import belebele
 from . import german_europarl_ppl
 from . import german_ler_ppl
 from . import germanquad
@@ -20,6 +21,7 @@ from . import xnli
 
 TASK_REGISTRY_TMP = {
     # OpenGPT-X tasks
+    **belebele.construct_tasks(),
     "german_europarl_ppl": german_europarl_ppl.GermanEuroparlPerplexity,
     "german_ler_ppl": german_ler_ppl.GermanLERPerplexity,
     "germanquad": germanquad.GermanQuAD,
