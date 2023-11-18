@@ -9,6 +9,7 @@ from . import mlqa
 from . import mlsum
 from . import oscar_ppl
 from . import pawsx
+from . import popqa
 from . import stereoset
 from . import wino_x
 from . import xcsr
@@ -31,6 +32,7 @@ TASK_REGISTRY_TMP = {
     **mlsum.construct_tasks(),
     "oscar_ppl_de": oscar_ppl.OscarPerplexityGerman,
     **pawsx.construct_tasks(),
+    "popqa": popqa.PopQA,
     **stereoset.construct_tasks(),
     **xcsr.construct_tasks(),
     "wino_de": wino_x.WinograndeXDe,
