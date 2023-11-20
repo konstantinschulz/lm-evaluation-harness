@@ -90,7 +90,7 @@ class HuggingFaceAutoLM(BaseLM):
         load_in_8bit: Optional[bool] = False,
         load_in_4bit: Optional[bool] = False,
         trust_remote_code: Optional[bool] = False,
-        gptq_use_triton: Optional[bool] = False,
+        gptq_use_triton: Optional[bool] = False
     ):
         """Initializes a HuggingFace `AutoModel` and `AutoTokenizer` for evaluation.
         Args:

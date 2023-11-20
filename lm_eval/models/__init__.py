@@ -5,6 +5,7 @@ from . import huggingface
 from . import megatronlm
 from . import textsynth
 from . import dummy
+from . import llm_gym
 
 MODEL_REGISTRY = {
     "hf": gpt2.HFLM,
@@ -17,6 +18,7 @@ MODEL_REGISTRY = {
     "megatronlm": megatronlm.MegatronLMClient,
     "textsynth": textsynth.TextSynthLM,
     "dummy": dummy.DummyLM,
+    "llmgym": llm_gym.LLMGym
 }
 
 
