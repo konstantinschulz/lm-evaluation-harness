@@ -1,4 +1,3 @@
-# TODO: Remove all TODO comments once the implementation is complete.
 """
 The Belebele Benchmark: a Parallel Reading Comprehension Dataset in 122 Language Variants
 https://arxiv.org/abs/2308.16884
@@ -25,21 +24,39 @@ _CITATION = """@article{bandarkar2023belebele,
 }
 """
 
-_PROMPT_PATTERN = {
-    "Passage":  "Passage",
-    "Question": "Question",
-    "Answer":   "Answer",
-    "Choices":  "Choices"
-}
-
-class belebeleBase(MultipleChoiceTask):
+class BelebeleBase(MultipleChoiceTask):
     VERSION = 0
-    # TODO: Add the `DATASET_PATH` string. This will be the name of the `Task`
-    # dataset as denoted in HuggingFace `datasets`.
     DATASET_PATH = "facebook/belebele"
 
+    PROMPT_KEYWORDS = {
+    "eng_Latn":["Passage", "Question", "Answer"],
+    "deu_Latn":["Passage", "Frage", "Antwort"],
+    "fra_Latn":["Passage", "Question", "Réponse"],
+    "ita_Latn":["Passaggio", "Domanda", "Risposta"],
+    "spa_Latn":["Pasaje", "Pregunta", "Respuesta"],
+    "bul_Cyrl":["Пасаж", "Въпрос", "Отговор"],
+    "ces_Latn":["Pasáž", "Otázka", "Odpověď"],
+    "dan_Latn":["Passage", "Spørgsmål", "Svar"],
+    "ell_Grek":["Απόσπασμα", "Ερώτηση", "Απάντηση"],
+    "est_Latn":["Passage", "Question", "Answer"],
+    "fin_Latn":["Kohta", "Kysymys", "Vastaus"],
+    "gle_Latn":["Sliocht", "Ceist", "Freagra"],
+    "hrv_Latn":["Odlomak","Pitanje","Odgovor"],
+    "hun_Latn":["Passzus", "Kérdés", "Válasz"],
+    #"lij_Latn":["Fragments", "Jautājums", "Atbilde"],
+    "lit_Latn":["Ištrauka", "Klausimas", "Atsakymas"],
+    "mlt_Latn":["Silta", "Mistoqsija", "Tweġiba"],
+    "nld_Latn":["Passage", "Vraag", "Antwoord"],
+    "pol_Latn":["Fragment", "Pytanie", "Odpowiedź"],
+    "por_Latn":["Passagem", "Pergunta", "Resposta"],
+    "ron_Latn":["Pasaj", "Întrebare", "Răspuns"],
+    "slk_Latn":["Pasáž", "Otázka", "Odpoveď"],
+    "slv_Latn":["Odlomek", "Vprašanje", "Odgovor"],
+    "swe_Latn":["Passage", "Fråga", "Svar"],
+    }
+
     def __init__(self, lang: str = None):
-        self.DATASET_NAME = self.lang_code = lang
+        self.lang_code = lang
         super().__init__()
 
     def has_training_docs(self):
@@ -52,57 +69,33 @@ class belebeleBase(MultipleChoiceTask):
         return True
 
     def test_docs(self):
-        if self.has_test_docs():
-            # TODO: Return the test document generator from `self.dataset`.
-            # In most case you can leave this as is unless the dataset split is
-            # named differently than the default `"test"`.
-            return map(self._process_doc,
-                       self.dataset["train"].filter(
-                           lambda x: x["dialect"]==self.lang_code))
+        return map(self._process_doc, self.dataset[self.lang_code])
 
     def _process_doc(self, doc):
-        def format_example(doc, keys):
-            """
-            Passage: <passage>
-            Question: <prompt>
-            Choices:
-            A. <choice1>
-            B. <choice2>
-            C. <choice3>
-            D. <choice4>
-            Answer:
-            """
+         keywords = self.PROMPT_KEYWORDS[self.lang_code]
+         
+         out_doc = {
+            "query": f"{keywords[0]}: {doc['flores_passage']}\n{keywords[1]}: {doc['question']}\n{keywords[2]}:",
+            "choices": [doc[f"mc_answer{i}"] for i in [1, 2, 3, 4]], 
+            "gold": int(doc["correct_answer_num"])-1, 
+         }
 
-            #TODO: decie whether choices should be included in prommpt (on bloom-1b5-clp: worse performance when included, 0.38 vs 0.27)
-            """
-                                 _PROMPT_PATTERN["Choices"] + "\n" +\
-                     "".join([f"{keys[i-1]}: {doc[f'mc_answer{i}']}\n" for i in range(1,5)]) +\
-            """
-            prompt = _PROMPT_PATTERN["Passage"] + ": " + doc["flores_passage"] + "\n" +\
-                     _PROMPT_PATTERN["Question"] + ": " + doc["question"] + "\n" +\
-                     _PROMPT_PATTERN["Answer"] + ":"
-            return prompt
-        keys = ["A", "B", "C", "D"]
-        return {
-            "query": format_example(doc, keys),  # The query prompt.
-            "choices": [doc[f"mc_answer{i}"] for i in range(1,5)],  # The list of choices.
-            "gold": int(doc["correct_answer_num"])-1,  # The integer used to index into the correct element of `"choices"`.
-        }
+         return out_doc
 
     def doc_to_text(self, doc):
         return doc["query"]
 
-def create_translation_task(language, version=0):
-    class belebele(belebeleBase):
+def create_task(language, version=0):
+    class Belebele(BelebeleBase):
         VERSION = version
 
         def __init__(self):
             super().__init__(language)
 
-    return belebele
+    return Belebele
 
 def construct_tasks():
-    return {f"belebele_{lang}":create_translation_task(lang) for lang in _LANGUAGES}
+    return {f"belebele_{lang}": create_task(lang) for lang in _LANGUAGES}
         
 _LANGUAGES = [
     # "ace_Arab",
@@ -139,35 +132,35 @@ _LANGUAGES = [
     # "bod_Tibt",
     # "bos_Latn",
     # "bug_Latn",
-    # "bul_Cyrl",
+    "bul_Cyrl",
     # "cat_Latn",
     # "ceb_Latn",
-    # "ces_Latn",
+    "ces_Latn",
     # "cjk_Latn",
     # "ckb_Arab",
     # "crh_Latn",
     # "cym_Latn",
-    # "dan_Latn",
+    "dan_Latn",
     "deu_Latn",
     # "dik_Latn",
     # "dyu_Latn",
     # "dzo_Tibt",
-    # "ell_Grek",
+    "ell_Grek",
     "eng_Latn",
     # "epo_Latn",
-    # "est_Latn",
+    "est_Latn",
     # "eus_Latn",
     # "ewe_Latn",
     # "fao_Latn",
     # "fij_Latn",
-    # "fin_Latn",
+    "fin_Latn",
     # "fon_Latn",
     "fra_Latn",
     # "fur_Latn",
     # "fuv_Latn",
     # "gaz_Latn",
     # "gla_Latn",
-    # "gle_Latn",
+    "gle_Latn",
     # "glg_Latn",
     # "grn_Latn",
     # "guj_Gujr",
@@ -176,8 +169,8 @@ _LANGUAGES = [
     # "heb_Hebr",
     # "hin_Deva",
     # "hne_Deva",
-    # "hrv_Latn",
-    # "hun_Latn",
+    "hrv_Latn",
+    "hun_Latn",
     # "hye_Armn",
     # "ibo_Latn",
     # "ilo_Latn",
@@ -211,7 +204,7 @@ _LANGUAGES = [
     # "lij_Latn",
     # "lim_Latn",
     # "lin_Latn",
-    # "lit_Latn",
+    "lit_Latn",
     # "lmo_Latn",
     # "ltg_Latn",
     # "ltz_Latn",
@@ -227,12 +220,12 @@ _LANGUAGES = [
     # "min_Arab",
     # "min_Latn",
     # "mkd_Cyrl",
-    # "mlt_Latn",
+    "mlt_Latn",
     # "mni_Beng",
     # "mos_Latn",
     # "mri_Latn",
     # "mya_Mymr",
-    # "nld_Latn",
+    "nld_Latn",
     # "nno_Latn",
     # "nob_Latn",
     # "npi_Deva",
@@ -247,11 +240,11 @@ _LANGUAGES = [
     # "pbt_Arab",
     # "pes_Arab",
     # "plt_Latn",
-    # "pol_Latn",
-    # "por_Latn",
+    "pol_Latn",
+    "por_Latn",
     # "prs_Arab",
     # "quy_Latn",
-    # "ron_Latn",
+    "ron_Latn",
     # "run_Latn",
     # "rus_Cyrl",
     # "sag_Latn",
@@ -260,8 +253,8 @@ _LANGUAGES = [
     # "scn_Latn",
     # "shn_Mymr",
     # "sin_Sinh",
-    # "slk_Latn",
-    # "slv_Latn",
+    "slk_Latn",
+    "slv_Latn",
     # "smo_Latn",
     # "sna_Latn",
     # "snd_Arab",
@@ -272,7 +265,7 @@ _LANGUAGES = [
     # "srp_Cyrl",
     # "ssw_Latn",
     # "sun_Latn",
-    # "swe_Latn",
+    "swe_Latn",
     # "swh_Latn",
     # "szl_Latn",
     # "tam_Taml",
