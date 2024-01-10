@@ -24,7 +24,7 @@ _CITATION = """
 }
 """
 
-LANGS = ["BG","DA","DE","ET","FI","FR","EL","IT","LV","LT","NL","PL","PT-PT","RO","SV","SK","SL","ES","CS","HU"]
+LANGS = ['DE', 'FR', 'IT', 'ES']
 
 SUBJECTS = [
     "abstract_algebra",
@@ -92,7 +92,7 @@ def create_all_tasks():
     :return: {task_name: task}
         e.g. {hendrycksTest-abstract_algebra: Task, hendrycksTest-anatomy: Task}
     """
-    return {f"mmlux-{sub}_{lang.lower()}": create_task(sub, lang)
+    return {f"mmlux_{lang.lower()}-{sub}": create_task(sub, lang)
             for sub in SUBJECTS for lang in LANGS}
 
 

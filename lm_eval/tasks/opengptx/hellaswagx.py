@@ -26,7 +26,7 @@ _CITATION = """
 }
 """
 
-LANGS = ["BG","DA","DE","ET","FI","FR","EL","IT","LV","LT","NL","PL","PT-PT","RO","SV","SK","SL","ES","CS","HU"]
+LANGS = ['DE', 'FR', 'IT', 'ES']
 
 def construct_all_tasks():
     return {f"hellaswagx_{lang.lower()}":construct_task(lang) for lang in LANGS}
