@@ -48,8 +48,8 @@ _CITATION = """
 LANGS = ["BG","DA","DE","ET","FI","FR","EL","IT","LV","LT","NL","PL","PT-PT","RO","SV","SK","SL","ES","CS","HU"]
 
 def construct_all_tasks():
-    mc = {f"truthfulqax-mc_{l.lower()}":construct_mc_task(l) for l in LANGS}
-    gen = {f"truthfulqax-gen_{l.lower()}":construct_gen_task(l) for l in LANGS}
+    mc = {f"truthfulqax_mc_{l.lower()}":construct_mc_task(l) for l in LANGS}
+    gen = {f"truthfulqax_gen_{l.lower()}":construct_gen_task(l) for l in LANGS}
     return mc|gen
 
 def construct_mc_task(lang):
@@ -60,7 +60,7 @@ def construct_mc_task(lang):
 
 def construct_gen_task(lang):
     class gentask(TruthfulQAGeneration):
-        def __init__(self,lang):
+        def __init__(self):
             super().__init__(lang)
     
     return gentask

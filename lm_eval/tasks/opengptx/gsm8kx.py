@@ -35,7 +35,7 @@ _CITATION = """
 LANGS = ['DE', 'FR', 'IT', 'ES']
 
 def construct_all_tasks():
-    return {f"gsm8kx_{lang}":construct_task(lang) for lang in LANGS}
+    return {f"gsm8kx_{lang.lower()}":construct_task(lang) for lang in LANGS}
 
 def construct_task(lang):
     class task(GradeSchoolMath8K):
