@@ -45,25 +45,50 @@ _CITATION = """
     primaryClass={cs.CL}
 }
 """
-LANGS = ["BG","DA","DE","ET","FI","FR","EL","IT","LV","LT","NL","PL","PT-PT","RO","SV","SK","SL","ES","CS","HU"]
+LANGS = [
+    "BG",
+    "DA",
+    "DE",
+    "ET",
+    "FI",
+    "FR",
+    "EL",
+    "IT",
+    "LV",
+    "LT",
+    "NL",
+    "PL",
+    "PT-PT",
+    "RO",
+    "SV",
+    "SK",
+    "SL",
+    "ES",
+    "CS",
+    "HU",
+]
+
 
 def construct_all_tasks():
-    mc = {f"truthfulqax_mc_{l.lower()}":construct_mc_task(l) for l in LANGS}
-    gen = {f"truthfulqax_gen_{l.lower()}":construct_gen_task(l) for l in LANGS}
-    return mc|gen
+    mc = {f"truthfulqax_mc_{l.lower()}": construct_mc_task(l) for l in LANGS}
+    gen = {f"truthfulqax_gen_{l.lower()}": construct_gen_task(l) for l in LANGS}
+    return mc | gen
+
 
 def construct_mc_task(lang):
     class mctask(TruthfulQAMultipleChoice):
-        DATASET_NAME=f"mc_{lang}"
+        DATASET_NAME = f"mc_{lang}"
 
     return mctask
+
 
 def construct_gen_task(lang):
     class gentask(TruthfulQAGeneration):
         def __init__(self):
             super().__init__(lang)
-    
+
     return gentask
+
 
 # The default QA preset prompt for all models.
 QA_PROMPT = (

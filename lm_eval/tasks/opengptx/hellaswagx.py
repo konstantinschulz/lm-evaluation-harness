@@ -26,16 +26,19 @@ _CITATION = """
 }
 """
 
-LANGS = ['DE', 'FR', 'IT', 'ES']
+LANGS = ["DE", "FR", "IT", "ES"]
+
 
 def construct_all_tasks():
-    return {f"hellaswagx_{lang.lower()}":construct_task(lang) for lang in LANGS}
+    return {f"hellaswagx_{lang.lower()}": construct_task(lang) for lang in LANGS}
+
 
 def construct_task(lang):
     class task(HellaSwag):
-        DATASET_NAME=lang
-    
+        DATASET_NAME = lang
+
     return task
+
 
 class HellaSwag(MultipleChoiceTask):
     VERSION = 0

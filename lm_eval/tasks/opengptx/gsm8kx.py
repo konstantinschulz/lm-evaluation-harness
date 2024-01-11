@@ -32,16 +32,19 @@ _CITATION = """
 }
 """
 
-LANGS = ['DE', 'FR', 'IT', 'ES']
+LANGS = ["DE", "FR", "IT", "ES"]
+
 
 def construct_all_tasks():
-    return {f"gsm8kx_{lang.lower()}":construct_task(lang) for lang in LANGS}
+    return {f"gsm8kx_{lang.lower()}": construct_task(lang) for lang in LANGS}
+
 
 def construct_task(lang):
     class task(GradeSchoolMath8K):
         DATASET_NAME = lang
-    
+
     return task
+
 
 ANS_RE = re.compile(r"#### (\-?[0-9\.\,]+)")
 INVALID_ANS = "[invalid]"
@@ -50,7 +53,7 @@ INVALID_ANS = "[invalid]"
 class GradeSchoolMath8K(Task):
     VERSION = 0
     DATASET_PATH = "openGPT-x/gsm8kx"
-    
+
     def has_training_docs(self):
         return True
 
