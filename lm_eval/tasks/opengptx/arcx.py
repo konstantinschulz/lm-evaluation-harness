@@ -24,24 +24,51 @@ _CITATION = """
   volume={abs/1803.05457}
 }
 """
-LANGS = ["BG","DA","DE","ET","FI","FR","EL","IT","LV","LT","NL","PL","PT-PT","RO","SV","SK","SL","ES","CS","HU"]
+LANGS = [
+    "BG",
+    "DA",
+    "DE",
+    "ET",
+    "FI",
+    "FR",
+    "EL",
+    "IT",
+    "LV",
+    "LT",
+    "NL",
+    "PL",
+    "PT-PT",
+    "RO",
+    "SV",
+    "SK",
+    "SL",
+    "ES",
+    "CS",
+    "HU",
+]
+
 
 def construct_task(lang: str, split: str):
     class ARC(ARCBase):
         def __init__(self, *args, **kwargs):
             self.DATASET_NAME = f"{split}_{lang.upper()}"
             super().__init__(*args, **kwargs)
+
     return ARC
-    
+
+
 def construct_all_tasks():
-    return {f"arcx_{s}_{l.lower()}": construct_task(l,s)
-            for l in LANGS for s in ["easy","challenge"]}
+    return {
+        f"arcx_{s}_{l.lower()}": construct_task(l, s)
+        for l in LANGS
+        for s in ["easy", "challenge"]
+    }
 
 
 class ARCBase(MultipleChoiceTask):
     VERSION = 0
     DATASET_PATH = "openGPT-x/arcx"
-    NUM_FEW_SHOT=25
+    NUM_FEW_SHOT = 25
 
     def has_training_docs(self):
         return True
@@ -87,11 +114,12 @@ class ARCBase(MultipleChoiceTask):
 
 
 class ARCChallenge(ARCBase):
-    def __init__(self, lang:str, **kwargs):
+    def __init__(self, lang: str, **kwargs):
         self.DATASET_NAME = f"challenge_{lang.upper()}"
         super().__init__(**kwargs)
 
+
 class ARCEasy(ARCBase):
-    def __init__(self, lang:str, **kwargs):
+    def __init__(self, lang: str, **kwargs):
         self.DATASET_NAME = f"easy_{lang.upper()}"
         super().__init__(**kwargs)
