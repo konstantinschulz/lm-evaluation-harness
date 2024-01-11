@@ -1,6 +1,7 @@
 # OpenGPT-X tasks
 from . import flores200
 from . import arcx
+from . import arcx
 from . import german_europarl_ppl
 from . import german_ler_ppl
 from . import germanquad
