@@ -60,9 +60,7 @@ class FloresBase(Task):
             language description, as well as the few shot examples, and the question
             part of the document for `doc`.
         """
-        return [
-            rf.loglikelihood_rolling(ctx)
-        ]
+        return [rf.loglikelihood_rolling(ctx)]
 
     def process_results(self, doc, results):
         ll = results[0]
@@ -94,7 +92,7 @@ class FloresBase(Task):
         }
 
     def __str__(self):
-        return f"Flores200 Perplexity Task for {self.language}" 
+        return f"Flores200 Perplexity Task for {self.language}"
 
 
 def create_ppl_task(lang, version=0):
@@ -108,9 +106,7 @@ def create_ppl_task(lang, version=0):
 
 
 def construct_lang_tasks():
-    return {
-        f"flores200-lang-{lang}": create_ppl_task(lang) for lang in _LANGUAGES
-    }
+    return {f"flores200-lang-{lang}": create_ppl_task(lang) for lang in _LANGUAGES}
 
 
 class FloresTranslationTask(Task):
@@ -227,7 +223,8 @@ def construct_trans_tasks():
         for src, tgt in permutations(_LANGUAGES, 2)
     }
 
-_LANGUAGES=[
+
+_LANGUAGES = [
     # "ace_Arab",
     # "ace_Latn",
     # "acm_Arab",
