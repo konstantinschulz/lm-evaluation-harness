@@ -32,7 +32,28 @@ _CITATION = """
 }
 """
 
-LANGS = ["DE", "FR", "IT", "ES"]
+LANGS = [
+    "BG",
+    "DA",
+    "DE",
+    "ET",
+    "FI",
+    "FR",
+    "EL",
+    "IT",
+    "LV",
+    "LT",
+    "NL",
+    "PL",
+    "PT-PT",
+    "RO",
+    "SV",
+    "SK",
+    "SL",
+    "ES",
+    "CS",
+    "HU",
+]
 
 
 def construct_all_tasks():
@@ -52,7 +73,7 @@ INVALID_ANS = "[invalid]"
 
 class GradeSchoolMath8K(Task):
     VERSION = 0
-    DATASET_PATH = "openGPT-x/gsm8kx"
+    DATASET_PATH = "openGPT-X/gsm8kx"
 
     def has_training_docs(self):
         return True

@@ -67,7 +67,7 @@ def construct_all_tasks():
 
 class ARCBase(MultipleChoiceTask):
     VERSION = 0
-    DATASET_PATH = "openGPT-x/arcx"
+    DATASET_PATH = "openGPT-X/arcx"
     NUM_FEW_SHOT = 25
 
     def has_training_docs(self):

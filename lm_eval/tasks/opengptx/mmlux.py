@@ -24,7 +24,28 @@ _CITATION = """
 }
 """
 
-LANGS = ["DE", "FR", "IT", "ES"]
+LANGS = [
+    "BG",
+    "DA",
+    "DE",
+    "ET",
+    "FI",
+    "FR",
+    "EL",
+    "IT",
+    "LV",
+    "LT",
+    "NL",
+    "PL",
+    "PT-PT",
+    "RO",
+    "SV",
+    "SK",
+    "SL",
+    "ES",
+    "CS",
+    "HU",
+]
 
 SUBJECTS = [
     "abstract_algebra",
@@ -109,7 +130,7 @@ def create_task(subject, lang):
 
 class GeneralHendrycksTest(MultipleChoiceTask):
     VERSION = 0
-    DATASET_PATH = "openGPT-x/mmlux"
+    DATASET_PATH = "openGPT-X/mmlux"
     DATASET_NAME = None
 
     def __init__(self, subject, lang):

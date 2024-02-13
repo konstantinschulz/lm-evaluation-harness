@@ -108,8 +108,8 @@ QA_PROMPT = (
 
 
 class TruthfulQAMultipleChoice(Task):
-    VERSION = 0.1
-    DATASET_PATH = "openGPT-x/truthfulqax"
+    VERSION = 0
+    DATASET_PATH = "openGPT-X/truthfulqax"
 
     def has_training_docs(self):
         return False

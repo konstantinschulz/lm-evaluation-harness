@@ -42,7 +42,7 @@ def construct_task(lang):
 
 class HellaSwag(MultipleChoiceTask):
     VERSION = 0
-    DATASET_PATH = "openGPT-x/hellaswagx"
+    DATASET_PATH = "openGPT-X/hellaswagx"
 
     def has_training_docs(self):
         return True
