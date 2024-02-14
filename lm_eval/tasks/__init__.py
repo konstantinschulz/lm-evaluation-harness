@@ -70,13 +70,9 @@ from .mlmm import multilingual_mmlu
 from .mlmm import multilingual_truthfulqa
 
 from . import crowspairsde
-
-
-
 ########################################
 # Translation tasks
 ########################################
-
 # 6 total
 gpt3_translation_benchmarks = {
     "wmt14": ["en-fr", "fr-en"],  # French
