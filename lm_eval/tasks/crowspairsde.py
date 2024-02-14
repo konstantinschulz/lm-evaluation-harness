@@ -49,6 +49,7 @@ class CrowsPairsDE(Task):
         self.biased_answers = 0
         self.final_accuracy = None
         self.bias_disambiguate = None
+
     def has_training_docs(self):
         return True
 
