@@ -26,7 +26,7 @@ Crowdsources Stereotype Pairs benchmark (CrowS-Pairs). CrowS-Pairs has 1508 exam
 with nine types of bias, like race, religion, and age. In CrowS-Pairs a model is presented with two sentences: one 
 that is more stereotyping and another that is less stereotyping. The data focuses on stereotypes about historically 
 disadvantaged groups and contrasts them with advantaged groups. We find that all three of the widely-used MLMs we 
-evaluate substantially favor sentences that express stereotypes in every category in CrowS-Pairs. As work on building 
+evaluate substantially favor sentences that express stereotypes in every category in CrowS-Pairs. As work on building
 less biased models advances, this dataset can be used as a benchmark to evaluate progress.", } """
 
 
