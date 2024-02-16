@@ -13,21 +13,24 @@ Homepage: https://github.com/nyu-mll/crows-pairs
 from lm_eval.base import rf, Task
 from lm_eval.metrics import mean
 
-_CITATION = """@inproceedings{nangia-etal-2020-crows, title = "{C}row{S}-Pairs: A Challenge Dataset for Measuring 
-Social Biases in Masked Language Models", author = "Nangia, Nikita  and Vania, Clara  and Bhalerao, Rasika  and 
-Bowman, Samuel R.", booktitle = "Proceedings of the 2020 Conference on Empirical Methods in Natural Language 
-Processing (EMNLP)", month = nov, year = "2020", address = "Online", publisher = "Association for Computational 
-Linguistics", url = "https://aclanthology.org/2020.emnlp-main.154", doi = "10.18653/v1/2020.emnlp-main.154", 
-pages = "1953--1967", abstract = "Pretrained language models, especially masked language models (MLMs) have seen 
-success across many NLP tasks. However, there is ample evidence that they use the cultural biases that are 
-undoubtedly present in the corpora they are trained on, implicitly creating harm with biased representations. To 
-measure some forms of social bias in language models against protected demographic groups in the US, we introduce the 
-Crowdsources Stereotype Pairs benchmark (CrowS-Pairs). CrowS-Pairs has 1508 examples that cover stereotypes dealing 
-with nine types of bias, like race, religion, and age. In CrowS-Pairs a model is presented with two sentences: one 
-that is more stereotyping and another that is less stereotyping. The data focuses on stereotypes about historically 
-disadvantaged groups and contrasts them with advantaged groups. We find that all three of the widely-used MLMs we 
-evaluate substantially favor sentences that express stereotypes in every category in CrowS-Pairs. As work on building 
-less biased models advances, this dataset can be used as a benchmark to evaluate progress.", } """
+_CITATION = """
+@inproceedings{nangia-etal-2020-crows,
+    title = "{C}row{S}-Pairs: A Challenge Dataset for Measuring Social Biases in Masked Language Models",
+    author = "Nangia, Nikita  and
+      Vania, Clara  and
+      Bhalerao, Rasika  and
+      Bowman, Samuel R.",
+    booktitle = "Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP)",
+    month = nov,
+    year = "2020",
+    address = "Online",
+    publisher = "Association for Computational Linguistics",
+    url = "https://aclanthology.org/2020.emnlp-main.154",
+    doi = "10.18653/v1/2020.emnlp-main.154",
+    pages = "1953--1967",
+    abstract = "Pretrained language models, especially masked language models (MLMs) have seen success across many NLP tasks. However, there is ample evidence that they use the cultural biases that are undoubtedly present in the corpora they are trained on, implicitly creating harm with biased representations. To measure some forms of social bias in language models against protected demographic groups in the US, we introduce the Crowdsourced Stereotype Pairs benchmark (CrowS-Pairs). CrowS-Pairs has 1508 examples that cover stereotypes dealing with nine types of bias, like race, religion, and age. In CrowS-Pairs a model is presented with two sentences: one that is more stereotyping and another that is less stereotyping. The data focuses on stereotypes about historically disadvantaged groups and contrasts them with advantaged groups. We find that all three of the widely-used MLMs we evaluate substantially favor sentences that express stereotypes in every category in CrowS-Pairs. As work on building less biased models advances, this dataset can be used as a benchmark to evaluate progress.",
+}
+"""
 
 
 class CrowsPairsDE(Task):
