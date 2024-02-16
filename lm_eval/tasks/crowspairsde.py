@@ -1,4 +1,3 @@
-
 """
 CrowS-Pairs: A Challenge Dataset for Measuring Social Biases in Masked Language Models
 https://aclanthology.org/2020.emnlp-main.154/

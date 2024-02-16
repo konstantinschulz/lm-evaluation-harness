@@ -70,6 +70,7 @@ from .mlmm import multilingual_mmlu
 from .mlmm import multilingual_truthfulqa
 
 from . import crowspairsde
+
 ########################################
 # Translation tasks
 ########################################
@@ -101,7 +102,6 @@ all_translation_benchmarks = {
 
 TASK_REGISTRY = {
     "crowspairsde": crowspairsde.CrowsPairsDE,
-
     # GLUE
     "cola": glue.CoLA,
     "mnli": glue.MNLI,
