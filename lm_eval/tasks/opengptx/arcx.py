@@ -135,15 +135,3 @@ class ARCBase(MultipleChoiceTask):
 
     def doc_to_decontamination_query(self, doc):
         return doc["query"]
-
-
-class ARCChallenge(ARCBase):
-    def __init__(self, lang: str, **kwargs):
-        self.DATASET_NAME = f"challenge_{lang.upper()}"
-        super().__init__(**kwargs)
-
-
-class ARCEasy(ARCBase):
-    def __init__(self, lang: str, **kwargs):
-        self.DATASET_NAME = f"easy_{lang.upper()}"
-        super().__init__(**kwargs)
