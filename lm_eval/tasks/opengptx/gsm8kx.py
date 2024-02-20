@@ -55,6 +55,28 @@ LANGS = [
     "HU",
 ]
 
+PROMPT_WORDS = {
+    'BG': ('Въпрос', 'Отговор'),
+    'DA': ('Spørgsmål', 'Svar'),
+    'DE': ('Frage', 'Antwort'),
+    'ET': ('Küsimus', 'Vastus'),
+    'FI': ('Kysymys', 'Vastaa'),
+    'FR': ('Question', 'Réponse'),
+    'EL': ('Ερώτηση', 'Απάντηση'),
+    'IT': ('Domanda', 'Risposta'),
+    'LV': ('Jautājums', 'Atbilde'),
+    'LT': ('Klausimas', 'Atsakymas'),
+    'NL': ('Vraag', 'Antwoord'),
+    'PL': ('Pytanie', 'Odpowiedź'),
+    'PT-PT': ('Questão', 'Resposta'),
+    'RO': ('Întrebare', 'Răspuns'),
+    'SV': ('Fråga', 'Svar'),
+    'SK': ('Otázka', 'Odpoveď'),
+    'SL': ('Vprašanje', 'Odgovor'),
+    'ES': ('Pregunta', 'Respuesta'),
+    'CS': ('Otázka', 'Odpověď'),
+    'HU': ('Kérdés', 'Válasz')
+ }
 
 def construct_all_tasks():
     return {f"gsm8kx_{lang.lower()}": construct_task(lang) for lang in LANGS}
@@ -63,6 +85,7 @@ def construct_all_tasks():
 def construct_task(lang):
     class task(GradeSchoolMath8K):
         DATASET_NAME = lang
+        QWORD, RWORD = PROMPT_WORDS.get(lang,("Question", "Answer"))
 
     return task
 
@@ -74,6 +97,7 @@ INVALID_ANS = "[invalid]"
 class GradeSchoolMath8K(Task):
     VERSION = 0
     DATASET_PATH = "openGPT-X/gsm8kx"
+    QWORD, RWORD = None, None
 
     def has_training_docs(self):
         return True
@@ -94,7 +118,7 @@ class GradeSchoolMath8K(Task):
         return self.dataset["test"]
 
     def doc_to_text(self, doc):
-        return "Question: " + doc["question"] + "\nAnswer:"
+        return self.QWORD + ": " + doc["question"] + f"\n{self.RWORD}:"
 
     def doc_to_target(self, doc):
         return " " + doc["answer"]
@@ -112,7 +136,7 @@ class GradeSchoolMath8K(Task):
         """
         # NOTE: The paper implements "verifiers" that assign a score to multiple
         # solutions and output the highest ranked solution.
-        completion = rf.greedy_until(ctx, {"until": [":", "Question:", "Question"]})
+        completion = rf.greedy_until(ctx, {"until": [":", f"{self.QWORD}:", f"{self.QWORD}"]})
         return completion
 
     def _extract_answer(self, completion):

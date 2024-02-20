@@ -47,13 +47,34 @@ LANGS = [
     "HU",
 ]
 
+PROMPT_WORDS = {
+    'BG': ('Въпрос', 'Отговор'),
+    'DA': ('Spørgsmål', 'Svar'),
+    'DE': ('Frage', 'Antwort'),
+    'ET': ('Küsimus', 'Vastus'),
+    'FI': ('Kysymys', 'Vastaa'),
+    'FR': ('Question', 'Réponse'),
+    'EL': ('Ερώτηση', 'Απάντηση'),
+    'IT': ('Domanda', 'Risposta'),
+    'LV': ('Jautājums', 'Atbilde'),
+    'LT': ('Klausimas', 'Atsakymas'),
+    'NL': ('Vraag', 'Antwoord'),
+    'PL': ('Pytanie', 'Odpowiedź'),
+    'PT-PT': ('Questão', 'Resposta'),
+    'RO': ('Întrebare', 'Răspuns'),
+    'SV': ('Fråga', 'Svar'),
+    'SK': ('Otázka', 'Odpoveď'),
+    'SL': ('Vprašanje', 'Odgovor'),
+    'ES': ('Pregunta', 'Respuesta'),
+    'CS': ('Otázka', 'Odpověď'),
+    'HU': ('Kérdés', 'Válasz')
+ }
+
 
 def construct_task(lang: str, split: str):
     class ARC(ARCBase):
-        def __init__(self, *args, **kwargs):
-            self.DATASET_NAME = f"{split}_{lang.upper()}"
-            super().__init__(*args, **kwargs)
-
+        QWORD, RWORD = PROMPT_WORDS.get(lang,("Question", "Answer"))
+        DATASET_NAME = f"{split}_{lang}"
     return ARC
 
 
@@ -68,7 +89,9 @@ def construct_all_tasks():
 class ARCBase(MultipleChoiceTask):
     VERSION = 0
     DATASET_PATH = "openGPT-X/arcx"
+    DATASET_NAME = None
     NUM_FEW_SHOT = 25
+    QWORD, RWORD = None, None
 
     def has_training_docs(self):
         return True
@@ -97,7 +120,7 @@ class ARCBase(MultipleChoiceTask):
         doc["answerKey"] = num_to_letter.get(doc["answerKey"], doc["answerKey"])
         out_doc = {
             "id": doc["id"],
-            "query": "Question: " + doc["question"] + "\nAnswer:",
+            "query": self.QWORD + ": " + doc["question"] + f"\n{self.RWORD}:",
             "choices": doc["choices"]["text"],
             "gold": ["A", "B", "C", "D", "E"].index(doc["answerKey"]),
         }
