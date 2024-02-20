@@ -108,27 +108,28 @@ SUBJECTS = [
 ]
 
 PROMPT_WORDS = {
-    'BG': ('Въпрос', 'Избори', 'Отговор'),
-    'DA': ('Spørgsmål', 'Valgmuligheder', 'Svar'),
-    'DE': ('Frage', 'Auswahlmöglichkeiten', 'Antwort'),
-    'ET': ('Küsimus', 'Valikud', 'Vastus'),
-    'FI': ('Kysymys', 'Valinnat', 'Vastaa'),
-    'FR': ('Question', 'Choix', 'Réponse'),
-    'EL': ('Ερώτηση', 'Επιλογές', 'Απάντηση'),
-    'IT': ('Domanda', 'Scelte', 'Risposta'),
-    'LV': ('Jautājums', 'Izvēle', 'Atbilde'),
-    'LT': ('Klausimas', 'Pasirinkimai', 'Atsakymas'),
-    'NL': ('Vraag', 'Keuzes', 'Antwoord'),
-    'PL': ('Pytanie', 'Wybory', 'Odpowiedź'),
-    'PT-PT': ('Questão', 'Escolhas', 'Resposta'),
-    'RO': ('Întrebare', 'Alegeri', 'Răspuns'),
-    'SV': ('Fråga', 'Valmöjligheter', 'Svar'),
-    'SK': ('Otázka', 'Voľby', 'Odpoveď'),
-    'SL': ('Vprašanje', 'Izbira', 'Odgovor'),
-    'ES': ('Pregunta', 'Opciones', 'Respuesta'),
-    'CS': ('Otázka', 'Volby', 'Odpověď'),
-    'HU': ('Kérdés', 'Választások', 'Válasz')
- }
+    "BG": ("Въпрос", "Избори", "Отговор"),
+    "DA": ("Spørgsmål", "Valgmuligheder", "Svar"),
+    "DE": ("Frage", "Auswahlmöglichkeiten", "Antwort"),
+    "ET": ("Küsimus", "Valikud", "Vastus"),
+    "FI": ("Kysymys", "Valinnat", "Vastaa"),
+    "FR": ("Question", "Choix", "Réponse"),
+    "EL": ("Ερώτηση", "Επιλογές", "Απάντηση"),
+    "IT": ("Domanda", "Scelte", "Risposta"),
+    "LV": ("Jautājums", "Izvēle", "Atbilde"),
+    "LT": ("Klausimas", "Pasirinkimai", "Atsakymas"),
+    "NL": ("Vraag", "Keuzes", "Antwoord"),
+    "PL": ("Pytanie", "Wybory", "Odpowiedź"),
+    "PT-PT": ("Questão", "Escolhas", "Resposta"),
+    "RO": ("Întrebare", "Alegeri", "Răspuns"),
+    "SV": ("Fråga", "Valmöjligheter", "Svar"),
+    "SK": ("Otázka", "Voľby", "Odpoveď"),
+    "SL": ("Vprašanje", "Izbira", "Odgovor"),
+    "ES": ("Pregunta", "Opciones", "Respuesta"),
+    "CS": ("Otázka", "Volby", "Odpověď"),
+    "HU": ("Kérdés", "Választások", "Válasz"),
+}
+
 
 def create_all_tasks():
     """Creates a dictionary of tasks from a list of subjects
@@ -143,7 +144,8 @@ def create_all_tasks():
 
 
 def create_task(subject, lang):
-    words = PROMPT_WORDS.get(lang,("Question", "Choices", "Answer"))
+    words = PROMPT_WORDS.get(lang, ("Question", "Choices", "Answer"))
+
     class HendrycksTest(GeneralHendrycksTest):
         def __init__(self):
             super().__init__(subject, lang, words)

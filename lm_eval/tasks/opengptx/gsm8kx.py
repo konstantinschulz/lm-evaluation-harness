@@ -56,27 +56,28 @@ LANGS = [
 ]
 
 PROMPT_WORDS = {
-    'BG': ('Въпрос', 'Отговор'),
-    'DA': ('Spørgsmål', 'Svar'),
-    'DE': ('Frage', 'Antwort'),
-    'ET': ('Küsimus', 'Vastus'),
-    'FI': ('Kysymys', 'Vastaa'),
-    'FR': ('Question', 'Réponse'),
-    'EL': ('Ερώτηση', 'Απάντηση'),
-    'IT': ('Domanda', 'Risposta'),
-    'LV': ('Jautājums', 'Atbilde'),
-    'LT': ('Klausimas', 'Atsakymas'),
-    'NL': ('Vraag', 'Antwoord'),
-    'PL': ('Pytanie', 'Odpowiedź'),
-    'PT-PT': ('Questão', 'Resposta'),
-    'RO': ('Întrebare', 'Răspuns'),
-    'SV': ('Fråga', 'Svar'),
-    'SK': ('Otázka', 'Odpoveď'),
-    'SL': ('Vprašanje', 'Odgovor'),
-    'ES': ('Pregunta', 'Respuesta'),
-    'CS': ('Otázka', 'Odpověď'),
-    'HU': ('Kérdés', 'Válasz')
- }
+    "BG": ("Въпрос", "Отговор"),
+    "DA": ("Spørgsmål", "Svar"),
+    "DE": ("Frage", "Antwort"),
+    "ET": ("Küsimus", "Vastus"),
+    "FI": ("Kysymys", "Vastaa"),
+    "FR": ("Question", "Réponse"),
+    "EL": ("Ερώτηση", "Απάντηση"),
+    "IT": ("Domanda", "Risposta"),
+    "LV": ("Jautājums", "Atbilde"),
+    "LT": ("Klausimas", "Atsakymas"),
+    "NL": ("Vraag", "Antwoord"),
+    "PL": ("Pytanie", "Odpowiedź"),
+    "PT-PT": ("Questão", "Resposta"),
+    "RO": ("Întrebare", "Răspuns"),
+    "SV": ("Fråga", "Svar"),
+    "SK": ("Otázka", "Odpoveď"),
+    "SL": ("Vprašanje", "Odgovor"),
+    "ES": ("Pregunta", "Respuesta"),
+    "CS": ("Otázka", "Odpověď"),
+    "HU": ("Kérdés", "Válasz"),
+}
+
 
 def construct_all_tasks():
     return {f"gsm8kx_{lang.lower()}": construct_task(lang) for lang in LANGS}
@@ -85,7 +86,7 @@ def construct_all_tasks():
 def construct_task(lang):
     class task(GradeSchoolMath8K):
         DATASET_NAME = lang
-        QWORD, RWORD = PROMPT_WORDS.get(lang,("Question", "Answer"))
+        QWORD, RWORD = PROMPT_WORDS.get(lang, ("Question", "Answer"))
 
     return task
 
@@ -136,7 +137,9 @@ class GradeSchoolMath8K(Task):
         """
         # NOTE: The paper implements "verifiers" that assign a score to multiple
         # solutions and output the highest ranked solution.
-        completion = rf.greedy_until(ctx, {"until": [":", f"{self.QWORD}:", f"{self.QWORD}"]})
+        completion = rf.greedy_until(
+            ctx, {"until": [":", f"{self.QWORD}:", f"{self.QWORD}"]}
+        )
         return completion
 
     def _extract_answer(self, completion):

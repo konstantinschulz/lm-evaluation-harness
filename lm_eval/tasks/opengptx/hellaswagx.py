@@ -26,7 +26,28 @@ _CITATION = """
 }
 """
 
-LANGS = ["BG","DA","DE","ET","FI","FR","EL","IT","LV","LT","NL","PL","PT-PT","RO","SV","SK","SL","ES","CS","HU"]
+LANGS = [
+    "BG",
+    "DA",
+    "DE",
+    "ET",
+    "FI",
+    "FR",
+    "EL",
+    "IT",
+    "LV",
+    "LT",
+    "NL",
+    "PL",
+    "PT-PT",
+    "RO",
+    "SV",
+    "SK",
+    "SL",
+    "ES",
+    "CS",
+    "HU",
+]
 
 
 def construct_all_tasks():

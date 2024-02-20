@@ -48,33 +48,34 @@ LANGS = [
 ]
 
 PROMPT_WORDS = {
-    'BG': ('Въпрос', 'Отговор'),
-    'DA': ('Spørgsmål', 'Svar'),
-    'DE': ('Frage', 'Antwort'),
-    'ET': ('Küsimus', 'Vastus'),
-    'FI': ('Kysymys', 'Vastaa'),
-    'FR': ('Question', 'Réponse'),
-    'EL': ('Ερώτηση', 'Απάντηση'),
-    'IT': ('Domanda', 'Risposta'),
-    'LV': ('Jautājums', 'Atbilde'),
-    'LT': ('Klausimas', 'Atsakymas'),
-    'NL': ('Vraag', 'Antwoord'),
-    'PL': ('Pytanie', 'Odpowiedź'),
-    'PT-PT': ('Questão', 'Resposta'),
-    'RO': ('Întrebare', 'Răspuns'),
-    'SV': ('Fråga', 'Svar'),
-    'SK': ('Otázka', 'Odpoveď'),
-    'SL': ('Vprašanje', 'Odgovor'),
-    'ES': ('Pregunta', 'Respuesta'),
-    'CS': ('Otázka', 'Odpověď'),
-    'HU': ('Kérdés', 'Válasz')
- }
+    "BG": ("Въпрос", "Отговор"),
+    "DA": ("Spørgsmål", "Svar"),
+    "DE": ("Frage", "Antwort"),
+    "ET": ("Küsimus", "Vastus"),
+    "FI": ("Kysymys", "Vastaa"),
+    "FR": ("Question", "Réponse"),
+    "EL": ("Ερώτηση", "Απάντηση"),
+    "IT": ("Domanda", "Risposta"),
+    "LV": ("Jautājums", "Atbilde"),
+    "LT": ("Klausimas", "Atsakymas"),
+    "NL": ("Vraag", "Antwoord"),
+    "PL": ("Pytanie", "Odpowiedź"),
+    "PT-PT": ("Questão", "Resposta"),
+    "RO": ("Întrebare", "Răspuns"),
+    "SV": ("Fråga", "Svar"),
+    "SK": ("Otázka", "Odpoveď"),
+    "SL": ("Vprašanje", "Odgovor"),
+    "ES": ("Pregunta", "Respuesta"),
+    "CS": ("Otázka", "Odpověď"),
+    "HU": ("Kérdés", "Válasz"),
+}
 
 
 def construct_task(lang: str, split: str):
     class ARC(ARCBase):
-        QWORD, RWORD = PROMPT_WORDS.get(lang,("Question", "Answer"))
+        QWORD, RWORD = PROMPT_WORDS.get(lang, ("Question", "Answer"))
         DATASET_NAME = f"{split}_{lang}"
+
     return ARC
 
 
