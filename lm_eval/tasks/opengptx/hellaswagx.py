@@ -26,7 +26,28 @@ _CITATION = """
 }
 """
 
-LANGS = ["DE", "FR", "IT", "ES"]
+LANGS = [
+    "BG",
+    "DA",
+    "DE",
+    "ET",
+    "FI",
+    "FR",
+    "EL",
+    "IT",
+    "LV",
+    "LT",
+    "NL",
+    "PL",
+    "PT-PT",
+    "RO",
+    "SV",
+    "SK",
+    "SL",
+    "ES",
+    "CS",
+    "HU",
+]
 
 
 def construct_all_tasks():
@@ -42,7 +63,7 @@ def construct_task(lang):
 
 class HellaSwag(MultipleChoiceTask):
     VERSION = 0
-    DATASET_PATH = "openGPT-x/hellaswagx"
+    DATASET_PATH = "openGPT-X/hellaswagx"
 
     def has_training_docs(self):
         return True

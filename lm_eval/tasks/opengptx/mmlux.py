@@ -24,7 +24,28 @@ _CITATION = """
 }
 """
 
-LANGS = ["DE", "FR", "IT", "ES"]
+LANGS = [
+    "BG",
+    "DA",
+    "DE",
+    "ET",
+    "FI",
+    "FR",
+    "EL",
+    "IT",
+    "LV",
+    "LT",
+    "NL",
+    "PL",
+    "PT-PT",
+    "RO",
+    "SV",
+    "SK",
+    "SL",
+    "ES",
+    "CS",
+    "HU",
+]
 
 SUBJECTS = [
     "abstract_algebra",
@@ -86,6 +107,29 @@ SUBJECTS = [
     "world_religions",
 ]
 
+PROMPT_WORDS = {
+    "BG": ("Въпрос", "Избори", "Отговор"),
+    "DA": ("Spørgsmål", "Valgmuligheder", "Svar"),
+    "DE": ("Frage", "Auswahlmöglichkeiten", "Antwort"),
+    "ET": ("Küsimus", "Valikud", "Vastus"),
+    "FI": ("Kysymys", "Valinnat", "Vastaa"),
+    "FR": ("Question", "Choix", "Réponse"),
+    "EL": ("Ερώτηση", "Επιλογές", "Απάντηση"),
+    "IT": ("Domanda", "Scelte", "Risposta"),
+    "LV": ("Jautājums", "Izvēle", "Atbilde"),
+    "LT": ("Klausimas", "Pasirinkimai", "Atsakymas"),
+    "NL": ("Vraag", "Keuzes", "Antwoord"),
+    "PL": ("Pytanie", "Wybory", "Odpowiedź"),
+    "PT-PT": ("Questão", "Escolhas", "Resposta"),
+    "RO": ("Întrebare", "Alegeri", "Răspuns"),
+    "SV": ("Fråga", "Valmöjligheter", "Svar"),
+    "SK": ("Otázka", "Voľby", "Odpoveď"),
+    "SL": ("Vprašanje", "Izbira", "Odgovor"),
+    "ES": ("Pregunta", "Opciones", "Respuesta"),
+    "CS": ("Otázka", "Volby", "Odpověď"),
+    "HU": ("Kérdés", "Választások", "Válasz"),
+}
+
 
 def create_all_tasks():
     """Creates a dictionary of tasks from a list of subjects
@@ -100,20 +144,23 @@ def create_all_tasks():
 
 
 def create_task(subject, lang):
+    words = PROMPT_WORDS.get(lang, ("Question", "Choices", "Answer"))
+
     class HendrycksTest(GeneralHendrycksTest):
         def __init__(self):
-            super().__init__(subject, lang)
+            super().__init__(subject, lang, words)
 
     return HendrycksTest
 
 
 class GeneralHendrycksTest(MultipleChoiceTask):
     VERSION = 0
-    DATASET_PATH = "openGPT-x/mmlux"
+    DATASET_PATH = "openGPT-X/mmlux"
     DATASET_NAME = None
 
-    def __init__(self, subject, lang):
+    def __init__(self, subject, lang, words):
         self.DATASET_NAME = f"{subject}_{lang}"
+        self.QWORD, self.CWORD, self.RWORD = words
         super().__init__()
 
     def has_training_docs(self):
@@ -142,11 +189,11 @@ class GeneralHendrycksTest(MultipleChoiceTask):
             D. <choice4>
             Answer:
             """
-            prompt = "Question: " + doc["question"] + "\nChoices:\n"
+            prompt = f"{self.QWORD}: " + doc["question"] + f"\n{self.CWORD}:\n"
             prompt += "".join(
                 [f"{key}. {choice}\n" for key, choice in zip(keys, doc["choices"])]
             )
-            prompt += "Answer:"
+            prompt += f"{self.RWORD}:"
             return prompt
 
         keys = ["A", "B", "C", "D"]
