@@ -72,6 +72,8 @@ from .mlmm import multilingual_truthfulqa
 from . import crowspairsde
 from . import crowspairsfr
 from . import crowspairses
+from . import crowspairsit
+
 
 
 
@@ -109,6 +111,7 @@ TASK_REGISTRY = {
     "crowspairsde": crowspairsde.CrowsPairsDE,
     "crowspairsfr": crowspairsfr.CrowsPairsFR,
     "crowspairses": crowspairses.CrowsPairsES,
+    "crowspairsit": crowspairsit.CrowsPairsIT,
 
     # GLUE
     "cola": glue.CoLA,
