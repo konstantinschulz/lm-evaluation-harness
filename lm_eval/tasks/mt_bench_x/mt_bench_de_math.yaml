@@ -1,0 +1,22 @@
+task: mt_bench_de_writing
+dataset_path: "openGPT-X/mt-bench-x"
+dataset_name: "DE_writing"
+output_type: generate_until
+training_split: 'train'
+test_split: 'train'
+doc_to_text: "prompt"
+process_docs: !function utils.process_docs
+doc_to_target: ""
+generation_kwargs:
+  until: []
+  do_sample: false
+  temperature: 0.0
+  max_gen_toks: 5
+process_results: !function utils.process_results
+metric_list:
+  - metric: !function utils.gpt_4_as_a_judge
+    aggregation: mean
+    higher_is_better: true
+
+metadata:
+  version: 0.0
