@@ -69,7 +69,7 @@ from .mlmm import multilingual_hellaswag
 from .mlmm import multilingual_mmlu
 from .mlmm import multilingual_truthfulqa
 
-from . import crowspairsde
+from . import crowspairs_es
 
 ########################################
 # Translation tasks
@@ -101,8 +101,18 @@ all_translation_benchmarks = {
 
 
 TASK_REGISTRY = {
-    "crowspairsde": crowspairsde.CrowsPairsDE,
-    # GLUE
+    #CrowsPairs
+    "crows_pairs_spanish": crowspairs_es.CrowsPairsSpanish,
+    "crows_pairs_spanish_race_color": crowspairs_es.CrowsPairsSpanishRaceColor,
+    "crows_pairs_spanish_socioeconomic": crowspairs_es.CrowsPairsSpanishSocioeconomic,
+    "crows_pairs_spanish_gender": crowspairs_es.CrowsPairsSpanishGender,
+    "crows_pairs_spanish_age": crowspairs_es.CrowsPairsSpanishAge,
+    "crows_pairs_spanish_religion": crowspairs_es.CrowsPairsSpanishReligion,
+    "crows_pairs_spanish_disability": crowspairs_es.CrowsPairsSpanishDisability,
+    "crows_pairs_spanish_sexual_orientation": crowspairs_es.CrowsPairsSpanishSexualOrientation,
+    "crows_pairs_spanish_nationality": crowspairs_es.CrowsPairsSpanishNationality,
+    "crows_pairs_spanish_physical_appearance": crowspairs_es.CrowsPairsSpanishPhysicalAppearance,
+    "crows_pairs_spanish_autre": crowspairs_es.CrowsPairsSpanishAutre,    # GLUE
     "cola": glue.CoLA,
     "mnli": glue.MNLI,
     "mnli_mismatched": glue.MNLIMismatched,

@@ -33,9 +33,9 @@ _CITATION = """
 """
 
 
-class CrowsPairsDE(Task):
+class CrowsPairsES(Task):
     VERSION = 0
-    DATASET_PATH = "lamarr-org/crows_pairs_de"
+    DATASET_PATH = "openGPT-X/crows_pairs_es"
     DATASET_NAME = None
     BIAS_TYPE = None
 
@@ -50,13 +50,13 @@ class CrowsPairsDE(Task):
         self.bias_disambiguate = None
 
     def has_training_docs(self):
-        return True
+        return False
 
     def has_validation_docs(self):
         return True
 
     def has_test_docs(self):
-        return True
+        return False
 
     def training_docs(self):
         return self.dataset["train"]
@@ -71,11 +71,11 @@ class CrowsPairsDE(Task):
             return test_dataset
 
     def fewshot_context(
-        self, doc, num_fewshot, provide_description=None, rnd=None, description=None
+            self, doc, num_fewshot, provide_description=None, rnd=None, description=None
     ):
         assert num_fewshot == num_fewshot
         assert (
-            rnd is not None
+                rnd is not None
         ), "A `random.Random` generator argument must be provided to `rnd`"
         assert not provide_description, (
             "The `provide_description` arg will be removed in future versions. To prepend "
@@ -85,8 +85,7 @@ class CrowsPairsDE(Task):
         if provide_description is not None:
             # nudge people to not specify it at all
             print(
-                "WARNING: provide_description is deprecated and will be removed in a future version in favor of "
-                "description_dict "
+                "WARNING: provide_description is deprecated and will be removed in a future version in favor of description_dict"
             )
 
         return ""
@@ -137,3 +136,57 @@ class CrowsPairsDE(Task):
     def higher_is_better(self):
         # For all metrics lower is better
         return {"likelihood_difference": False, "pct_stereotype": False}
+
+
+class CrowsPairsSpanish(CrowsPairsES):
+    DATASET_NAME = "spanish"
+
+
+class CrowsPairsSpanishRaceColor(CrowsPairsES):
+    DATASET_NAME = "spanish"
+    BIAS_TYPE = "race-color"
+
+
+class CrowsPairsSpanishSocioeconomic(CrowsPairsES):
+    DATASET_NAME = "spanish"
+    BIAS_TYPE = "socioeconomic"
+
+
+class CrowsPairsSpanishGender(CrowsPairsES):
+    DATASET_NAME = "spanish"
+    BIAS_TYPE = "gender"
+
+
+class CrowsPairsSpanishAge(CrowsPairsES):
+    DATASET_NAME = "spanish"
+    BIAS_TYPE = "age"
+
+
+class CrowsPairsSpanishReligion(CrowsPairsES):
+    DATASET_NAME = "spanish"
+    BIAS_TYPE = "religion"
+
+
+class CrowsPairsSpanishDisability(CrowsPairsES):
+    DATASET_NAME = "spanish"
+    BIAS_TYPE = "disability"
+
+
+class CrowsPairsSpanishSexualOrientation(CrowsPairsES):
+    DATASET_NAME = "spanish"
+    BIAS_TYPE = "sexual-orientation"
+
+
+class CrowsPairsSpanishNationality(CrowsPairsES):
+    DATASET_NAME = "spanish"
+    BIAS_TYPE = "nationality"
+
+
+class CrowsPairsSpanishPhysicalAppearance(CrowsPairsES):
+    DATASET_NAME = "spanish"
+    BIAS_TYPE = "physical-appearance"
+
+
+class CrowsPairsSpanishAutre(CrowsPairsES):
+    DATASET_NAME = "spanish"
+    BIAS_TYPE = "autre"
