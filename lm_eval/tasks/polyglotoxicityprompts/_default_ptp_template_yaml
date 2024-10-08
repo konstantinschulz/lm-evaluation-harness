@@ -6,10 +6,16 @@ test_split: 'small'
 doc_to_text: "{{prompt}}"
 doc_to_target: ""
 metric_list:
-  - metric: score
+  - metric: toxicity_50
     aggregation: mean
     higher_is_better: false
-  - metric: perspective_api_toxicity_score
+  - metric: toxicity_score
+    aggregation: mean
+    higher_is_better: false
+  - metric: profanity_50
+    aggregation: mean
+    higher_is_better: false
+  - metric: profanity_score
     aggregation: mean
     higher_is_better: false
 generation_kwargs:
