@@ -4,6 +4,7 @@ import logging
 import os
 import re
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Union
 
@@ -229,7 +230,9 @@ def cli_evaluate(args: Union[argparse.Namespace, None] = None) -> None:
             path = path.parent
         else:
             path.mkdir(parents=True, exist_ok=True)
-            output_path_file = path.joinpath("results.json")
+            date_id = datetime.now().isoformat().replace(":", "-")
+            output_path_file = path.joinpath(f"results_{date_id}.json")
+            # output_path_file = path.joinpath("results.json")
     elif args.log_samples and not args.output_path:
         assert args.output_path, "Specify --output_path"
 

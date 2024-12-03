@@ -5,7 +5,7 @@ import collections
 import torch
 
 import numpy as np
-
+import time
 import lm_eval.api
 import lm_eval.tasks
 import lm_eval.models
@@ -74,6 +74,7 @@ def simple_evaluate(
     :return
         Dictionary of results
     """
+    start_date = time.time()
     random.seed(0)
     np.random.seed(1234)
     torch.manual_seed(
@@ -184,6 +185,7 @@ def simple_evaluate(
             "bootstrap_iters": bootstrap_iters,
             "gen_kwargs": gen_kwargs,
         }
+        results["date"] = start_date
         results["git_hash"] = get_git_commit_hash()
         return results
     else:
